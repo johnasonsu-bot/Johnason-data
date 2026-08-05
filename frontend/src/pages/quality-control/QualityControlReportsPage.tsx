@@ -300,7 +300,7 @@ export function QualityControlReportsPage() {
     if (gradeFilter === "attention" && !(report.score >= 70 && report.score < 80)) return false;
     if (gradeFilter === "risk" && !(report.score < 70)) return false;
     return true;
-  }), [reports, activeMode, activeSnapshotScope, activeComparisonType, keyword, gradeFilter, syncFilter]);
+  }), [reports, activeMode, activeSnapshotScope, activeComparisonType, keyword, gradeFilter]);
 
   const actionColumn = {
     title: "操作",
