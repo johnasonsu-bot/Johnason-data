@@ -1075,6 +1075,40 @@ async function preflightImport(connection, packagePayload) {
   };
 }
 
+async function adaptExternalStandardReferences(connection, packagePayload) {
+  const mappingTable = packagePayload.tables.find((table) => table.tableName === "std_field_mappings");
+  if (!mappingTable?.rows?.length) return packagePayload;
+
+  const sourceElementIds = [...new Set(mappingTable.rows
+    .map((row) => Number(row.element_id))
+    .filter((id) => Number.isFinite(id) && id > 0))];
+  if (sourceElementIds.length === 0) return packagePayload;
+
+  const [rows] = await connection.query(
+    `SELECT id FROM std_data_elements WHERE id IN (${sourceElementIds.map(() => "?").join(", ")})`,
+    sourceElementIds,
+  );
+  const availableIds = new Set(rows.map((row) => Number(row.id)));
+  const retainedRows = mappingTable.rows.filter((row) => availableIds.has(Number(row.element_id)));
+  const skippedCount = mappingTable.rows.length - retainedRows.length;
+  if (skippedCount === 0) return packagePayload;
+
+  const warning = `目标环境缺少项目包引用的全局标准数据元，已跳过 ${skippedCount} 条字段采标映射；其他项目资产不受影响。`;
+  return {
+    ...packagePayload,
+    tables: packagePayload.tables.map((table) => table.tableName === "std_field_mappings"
+      ? { ...table, rows: retainedRows }
+      : table),
+    manifest: {
+      ...packagePayload.manifest,
+      compatibility: {
+        ...(packagePayload.manifest?.compatibility || {}),
+        warnings: [...(packagePayload.manifest?.compatibility?.warnings || []), warning],
+      },
+    },
+  };
+}
+
 function buildRuntimeFileMap(packagePayload, targetProjectId, importId = crypto.randomUUID()) {
   return new Map((packagePayload.files || []).map((file) => {
     const extension = path.extname(file.relativePath || "").slice(0, 24);
@@ -1495,6 +1529,7 @@ async function importProject(packagePayload, options = {}, user = {}) {
   const connection = await pool.getConnection();
   let restoredRuntimePaths = [];
   try {
+    packagePayload = await adaptExternalStandardReferences(connection, packagePayload);
     const preflight = await preflightImport(connection, packagePayload);
     await connection.beginTransaction();
     if (mode === "new") {

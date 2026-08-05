@@ -17,9 +17,10 @@ const {
 const router = express.Router();
 const uploadDir = path.join(os.tmpdir(), "medata-project-assets");
 fs.mkdirSync(uploadDir, { recursive: true });
+const projectAssetUploadLimitMb = Math.max(1, Number(process.env.PROJECT_ASSET_UPLOAD_LIMIT_MB || 512));
 const upload = multer({
   dest: uploadDir,
-  limits: { fileSize: 200 * 1024 * 1024 },
+  limits: { fileSize: projectAssetUploadLimitMb * 1024 * 1024 },
 });
 
 router.use(authMiddleware);
