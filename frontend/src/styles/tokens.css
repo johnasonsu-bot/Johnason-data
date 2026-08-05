@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+
+  /* Legacy aliases. New code must use the --md-* variables from the design system. */
+  --app-color-primary: var(--md-color-primary);
+  --app-color-primary-hover: var(--md-color-primary-hover);
+  --app-color-primary-active: var(--md-color-primary-active);
+  --app-color-primary-soft: var(--md-color-primary-soft);
+  --app-color-primary-soft-hover: var(--md-color-primary-soft-hover);
+  --app-color-bg-layout: var(--md-color-canvas);
+  --app-color-bg-surface: var(--md-color-surface);
+  --app-color-bg-subtle: var(--md-color-surface-subtle);
+  --app-color-border: var(--md-color-border);
+  --app-color-border-strong: var(--md-color-border-strong);
+  --app-color-text: var(--md-color-text);
+  --app-color-text-secondary: var(--md-color-text-secondary);
+  --app-color-text-tertiary: var(--md-color-text-tertiary);
+  --app-color-success: var(--md-color-success);
+  --app-color-warning: var(--md-color-warning);
+  --app-color-error: var(--md-color-error);
+  --app-color-info: var(--md-color-info);
+  --app-shadow-card: var(--md-shadow-none);
+  --app-shadow-soft: var(--md-shadow-none);
+  --app-radius-xs: var(--md-radius-xs);
+  --app-radius-sm: var(--md-radius-sm);
+  --app-radius-md: var(--md-radius-md);
+  --app-radius-lg: var(--md-radius-lg);
+  --app-header-height: var(--md-header-height);
+  --app-sider-width: var(--md-sider-width);
+  --app-content-max-width: var(--md-content-max-width);
+  --app-space-1: var(--md-space-2);
+  --app-space-2: var(--md-space-3);
+  --app-space-3: var(--md-space-4);
+  --app-space-4: var(--md-space-8);
+  --app-font-size-xs: var(--md-font-size-xs);
+  --app-font-size-sm: var(--md-font-size-sm);
+  --app-font-size-base: var(--md-font-size-base);
+  --app-font-size-lg: var(--md-font-size-lg);
+  --app-font-size-xl: var(--md-font-size-xl);
+  --app-font-size-2xl: var(--md-font-size-2xl);
+  --app-transition-fast: var(--md-motion-fast);
+  --app-transition-base: var(--md-motion-base);
+}

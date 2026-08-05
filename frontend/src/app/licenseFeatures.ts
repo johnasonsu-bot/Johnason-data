@@ -1,0 +1,1 @@
+export const CORE_LICENSE_FEATURES:string[]=[];export const ACTIVATION_FREE_LICENSE_FEATURES:string[]=[];export const MODULE_LICENSE_FEATURES:string[]=[];export function normalizeLicenseFeatures(..._args:unknown[]){return ['all'];}export function hasLicensedFeature(..._args:unknown[]){return true;}export function hasAnyLicensedFeature(..._args:unknown[]){return true;}

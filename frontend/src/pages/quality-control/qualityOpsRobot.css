@@ -1,0 +1,52 @@
+.quality-ops-robot__panel {
+  background: rgba(248, 252, 250, 0.98);
+  border-color: rgba(60, 145, 105, 0.2);
+  box-shadow: 0 24px 60px rgba(28, 86, 63, 0.2);
+}
+
+.quality-ops-robot:not(.ops-robot-float--open) .ops-robot-trigger {
+  transform: scale(0.76);
+  transform-origin: right bottom;
+}
+
+.quality-ops-robot__panel .ops-robot-panel__header {
+  background: linear-gradient(180deg, rgba(47, 158, 108, 0.11), rgba(47, 158, 108, 0));
+}
+
+.quality-ops-robot__panel .ops-robot-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quality-ops-robot__panel .ops-robot-panel__title .ant-tag {
+  margin-inline-end: 0;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.quality-ops-robot__panel .ops-robot-message--user .ops-robot-message__bubble {
+  background: linear-gradient(135deg, #18875b, #35ad78);
+}
+
+.quality-ops-robot__panel .ops-robot-card {
+  background: #f3faf6;
+  border-color: rgba(47, 145, 101, 0.14);
+}
+
+.quality-ops-robot__panel .ops-robot-history__item.is-active {
+  border-color: rgba(35, 151, 101, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(35, 151, 101, 0.14);
+}
+
+.quality-ops-robot__thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(37, 151, 102, 0.09), rgba(54, 190, 151, 0.14));
+  color: #277052;
+  font-size: 12px;
+}

@@ -1,0 +1,16 @@
+import { http } from "./http";
+import { getSelectedProjectHeaders } from "./projectContext";
+import type { ApiEnvelope, SystemKnowledgeBaseRecord, SystemKnowledgeDocumentPreview } from "../types/api";
+const API_BASE_URL=import.meta.env.VITE_API_BASE_URL||"/api/v1";
+export interface SystemKnowledgeBasePayload { kbName:string; kbDesc?:string|null; tags?:string[]; status?:"active"|"inactive"; }
+export function fetchSystemKnowledgeBases(token:string){return http<ApiEnvelope<SystemKnowledgeBaseRecord[]>>("/system-knowledge-bases",undefined,token);}
+export function fetchSystemKnowledgeBaseDetail(token:string,id:number){return http<ApiEnvelope<SystemKnowledgeBaseRecord>>(`/system-knowledge-bases/${id}`,undefined,token);}
+export function createSystemKnowledgeBase(token:string,payload:SystemKnowledgeBasePayload){return http<ApiEnvelope<SystemKnowledgeBaseRecord>>("/system-knowledge-bases",{method:"POST",body:JSON.stringify(payload)},token);}
+export function updateSystemKnowledgeBase(token:string,id:number,payload:SystemKnowledgeBasePayload){return http<ApiEnvelope<SystemKnowledgeBaseRecord>>(`/system-knowledge-bases/${id}`,{method:"PUT",body:JSON.stringify(payload)},token);}
+export function deleteSystemKnowledgeBase(token:string,id:number){return http<ApiEnvelope<{id:number}>>(`/system-knowledge-bases/${id}`,{method:"DELETE"},token);}
+export async function uploadSystemKnowledgeDocument(token:string,kbId:number,file:File){const body=new FormData();body.append("file",file);const response=await fetch(`${API_BASE_URL}/system-knowledge-bases/${kbId}/documents`,{method:"POST",headers:{Authorization:`Bearer ${token}`,...getSelectedProjectHeaders()},body});if(!response.ok)throw new Error('上传失败');return response.json() as Promise<ApiEnvelope<SystemKnowledgeBaseRecord>>;}
+export function reparseSystemKnowledgeDocument(token:string,id:number){return http<ApiEnvelope<SystemKnowledgeBaseRecord>>(`/system-knowledge-bases/documents/${id}/reparse`,{method:"POST"},token);}
+export function fetchSystemKnowledgeDocumentPreview(token:string,id:number){return http<ApiEnvelope<SystemKnowledgeDocumentPreview>>(`/system-knowledge-bases/documents/${id}/preview`,undefined,token);}
+export function deleteSystemKnowledgeDocument(token:string,id:number){return http<ApiEnvelope<{id:number;kbId:number}>>(`/system-knowledge-bases/documents/${id}`,{method:"DELETE"},token);}
+export async function downloadSystemKnowledgeDocument(token:string,id:number,fileName:string){const response=await fetch(`${API_BASE_URL}/system-knowledge-bases/documents/${id}/download`,{headers:{Authorization:`Bearer ${token}`,...getSelectedProjectHeaders()}});if(!response.ok)throw new Error(await response.text()||"下载失败");const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=fileName;link.click();URL.revokeObjectURL(url);}
+export function syncIncubationKnowledgeBase(token:string,incubationId:number,payload:{categoryCode?:string|null}){return http<ApiEnvelope<{scope:string;knowledgeBase:SystemKnowledgeBaseRecord;industryKnowledgeBase?:SystemKnowledgeBaseRecord}>>(`/system-knowledge-bases/sync/incubation/${incubationId}`,{method:"POST",body:JSON.stringify(payload)},token);}

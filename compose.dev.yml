@@ -1,0 +1,13 @@
+name: data-platform-source
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: data-platform-source-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_DATABASE: ${DB_NAME:-data_platform_source}
+    ports: ["46122:3306"]
+    volumes: ["data-platform-source-mysql:/var/lib/mysql"]
+volumes:
+  data-platform-source-mysql:
+    name: data-platform-source-mysql-data

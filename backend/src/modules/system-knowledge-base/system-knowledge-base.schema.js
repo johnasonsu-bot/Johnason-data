@@ -1,0 +1,10 @@
+const fs = require("fs");
+const path = require("path");
+const multer = require("multer");
+const { z } = require("../../common/middleware/validate");
+const uploadDir = path.resolve(process.cwd(), "runtime/system-knowledge-base-uploads");
+fs.mkdirSync(uploadDir, { recursive: true });
+const upload = multer({ dest: uploadDir, limits: { fileSize: 20 * 1024 * 1024 } });
+const knowledgeBaseSchema = z.object({ kbName: z.string().min(2).max(128), kbDesc: z.string().max(1024).optional().nullable(), tags: z.array(z.string().min(1).max(64)).max(30).optional().default([]), status: z.enum(["active", "inactive"]).optional().default("active") });
+const incubationKnowledgeSyncSchema = z.object({ categoryCode: z.string().max(128).optional().nullable() });
+module.exports = { upload, knowledgeBaseSchema, incubationKnowledgeSyncSchema };

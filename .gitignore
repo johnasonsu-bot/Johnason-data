@@ -1,0 +1,36 @@
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Dependencies
+node_modules/
+
+# Build and test output
+dist/
+build/
+coverage/
+.cache/
+
+# Runtime data and logs
+*.log
+logs/
+tmp/
+temp/
+*.pid
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+

@@ -1,0 +1,72 @@
+{
+    "edition":  "data-platform-source",
+    "status":  "ready",
+    "generatedAt":  "2026-08-04T22:42:41.4843452+08:00",
+    "approvedBaselineDate":  "2026-07-18",
+    "assemblyPolicy":  "strict-whitelist",
+    "includedModules":  [
+                            "platform",
+                            "asset-search",
+                            "data-sources",
+                            "data-source-research",
+                            "ingestion-tasks",
+                            "file-imports",
+                            "ingestion-ai-configs",
+                            "quality-control",
+                            "data-development",
+                            "dev-ai-configs",
+                            "data-lab",
+                            "data-lab-sources",
+                            "data-map",
+                            "data-standards",
+                            "data-services",
+                            "reporting",
+                            "model-providers",
+                            "system-management",
+                            "auth",
+                            "project-spaces"
+                        ],
+    "excludedModules":  [
+                            "licenses",
+                            "online-docs",
+                            "agent-platform",
+                            "dev-tools",
+                            "data-experiment-lab",
+                            "dify",
+                            "ops-robot"
+                        ],
+    "includeSystemCapabilities":  [
+                                      "system_models",
+                                      "system_users",
+                                      "system_roles",
+                                      "system_services",
+                                      "system_projects",
+                                      "system_knowledge_bases"
+                                  ],
+    "excludeSystemCapabilities":  [
+                                      "system_license"
+                                  ],
+    "forbiddenPaths":  [
+                           "runtime",
+                           "keys",
+                           "deploy",
+                           "delivery",
+                           "images",
+                           "bootstrap",
+                           "node_modules",
+                           "dist",
+                           "logs",
+                           "log",
+                           "log_perf",
+                           ".env"
+                       ],
+    "environment":  {
+                        "frontendPort":  46120,
+                        "backendPort":  46121,
+                        "mysqlPort":  46122,
+                        "database":  "data_platform_source",
+                        "mysqlContainer":  "data-platform-source-mysql"
+                    },
+    "fileCount":  807,
+    "hashManifest":  "SOURCE_FILE_SHA256SUMS.txt"
+}
