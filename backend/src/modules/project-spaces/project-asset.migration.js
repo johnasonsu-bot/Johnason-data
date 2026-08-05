@@ -223,6 +223,21 @@ const createTableStatements = [
     KEY idx_online_doc_nodes_parent (parent_id),
     KEY idx_online_doc_nodes_document (document_id)
   )`,
+  `CREATE TABLE IF NOT EXISTS online_doc_assets (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    space_id BIGINT NOT NULL,
+    document_id BIGINT NULL,
+    asset_type VARCHAR(32) NOT NULL,
+    file_name VARCHAR(512) NOT NULL,
+    file_ext VARCHAR(64) NULL,
+    mime_type VARCHAR(255) NULL,
+    file_size BIGINT NULL,
+    storage_path VARCHAR(2048) NULL,
+    created_by VARCHAR(128) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_online_doc_assets_space (space_id),
+    KEY idx_online_doc_assets_document (document_id)
+  )`,
 ];
 
 const requiredQcReportColumns = [

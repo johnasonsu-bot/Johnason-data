@@ -70,6 +70,12 @@ const IMPLICIT_FOREIGN_KEYS = [
   { childTable: "dev_workflow_nodes", childColumn: "orchestration_task_id", parentTable: "dev_orchestration_tasks", parentColumn: "id" },
   { childTable: "dev_job_instances", childColumn: "processing_job_id", parentTable: "dev_processing_jobs", parentColumn: "id" },
   { childTable: "dev_job_instances", childColumn: "orchestration_task_id", parentTable: "dev_orchestration_tasks", parentColumn: "id" },
+  { childTable: "online_documents", childColumn: "space_id", parentTable: "online_doc_spaces", parentColumn: "id" },
+  { childTable: "online_doc_assets", childColumn: "space_id", parentTable: "online_doc_spaces", parentColumn: "id" },
+  { childTable: "online_doc_assets", childColumn: "document_id", parentTable: "online_documents", parentColumn: "id" },
+  { childTable: "online_doc_nodes", childColumn: "space_id", parentTable: "online_doc_spaces", parentColumn: "id" },
+  { childTable: "online_doc_nodes", childColumn: "parent_id", parentTable: "online_doc_nodes", parentColumn: "id" },
+  { childTable: "online_doc_nodes", childColumn: "document_id", parentTable: "online_documents", parentColumn: "id" },
 ];
 const RUNTIME_FILE_COLUMNS = [];
 const RUNTIME_ROOT = path.resolve(process.cwd(), "runtime");
