@@ -1604,7 +1604,16 @@ export function TaskConfigPage() {
       targetTableMode: values.targetTableMode,
       syncMode: values.syncMode,
       targetConfig: {
-        writeMode: values.writeMode || "append"
+        writeMode: values.writeMode || "append",
+        ...(values.writeMode === "upsert"
+          ? {
+              keyFields:
+                currentTask?.targetConfig?.keyFields ||
+                fieldMappings
+                  .filter((item) => item.enabled && item.isPrimaryKey && item.targetField)
+                  .map((item) => item.targetField)
+            }
+          : {})
       },
       fieldMappings: fieldMappings
         .filter((item) => item.enabled && item.targetField)
@@ -3759,6 +3768,7 @@ function getWriteModeOptions(
   if (normalizedTargetType === "postgresql") {
     return [
       { value: "append", label: "追加写入" },
+      { value: "upsert", label: "主键更新（幂等）" },
       { value: "overwrite", label: "覆盖写入" }
     ];
   }

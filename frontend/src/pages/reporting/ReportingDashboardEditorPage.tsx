@@ -43,11 +43,13 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import * as echarts from "echarts";
 import ReactECharts from "echarts-for-react";
-import "echarts-wordcloud";
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { installEchartsWordCloud, normalizeWordCloudOption } from "./charts/echarts-word-cloud";
 import chinaGeoJson from "../../constants/china.geo.json";
+
+installEchartsWordCloud();
 import { useAuth } from "../../app/providers/AuthProvider";
 import { PageToolbar } from "../../components/ui/PageToolbar";
 import {
@@ -5279,7 +5281,7 @@ function ChartWidgetPreview({
           layoutBox,
         );
       if (!cancelled) {
-        setPreparedOption(nextOption);
+        setPreparedOption(normalizeWordCloudOption(nextOption));
       }
     };
     void prepareOption();

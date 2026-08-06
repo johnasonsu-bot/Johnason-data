@@ -38,7 +38,7 @@ function splitVendorChunk(id: string): string | undefined {
   ) {
     return "vendor-core";
   }
-  if (id.includes("/echarts") || id.includes("/zrender/")) {
+  if (id.includes("/echarts") || id.includes("/@echarts-x/") || id.includes("/zrender/")) {
     return "vendor-echarts";
   }
   if (id.includes("/mermaid/") || id.includes("/@mermaid-js/") || id.includes("/katex/") || id.includes("/dompurify/") || id.includes("/marked/")) {

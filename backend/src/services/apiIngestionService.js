@@ -4,7 +4,7 @@ const { pool } = require("../config/database");
 const { createPostgresLikeClient } = require("../common/utils/db-client");
 const { inferDatasourceDialect, resolveDatasourceConnection } = require("../common/utils/datasource-dialect");
 
-const SENSITIVE_KEY_PATTERN = /(authorization|token|secret|password|apikey|api_key|x-api-key)/i;
+const SENSITIVE_KEY_PATTERN = /(authorization|token|secret|password|apikey|api[_-]?key|access[_-]?key|x-api-key)/i;
 
 function normalizeApiConnectionConfig(config = {}) {
   const baseUrl = String(config.baseUrl || config.apiBaseUrl || config.url || "").trim().replace(/\/+$/g, "");
@@ -28,6 +28,7 @@ function normalizeApiSourceConfig(rawConfig = {}, sourceObject = "") {
   const pagination = rawConfig.pagination || {};
   const incremental = rawConfig.incremental || {};
   return {
+    rowAdapter: String(rawConfig.rowAdapter || "").trim(),
     endpointPath,
     method: normalizeHttpMethod(rawConfig.method),
     contentType: normalizeEnum(rawConfig.contentType || "application/json", ["application/json", "application/x-www-form-urlencoded", "text/plain"], "application/json"),
@@ -927,7 +928,7 @@ function inferSampleType(values = []) {
 
 function sanitizeRequestInfo(request) {
   return {
-    url: request.url.replace(/([?&][^=]*(token|secret|password|api[_-]?key)[^=]*=)[^&]*/ig, "$1******"),
+    url: request.url.replace(/([?&][^=]*(token|secret|password|api[_-]?key|access[_-]?key)[^=]*=)[^&]*/ig, "$1******"),
     method: request.method,
     headers: Object.fromEntries(Object.entries(request.headers || {}).map(([key, value]) => [
       key,
@@ -954,4 +955,5 @@ module.exports = {
   normalizeApiSourceConfig,
   sampleApiRows,
   testApiConnection,
+  sanitizeRequestInfo,
 };

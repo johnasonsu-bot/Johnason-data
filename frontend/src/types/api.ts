@@ -1508,7 +1508,7 @@ export interface ScheduleConfig {
   retryIntervalMs?: number;
 }
 
-export type IngestionWriteMode = "append" | "replace" | "overwrite" | "partition_overwrite";
+export type IngestionWriteMode = "append" | "replace" | "upsert" | "overwrite" | "partition_overwrite";
 
 export type FileImportWriteMode = "append" | "overwrite";
 
@@ -1950,6 +1950,10 @@ export interface DataSourceResearchTableRelationshipReport {
     relationType: "1:1" | "1:N" | "N:1" | "N:N";
     confidence: number;
     source: "constraint" | "name_rule" | "ai";
+    fromFieldRole?: "FOREIGN_KEY" | "REFERENCE";
+    toFieldRole?: "PRIMARY_KEY" | "UNIQUE_KEY" | "BUSINESS_KEY";
+    constraintName?: string;
+    joinCondition?: string;
     evidence: string[];
   }>;
 }

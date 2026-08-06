@@ -7,8 +7,8 @@ import chinaGeoJson from "../../constants/china.geo.json";
 import { fetchReportingDashboardRuntime, fetchReportingThemeTemplates, previewReportingDashboardChart, previewReportingRuntimeDashboardChart } from "../../services/reporting";
 import { useAuth } from "../../app/providers/AuthProvider";
 import type { ReportingDashboardRecord, ReportingDashboardWidgetRecord } from "../../types/api";
-import "echarts-wordcloud";
 import * as echarts from "echarts";
+import { installEchartsWordCloud, normalizeWordCloudOption } from "./charts/echarts-word-cloud";
 import {
   buildDefaultKpiConfig,
   buildDefaultChartStyleConfig,
@@ -28,6 +28,8 @@ import {
 } from "./ReportingDashboardEditorPage";
 import { backfillMissingComboThemeFields, backfillMissingGaugeThemeFields, backfillMissingMapThemeFields, backfillMissingWordCloudThemeFields, resolveWidgetVisualTheme } from "./theme/theme-runtime";
 import type { ThemeTemplateRecord } from "./theme/theme-template.types";
+
+installEchartsWordCloud();
 
 type RuntimeWidgetDraft = {
   key: string;
@@ -668,7 +670,7 @@ function renderRuntimeWidget(widget: ReportingDashboardWidgetRecord, preview: an
   }
 
   if (preview?.option) {
-    const option = { ...(preview.option || {}) } as Record<string, any>;
+    const option = normalizeWordCloudOption({ ...(preview.option || {}) } as Record<string, any>);
     delete option.title;
     return (
       <div

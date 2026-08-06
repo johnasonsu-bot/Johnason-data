@@ -10,6 +10,8 @@ const dataSourceMetadata = require("../modules/data-sources/data-source.metadata
 const { parseFileBuffer } = require("../modules/file-imports/file-import.parser");
 const hiveService = require("./hiveService");
 const apiIngestionService = require("./apiIngestionService");
+const { adaptApiRows } = require("./apiRowAdapters");
+const { buildConflictClause, deduplicateRowsByKeys } = require("./sqlInsertBuilder");
 const { createPostgresLikeClient } = require("../common/utils/db-client");
 const { inferDatasourceDialect, resolveDatasourceConnection } = require("../common/utils/datasource-dialect");
 
@@ -40,7 +42,8 @@ async function executeApiTask(task, jobRun = null) {
     errorConfig,
     state,
   });
-  const writeResult = await writeMappedRows(task, collectResult.rows);
+  const adaptedRows = adaptApiRows(sourceConfig.rowAdapter, collectResult.rows);
+  const writeResult = await writeMappedRows(task, adaptedRows);
   await repository.upsertApiSyncState({
     projectId: task.projectId || null,
     taskId: task.id,
@@ -58,7 +61,7 @@ async function executeApiTask(task, jobRun = null) {
     success: true,
     recordsCount: writeResult.recordsCount,
     metrics: {
-      totalRecords: collectResult.rows.length,
+      totalRecords: adaptedRows.length,
       successRecords: writeResult.recordsCount,
       errorRecords: 0,
     },
@@ -68,6 +71,8 @@ async function executeApiTask(task, jobRun = null) {
       endpointPath: sourceConfig.endpointPath || task.sourceTable,
       syncMode: task.syncMode || "full",
       pageResults: collectResult.pageResults,
+      fetchedRecords: collectResult.rows.length,
+      acceptedRecords: adaptedRows.length,
       writtenRecords: writeResult.recordsCount,
       targetTable: task.targetTable,
       state: collectResult.state,
@@ -316,10 +321,13 @@ async function executeFtpTask(task, jobRun = null) {
 
 async function writeMappedRows(task, sourceRows) {
   const fieldMappings = (task.fieldMappings || []).filter((item) => item.targetField);
-  const targetRows = sourceRows.map((row) => Object.fromEntries(
+  let targetRows = sourceRows.map((row) => Object.fromEntries(
     fieldMappings.map((mapping) => [mapping.targetField, convertCellValue(row[mapping.sourceField], mapping.dataType)])
   ));
   const targetColumns = fieldMappings.map((mapping) => mapping.targetField);
+  if (String(task.targetConfig?.writeMode || "append").toLowerCase() === "upsert") {
+    targetRows = deduplicateRowsByKeys(targetRows, task.targetConfig?.keyFields || []);
+  }
   const targetDialect = inferDatasourceDialect(task.targetSourceType || task.targetType, task.targetConnectionConfig || {});
 
   if (targetDialect === "mysql") {
@@ -386,7 +394,8 @@ async function insertRows(connection, dialect, qualifiedTable, targetColumns, ro
       });
       return `(${rowPlaceholders.join(", ")})`;
     });
-    await connection.query(`${verb} INTO ${qualifiedTable} (${columnSql}) VALUES ${placeholders.join(", ")}`, values);
+    const conflictClause = buildConflictClause(dialect, targetColumns, options);
+    await connection.query(`${verb} INTO ${qualifiedTable} (${columnSql}) VALUES ${placeholders.join(", ")}${conflictClause}`, values);
   }
 }
 

@@ -666,14 +666,22 @@ function normalizeTargetConfig(targetConfig, targetType, connectionConfig = {}) 
   }
 
   if (normalizedTargetType === "postgresql") {
-    const allowedWriteModes = ["append", "overwrite"];
+    const allowedWriteModes = ["append", "upsert", "overwrite"];
     if (!allowedWriteModes.includes(writeMode)) {
-      throw new AppError("PostgreSQL 目标仅支持追加写和覆盖写", 400);
+      throw new AppError("PostgreSQL 目标仅支持追加写、主键更新和覆盖写", 400);
+    }
+
+    const keyFields = Array.isArray(targetConfig.keyFields)
+      ? targetConfig.keyFields.map((field) => String(field || "").trim()).filter(Boolean)
+      : [];
+    if (writeMode === "upsert" && keyFields.length === 0) {
+      throw new AppError("PostgreSQL 主键更新模式必须配置 keyFields", 400);
     }
 
     return {
       ...targetConfig,
-      writeMode
+      writeMode,
+      ...(writeMode === "upsert" ? { keyFields } : {})
     };
   }
 
