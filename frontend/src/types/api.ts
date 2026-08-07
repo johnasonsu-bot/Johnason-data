@@ -909,7 +909,7 @@ export interface SystemKnowledgeDocumentRecord {
   kbId: number;
   fileName: string;
   fileType: string;
-  filePath: string;
+  filePath?: string;
   fileSize: number;
   parseStatus: string;
   parseSummary?: string | null;
@@ -919,6 +919,19 @@ export interface SystemKnowledgeDocumentRecord {
   lastParsedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SystemKnowledgeDocumentViewer {
+  kind: "html" | "markdown" | "code" | "json" | "table" | "pdf" | "image" | "audio" | "video" | "office" | "unsupported" | string;
+  mimeType: string;
+  language?: string | null;
+  preferredVariant: "original" | "text" | "pdf" | string;
+  fileName: string;
+  fileSize: number;
+  contentUrl: string;
+  converted: boolean;
+  fallbackReason?: string | null;
+  maxPreviewBytes: number;
 }
 
 export interface SystemKnowledgeDocumentChunkPreview {
@@ -936,6 +949,7 @@ export interface SystemKnowledgeDocumentPreview {
   previewSource: "chunks" | "file" | "summary" | string;
   previewText: string;
   truncated: boolean;
+  viewer?: SystemKnowledgeDocumentViewer;
 }
 
 export interface SystemKnowledgeBaseRecord {
