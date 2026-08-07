@@ -19,6 +19,50 @@
 
 ---
 
+### Task 0: Restore Oracle and DM DataX runtime support
+
+**Files:**
+- Create: `scripts/install-datax-enterprise-plugins.sh`
+- Create: `scripts/verify-datax-enterprise-plugins.js`
+- Modify: `backend/src/modules/data-sources/data-source.database-capabilities.test.js`
+- Create/restore: `backend/datax/plugin/reader/oraclereader/**`
+- Create/restore: `backend/datax/plugin/writer/oraclewriter/**`
+- Create/restore: `backend/datax/plugin/reader/rdbmsreader/**`
+- Create/restore: `backend/datax/plugin/writer/rdbmswriter/**`
+- Modify: `README.md`
+
+**Interfaces:**
+- Produces: a pinned, reproducible installer for official Alibaba DataX Oracle/RDBMS plugins, Oracle `ojdbc8`, and DM `DmJdbcDriver18`.
+- Produces: `node scripts/verify-datax-enterprise-plugins.js` that validates plugin descriptors, plugin classes, JDBC driver classes, and required shared libraries.
+
+- [ ] **Step 1: Keep the observed failing distribution test as RED**
+
+Run: `cd backend && node --test src/modules/data-sources/data-source.database-capabilities.test.js`
+
+Expected: FAIL at `reader/oraclereader/plugin.json` because the original source package contains empty Oracle and RDBMS plugin directories.
+
+- [ ] **Step 2: Strengthen the test around executable artifacts**
+
+Add assertions that JAR archives contain `OracleReader`, `OracleWriter`, `RdbmsReader`, `RdbmsWriter`, `oracle.jdbc.OracleDriver`, and `dm.jdbc.driver.DmDriver` classes. This prevents empty or renamed placeholder JARs from satisfying readiness checks.
+
+- [ ] **Step 3: Implement the reproducible installer**
+
+Pin the official Alibaba DataX source revision, build the four modules with a Maven JDK 8 container, copy plugin descriptors/templates/JARs and shared plugin dependencies into the bundled DataX tree, and fetch version-pinned Oracle and DM JDBC drivers from Maven Central. Verify SHA-256 hashes before installation and avoid embedding credentials.
+
+- [ ] **Step 4: Run the distribution verifier and focused test**
+
+Run: `node scripts/verify-datax-enterprise-plugins.js`
+
+Run: `cd backend && node --test src/modules/data-sources/data-source.database-capabilities.test.js`
+
+Expected: verifier passes; capability test reports all Oracle/DM DataX artifacts ready. Optional live database tests remain skipped when test connection environment variables are absent.
+
+- [ ] **Step 5: Document Java/DataX installation requirements**
+
+Document JDK 8/11 runtime requirements, the installer command, Docker build fallback, supported JDBC driver versions, and environment overrides without writing any password or token into source.
+
+---
+
 ### Task 1: Backend file classification and safe preview descriptors
 
 **Files:**
