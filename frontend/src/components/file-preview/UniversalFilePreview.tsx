@@ -91,7 +91,7 @@ export function UniversalFilePreview({ open, preview, token, onClose, onDownload
   const tableData = useMemo(() => renderer === "table" ? parseCsvContent(textContent) : { columns: [], rows: [] }, [renderer, textContent]);
 
   function renderContent() {
-    if (loading) return <div className="universal-file-preview__state"><Spin size="large" tip="正在加载文件预览" /></div>;
+    if (loading) return <div className="universal-file-preview__state"><Space direction="vertical" align="center"><Spin size="large" /><Typography.Text type="secondary">正在加载文件预览</Typography.Text></Space></div>;
     if (error) return <Alert type="error" showIcon message="文件预览失败" description={error} action={onDownload ? <Button onClick={onDownload}>下载原文件</Button> : undefined} />;
     if (!viewer) return <Typography.Paragraph style={{ whiteSpace: "pre-wrap" }}>{preview?.previewText || "暂无可预览内容"}</Typography.Paragraph>;
     if (renderer === "html") return <iframe className="universal-file-preview__frame" sandbox="allow-scripts" srcDoc={buildSandboxedHtml(textContent)} title={viewer.fileName} />;

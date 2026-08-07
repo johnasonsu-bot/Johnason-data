@@ -342,7 +342,11 @@ function resolveExistingKnowledgeDocumentPath(document) {
 async function readDocumentText(filePath, fileType) {
   const ext = String(fileType || "").toLowerCase();
 
-  if (["txt", "md", "csv", "json", "log"].includes(ext)) {
+  if ([
+    "txt", "md", "markdown", "csv", "json", "log", "html", "htm",
+    "sql", "yaml", "yml", "xml", "js", "jsx", "ts", "tsx", "css",
+    "scss", "sh", "py", "java"
+  ].includes(ext)) {
     const buffer = fs.readFileSync(filePath);
     const utf8Text = buffer.toString("utf8");
     if (!isLikelyMojibakeText(utf8Text)) {
@@ -1033,4 +1037,5 @@ module.exports = {
   getKnowledgeDocumentById,
   deleteKnowledgeDocument,
   syncIncubationKnowledgeBase,
+  readDocumentText,
 };
