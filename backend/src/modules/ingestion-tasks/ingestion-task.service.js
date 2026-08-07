@@ -113,6 +113,10 @@ async function updateTask(id, payload) {
     const mergedPayload = {
       ...existingTask,
       ...payload,
+      targetTableMode: normalizeTargetTableMode(
+        payload.targetTableMode,
+        existingTask.targetConfig?.targetTableMode
+      ),
       fieldMappings: payload.fieldMappings !== undefined ? payload.fieldMappings : existingTask.fieldMappings,
       transformRules: payload.transformRules !== undefined ? payload.transformRules : existingTask.transformRules,
       incrementalConfig: payload.incrementalConfig !== undefined ? payload.incrementalConfig : existingTask.incrementalConfig,
@@ -156,6 +160,10 @@ async function previewTaskUpdate(id, payload) {
   const mergedPayload = {
     ...existingTask,
     ...payload,
+    targetTableMode: normalizeTargetTableMode(
+      payload.targetTableMode,
+      existingTask.targetConfig?.targetTableMode
+    ),
     fieldMappings: payload.fieldMappings !== undefined ? payload.fieldMappings : existingTask.fieldMappings,
     transformRules: payload.transformRules !== undefined ? payload.transformRules : existingTask.transformRules,
     incrementalConfig: payload.incrementalConfig !== undefined ? payload.incrementalConfig : existingTask.incrementalConfig,
@@ -268,7 +276,7 @@ async function normalizeTaskPayload(payload, isUpdate = false, existingTask = nu
       (table) => table.tableName === normalizeTableNameBySourceType(normalizedTargetTable, target.sourceType)
     );
 
-    if (payload.targetTableMode === "create") {
+    if (normalizeTargetTableMode(payload.targetTableMode) === "create") {
       await dataSourceMetadata.ensureTableMatchesColumns(
         target,
         normalizedTargetTable,
@@ -277,11 +285,11 @@ async function normalizeTaskPayload(payload, isUpdate = false, existingTask = nu
       );
     }
 
-    if (payload.targetTableMode !== "create" && !targetTableExists) {
+    if (normalizeTargetTableMode(payload.targetTableMode) !== "create" && !targetTableExists) {
       throw new AppError("目标表不存在，请切换为自动建表或先创建目标表", 400);
     }
   } else if (targetDialect === "hive") {
-    if (payload.targetTableMode === "create") {
+    if (normalizeTargetTableMode(payload.targetTableMode) === "create") {
       await hiveService.ensureTableExists(
         target.connectionConfig || {},
         normalizedTargetTable,
@@ -325,7 +333,8 @@ async function normalizeTaskPayload(payload, isUpdate = false, existingTask = nu
     targetConfig: {
       ...targetConfig,
       table: [normalizedTargetTable],
-      column: fieldMappings.map((item) => item.targetField)
+      column: fieldMappings.map((item) => item.targetField),
+      targetTableMode: normalizeTargetTableMode(payload.targetTableMode)
     },
     syncMode: payload.syncMode,
     status: payload.status,
@@ -1126,11 +1135,6 @@ function resolveTargetColumnType(mapping, sourceColumn, targetType = "mysql", co
   const mappingDataType = String(mapping.dataType || "").trim();
   const normalizedTargetType = resolveDatasourceDialect(targetType, connectionConfig);
   const sourceColumnType = String(sourceColumn?.columnType || "").trim();
-  const sourceTypeDefinition = parseColumnTypeDefinitionForMapping(sourceColumnType || mappingDataType);
-
-  if (normalizedTargetType === "postgresql" && ["json", "jsonb"].includes(sourceTypeDefinition.baseType)) {
-    return "text";
-  }
 
   if (sourceColumn?.columnType) {
     const sourceDataType = String(sourceColumn.dataType || "").trim().toLowerCase();
@@ -1234,14 +1238,14 @@ function normalizeColumnTypeForTarget(columnType, targetType) {
     if (["character", "char"].includes(normalizedBaseType)) {
       return `char(${Number(args[0] || 1)})`;
     }
-    if (["timestamp without time zone", "timestamp with time zone"].includes(normalizedBaseType)) {
-      return normalizedBaseType;
+    if (["timestamp without time zone", "timestamp with time zone", "timestamptz"].includes(normalizedBaseType)) {
+      return normalizedBaseType === "timestamptz" ? "timestamp with time zone" : normalizedBaseType;
     }
     if (["time without time zone", "time with time zone"].includes(normalizedBaseType)) {
       return normalizedBaseType;
     }
     if (["json", "jsonb"].includes(normalizedBaseType)) {
-      return "text";
+      return normalizedBaseType;
     }
     if (["varchar2", "nvarchar2", "varchar", "char", "nchar"].includes(normalizedBaseType)) {
       return `${normalizedBaseType === "char" || normalizedBaseType === "nchar" ? "char" : "varchar"}(${Number(args[0] || 255)})`;
@@ -1333,6 +1337,10 @@ function getTargetTextType(targetType = "mysql") {
   return "text";
 }
 
+function normalizeTargetTableMode(value, existingValue) {
+  return value === "create" || (value === undefined && existingValue === "create") ? "create" : "existing";
+}
+
 function resolveSourceTableComment(tables = [], tableName = "") {
   const normalized = String(tableName || "").trim().replace(/["`]/g, "");
   if (!normalized) {
@@ -1368,4 +1376,5 @@ module.exports = {
   analyzeJobRunFailure,
   reconcileRunningJobsAfterRestart,
   buildTargetColumnsFromMappings,
+  normalizeTargetTableMode,
 };

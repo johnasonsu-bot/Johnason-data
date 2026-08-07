@@ -1654,6 +1654,7 @@ export interface PartitionWriteConfig {
 export interface IngestionTargetConfig {
   table?: string[];
   column?: string[];
+  targetTableMode?: "existing" | "create";
   writeMode?: IngestionWriteMode;
   partitionConfig?: PartitionWriteConfig;
   [key: string]: unknown;

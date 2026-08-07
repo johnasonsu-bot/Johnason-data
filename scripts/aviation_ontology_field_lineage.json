@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "title": "航空本体概念到物理字段级数据血缘",
+    "version": "1.0.0",
+    "grain": "concept field -> DWD view field -> ODS source field",
+    "evidence_sql": "scripts/aviation_ontology_field_lineage.sql"
+  },
+  "concepts": [
+    {"id":"FlightSegment","view":"dwd_ent_flight_segment","source_tables":["ods_flight_schedule","dim_delay_code_coda"],"key":"flight_segment_id"},
+    {"id":"AircraftTail","view":"dwd_ent_aircraft_tail","source_tables":["ods_aircraft_tail"],"key":"tail_no"},
+    {"id":"CrewMember","view":"dwd_ent_crew_member","source_tables":["ods_crew_roster"],"key":"crew_id"},
+    {"id":"WeatherEvent","view":"dwd_ent_weather_event","source_tables":["ods_weather_metar","ods_china_airport_current_weather"],"key":"airport_icao#observe_time"},
+    {"id":"RunwayCapacity","view":"dwd_ent_runway_capacity","source_tables":["ods_runway_slot"],"key":"airport_icao#runway_id#slot_hour"}
+  ],
+  "fieldMappings": [
+    {"concept":"FlightSegment","conceptField":"entity_id","source":{"table":"ods_flight_schedule","field":"flight_segment_id"},"target":{"view":"dwd_ent_flight_segment","field":"entity_id"},"transform":"direct","keyRole":"PK"},
+    {"concept":"FlightSegment","conceptField":"flight_no","source":{"table":"ods_flight_schedule","field":"flight_no"},"target":{"view":"dwd_ent_flight_segment","field":"flight_no"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"FlightSegment","conceptField":"dep_airport","source":{"table":"ods_flight_schedule","field":"dep_airport"},"target":{"view":"dwd_ent_flight_segment","field":"dep_airport"},"transform":"direct ICAO","keyRole":"JOIN_KEY"},
+    {"concept":"FlightSegment","conceptField":"arr_airport","source":{"table":"ods_flight_schedule","field":"arr_airport"},"target":{"view":"dwd_ent_flight_segment","field":"arr_airport"},"transform":"direct ICAO","keyRole":"JOIN_KEY"},
+    {"concept":"FlightSegment","conceptField":"std","source":{"table":"ods_flight_schedule","field":"std"},"target":{"view":"dwd_ent_flight_segment","field":"std"},"transform":"direct; incremental cursor","keyRole":"INCREMENTAL_CURSOR"},
+    {"concept":"FlightSegment","conceptField":"sta","source":{"table":"ods_flight_schedule","field":"sta"},"target":{"view":"dwd_ent_flight_segment","field":"sta"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"FlightSegment","conceptField":"atd","source":{"table":"ods_flight_schedule","field":"atd"},"target":{"view":"dwd_ent_flight_segment","field":"atd"},"transform":"direct; nullable until departure","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"FlightSegment","conceptField":"flight_status","source":{"table":"ods_flight_schedule","field":"flight_status"},"target":{"view":"dwd_ent_flight_segment","field":"flight_status"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"FlightSegment","conceptField":"delay_minutes","source":{"table":"ods_flight_schedule","field":"delay_minutes"},"target":{"view":"dwd_ent_flight_segment","field":"delay_minutes"},"transform":"safe numeric cast; blank -> null","keyRole":"RULE_INPUT"},
+    {"concept":"FlightSegment","conceptField":"delay_code_raw","source":{"table":"ods_flight_schedule","field":"delay_code_raw"},"target":{"view":"dwd_ent_flight_segment","field":"delay_code_raw"},"transform":"direct source evidence","keyRole":"RULE_INPUT"},
+    {"concept":"FlightSegment","conceptField":"delay_code_std","source":{"table":"dim_delay_code_coda","field":"coda_code"},"target":{"view":"dwd_ent_flight_segment","field":"delay_code_std"},"transform":"left join raw_code = COALESCE(delay_code_raw,'')","keyRole":"DICTIONARY_OUTPUT"},
+    {"concept":"FlightSegment","conceptField":"delay_category_cn","source":{"table":"dim_delay_code_coda","field":"category_cn"},"target":{"view":"dwd_ent_flight_segment","field":"delay_category_cn"},"transform":"left join CODA dictionary","keyRole":"DICTIONARY_OUTPUT"},
+    {"concept":"FlightSegment","conceptField":"tail_no","source":{"table":"ods_flight_schedule","field":"tail_no"},"target":{"view":"dwd_ent_flight_segment","field":"tail_no"},"transform":"direct; nullable for API records","keyRole":"RELATION_KEY"},
+    {"concept":"FlightSegment","conceptField":"carrier_code","source":{"table":"ods_flight_schedule","field":"carrier_code"},"target":{"view":"dwd_ent_flight_segment","field":"carrier_code"},"transform":"direct; Aviationstack source constrained to CZ","keyRole":"QUALITY_INPUT"},
+    {"concept":"AircraftTail","conceptField":"entity_id","source":{"table":"ods_aircraft_tail","field":"tail_no"},"target":{"view":"dwd_ent_aircraft_tail","field":"entity_id"},"transform":"direct","keyRole":"PK"},
+    {"concept":"AircraftTail","conceptField":"aircraft_model","source":{"table":"ods_aircraft_tail","field":"aircraft_model"},"target":{"view":"dwd_ent_aircraft_tail","field":"aircraft_model"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"AircraftTail","conceptField":"cabin_class","source":{"table":"ods_aircraft_tail","field":"cabin_class"},"target":{"view":"dwd_ent_aircraft_tail","field":"cabin_class"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"AircraftTail","conceptField":"remain_flight_hours","source":{"table":"ods_aircraft_tail","field":"remain_flight_hours"},"target":{"view":"dwd_ent_aircraft_tail","field":"remain_flight_hours"},"transform":"safe numeric cast","keyRole":"QUALITY_INPUT"},
+    {"concept":"AircraftTail","conceptField":"has_mel_defect","source":{"table":"ods_aircraft_tail","field":"mel_defect"},"target":{"view":"dwd_ent_aircraft_tail","field":"has_mel_defect"},"transform":"CASE blank -> 0 else 1","keyRole":"RULE_INPUT"},
+    {"concept":"AircraftTail","conceptField":"current_station","source":{"table":"ods_aircraft_tail","field":"current_station"},"target":{"view":"dwd_ent_aircraft_tail","field":"current_station"},"transform":"direct ICAO","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"AircraftTail","conceptField":"tail_status","source":{"table":"ods_aircraft_tail","field":"tail_status"},"target":{"view":"dwd_ent_aircraft_tail","field":"tail_status"},"transform":"direct","keyRole":"RULE_INPUT"},
+    {"concept":"CrewMember","conceptField":"entity_id","source":{"table":"ods_crew_roster","field":"crew_id"},"target":{"view":"dwd_ent_crew_member","field":"entity_id"},"transform":"direct","keyRole":"PK"},
+    {"concept":"CrewMember","conceptField":"crew_role","source":{"table":"ods_crew_roster","field":"crew_role"},"target":{"view":"dwd_ent_crew_member","field":"crew_role"},"transform":"direct","keyRole":"BUSINESS_ATTRIBUTE"},
+    {"concept":"CrewMember","conceptField":"qualified_model","source":{"table":"ods_crew_roster","field":"qualified_model"},"target":{"view":"dwd_ent_crew_member","field":"qualified_model"},"transform":"direct","keyRole":"JOIN_ATTRIBUTE"},
+    {"concept":"CrewMember","conceptField":"duty_start","source":{"table":"ods_crew_roster","field":"duty_start"},"target":{"view":"dwd_ent_crew_member","field":"duty_start"},"transform":"direct datetime","keyRole":"TIME_ATTRIBUTE"},
+    {"concept":"CrewMember","conceptField":"duty_hours","source":{"table":"ods_crew_roster","field":"duty_hours"},"target":{"view":"dwd_ent_crew_member","field":"duty_hours"},"transform":"safe numeric cast","keyRole":"RULE_INPUT"},
+    {"concept":"CrewMember","conceptField":"duty_limit_hours","source":{"table":"ods_crew_roster","field":"duty_limit_hours"},"target":{"view":"dwd_ent_crew_member","field":"duty_limit_hours"},"transform":"safe numeric cast; default policy 13","keyRole":"RULE_INPUT"},
+    {"concept":"CrewMember","conceptField":"rest_hours","source":{"table":"ods_crew_roster","field":"rest_hours"},"target":{"view":"dwd_ent_crew_member","field":"rest_hours"},"transform":"safe numeric cast","keyRole":"RULE_INPUT"},
+    {"concept":"CrewMember","conceptField":"rest_min_hours","source":{"table":"ods_crew_roster","field":"rest_min_hours"},"target":{"view":"dwd_ent_crew_member","field":"rest_min_hours"},"transform":"safe numeric cast; default policy 10","keyRole":"RULE_INPUT"},
+    {"concept":"CrewMember","conceptField":"assigned_flight_no","source":{"table":"ods_crew_roster","field":"assigned_flight_no"},"target":{"view":"dwd_ent_crew_member","field":"assigned_flight_no"},"transform":"direct","keyRole":"RELATION_KEY"},
+    {"concept":"CrewMember","conceptField":"compliance_flag","source":{"table":"ods_crew_roster","field":"compliance_flag"},"target":{"view":"dwd_ent_crew_member","field":"compliance_flag"},"transform":"direct evidence; recomputed by rule view","keyRole":"QUALITY_OUTPUT"},
+    {"concept":"WeatherEvent","conceptField":"entity_id","source":{"table":"ods_weather_metar","field":"airport_icao"},"target":{"view":"dwd_ent_weather_event","field":"entity_id"},"transform":"concat airport_icao || '#' || observe_time","keyRole":"COMPOSITE_PK"},
+    {"concept":"WeatherEvent","conceptField":"airport_icao","source":{"table":"ods_weather_metar","field":"airport_icao"},"target":{"view":"dwd_ent_weather_event","field":"airport_icao"},"transform":"direct ICAO","keyRole":"JOIN_KEY"},
+    {"concept":"WeatherEvent","conceptField":"observe_time","source":{"table":"ods_weather_metar","field":"observe_time"},"target":{"view":"dwd_ent_weather_event","field":"observe_time"},"transform":"direct datetime","keyRole":"COMPOSITE_PK"},
+    {"concept":"WeatherEvent","conceptField":"weather_phenomenon","source":{"table":"ods_weather_metar","field":"weather_phenomenon"},"target":{"view":"dwd_ent_weather_event","field":"weather_phenomenon"},"transform":"direct normalized text","keyRole":"RULE_INPUT"},
+    {"concept":"WeatherEvent","conceptField":"visibility_m","source":{"table":"ods_weather_metar","field":"visibility_m"},"target":{"view":"dwd_ent_weather_event","field":"visibility_m"},"transform":"safe numeric cast from raw visibility","keyRole":"RULE_INPUT"},
+    {"concept":"WeatherEvent","conceptField":"wind_gust_kt","source":{"table":"ods_weather_metar","field":"wind_gust_kt"},"target":{"view":"dwd_ent_weather_event","field":"wind_gust_kt"},"transform":"safe numeric cast; VRB stays in raw field","keyRole":"RULE_INPUT"},
+    {"concept":"WeatherEvent","conceptField":"severity_level","source":{"table":"ods_weather_metar","field":"severity_level"},"target":{"view":"dwd_ent_weather_event","field":"severity_level"},"transform":"direct; filter SEVERE","keyRole":"RULE_INPUT"},
+    {"concept":"WeatherEvent","conceptField":"flight_category","source":{"table":"ods_china_airport_current_weather","field":"flight_category"},"target":{"view":"dwd_ent_weather_event","field":"flight_category"},"transform":"fallback current-weather snapshot","keyRole":"QUALITY_INPUT"},
+    {"concept":"RunwayCapacity","conceptField":"entity_id","source":{"table":"ods_runway_slot","field":"airport_icao"},"target":{"view":"dwd_ent_runway_capacity","field":"entity_id"},"transform":"concat airport_icao || '#' || runway_id || '#' || slot_hour","keyRole":"COMPOSITE_PK"},
+    {"concept":"RunwayCapacity","conceptField":"airport_icao","source":{"table":"ods_runway_slot","field":"airport_icao"},"target":{"view":"dwd_ent_runway_capacity","field":"airport_icao"},"transform":"direct ICAO","keyRole":"JOIN_KEY"},
+    {"concept":"RunwayCapacity","conceptField":"runway_id","source":{"table":"ods_runway_slot","field":"runway_id"},"target":{"view":"dwd_ent_runway_capacity","field":"runway_id"},"transform":"direct","keyRole":"COMPOSITE_PK"},
+    {"concept":"RunwayCapacity","conceptField":"slot_hour","source":{"table":"ods_runway_slot","field":"slot_hour"},"target":{"view":"dwd_ent_runway_capacity","field":"slot_hour"},"transform":"direct hour bucket","keyRole":"COMPOSITE_PK"},
+    {"concept":"RunwayCapacity","conceptField":"declared_capacity","source":{"table":"ods_runway_slot","field":"declared_capacity"},"target":{"view":"dwd_ent_runway_capacity","field":"declared_capacity"},"transform":"NULLIF blank then numeric","keyRole":"RULE_INPUT"},
+    {"concept":"RunwayCapacity","conceptField":"available_capacity","source":{"table":"ods_runway_slot","field":"available_capacity"},"target":{"view":"dwd_ent_runway_capacity","field":"available_capacity"},"transform":"NULLIF blank then numeric","keyRole":"RULE_INPUT"},
+    {"concept":"RunwayCapacity","conceptField":"capacity_ratio","source":{"table":"ods_runway_slot","field":"capacity_ratio"},"target":{"view":"dwd_ent_runway_capacity","field":"capacity_ratio"},"transform":"NULLIF blank then numeric; 0..1 quality rule","keyRole":"RULE_INPUT"},
+    {"concept":"RunwayCapacity","conceptField":"restriction_reason","source":{"table":"ods_runway_slot","field":"restriction_reason"},"target":{"view":"dwd_ent_runway_capacity","field":"restriction_reason"},"transform":"direct","keyRole":"RULE_INPUT"}
+  ],
+  "relationMappings": [
+    {"relation":"operatedBy","sourceConcept":"FlightSegment","targetConcept":"AircraftTail","source":{"table":"ods_flight_schedule","field":"tail_no"},"target":{"table":"ods_aircraft_tail","field":"tail_no"},"view":"dwd_rel_flight_operated_by_tail","condition":"source tail_no = target tail_no"},
+    {"relation":"staffedBy","sourceConcept":"FlightSegment","targetConcept":"CrewMember","source":{"table":"ods_flight_schedule","field":"flight_no"},"target":{"table":"ods_crew_roster","field":"assigned_flight_no"},"view":"dwd_rel_flight_staffed_by_crew","condition":"same flight number and same operating date/window"},
+    {"relation":"impacts","sourceConcept":"WeatherEvent","targetConcept":"FlightSegment","source":{"table":"ods_weather_metar","field":"airport_icao#observe_time"},"target":{"table":"ods_flight_schedule","field":"dep_airport#std"},"view":"dwd_rel_weather_impacts_flight","condition":"airport matches and observe hour overlaps planned departure hour"}
+  ],
+  "ruleMappings": [
+    {"rule":"SWRL-WEATHER-DELAY","inputs":["dwd_rel_weather_impacts_flight.weather_phenomenon","dwd_ent_flight_segment.delay_minutes"],"output":"dwd_rule_weather_delay_inferred.inferred_class"},
+    {"rule":"SHACL-CREW-DUTY","inputs":["dwd_rel_flight_staffed_by_crew.duty_hours","dwd_rel_flight_staffed_by_crew.duty_limit_hours","dwd_rel_flight_staffed_by_crew.rest_hours","dwd_rel_flight_staffed_by_crew.rest_min_hours"],"output":"dwd_rule_crew_duty_violation.violation_type"}
+  ]
+}

@@ -48,10 +48,10 @@ import type {
   IngestionWriteMode
 } from "../../types/api";
 import { inferDatasourceDialect } from "../../utils/datasource";
+import { inferTargetTableMode, type TargetTableMode } from "./task-target-mode";
 
 type BusinessScheduleType = "manual" | "interval" | "daily" | "weekly" | "monthly" | "cron";
 type IncrementalMode = "timestamp" | "id";
-type TargetTableMode = "existing" | "create";
 
 type MappingRow = FieldMapping & {
   enabled: boolean;
@@ -3841,14 +3841,6 @@ function resolveScheduleType(scheduleConfig?: IngestionTask["scheduleConfig"]): 
   return type && ["manual", "interval", "daily", "weekly", "monthly", "cron"].includes(type)
     ? (type as BusinessScheduleType)
     : "manual";
-}
-
-function inferTargetTableMode(task: IngestionTask): TargetTableMode {
-  if (task.targetConfig?.table && task.targetConfig.table.length > 0) {
-    return "create";
-  }
-
-  return "existing";
 }
 
 function buildRecommendedTaskCode(taskName?: string, sourceTable?: string) {

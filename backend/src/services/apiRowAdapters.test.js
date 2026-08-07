@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const { adaptApiRows } = require("./apiRowAdapters");
+const { adaptApiRows, resolveApiRowAdapter, resolveApiSourceConfig } = require("./apiRowAdapters");
 
 const sampleRow = {
   flight_date: "2026-08-06",
@@ -89,4 +89,28 @@ test("相同来源记录产生稳定主键，国际到达机场标记为 INT", (
 
   assert.equal(first.flight_segment_id, second.flight_segment_id);
   assert.equal(first.segment_type, "INT");
+});
+
+test("航空stack航班任务缺少 rowAdapter 时自动使用标准适配器", () => {
+  assert.equal(
+    resolveApiRowAdapter({ sourceType: "api", sourceTable: "/flights", targetTable: "ods_flight_schedule" }, {}),
+    "aviationstack_flight_schedule"
+  );
+  assert.equal(
+    resolveApiRowAdapter({ sourceType: "api", sourceTable: "/flights", targetTable: "ods_flight_schedule" }, { rowAdapter: "custom" }),
+    "custom"
+  );
+});
+
+test("航空stack南航广州任务自动注入南航和广州出港查询参数", () => {
+  const sourceConfig = resolveApiSourceConfig(
+    { sourceType: "api", sourceTable: "/flights", targetTable: "ods_flight_schedule" },
+    { endpointPath: "/flights", queryParams: [] }
+  );
+
+  assert.equal(sourceConfig.rowAdapter, "aviationstack_flight_schedule");
+  assert.deepEqual(sourceConfig.queryParams, [
+    { name: "airline_iata", value: "CZ" },
+    { name: "dep_iata", value: "CAN" },
+  ]);
 });

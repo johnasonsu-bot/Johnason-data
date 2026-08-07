@@ -370,6 +370,49 @@ function parseColumnTypeDefinition(columnType) {
   };
 }
 
+function normalizePostgreSqlColumnType(columnType) {
+  const rawType = String(columnType || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const temporalMatch = rawType.match(/^(timestamp|time)\((\d+)\) (with|without) time zone$/);
+  const parsed = temporalMatch
+    ? {
+        baseType: `${temporalMatch[1]} ${temporalMatch[3]} time zone`,
+        args: [temporalMatch[2]],
+      }
+    : parseColumnTypeDefinition(rawType);
+  const { baseType, args } = parsed;
+  const aliases = {
+    varchar: "character varying",
+    char: "character",
+    int: "integer",
+    int4: "integer",
+    int8: "bigint",
+    int2: "smallint",
+    float8: "double precision",
+    float4: "real",
+    bool: "boolean",
+    timestamptz: "timestamp with time zone",
+    timestamp: "timestamp without time zone",
+    timetz: "time with time zone",
+    time: "time without time zone",
+    decimal: "numeric",
+  };
+  const normalizedBaseType = aliases[baseType] || baseType;
+  const isTemporalType = normalizedBaseType.startsWith("timestamp ") || normalizedBaseType.startsWith("time ");
+  const normalizedArgs = isTemporalType && args.length === 1 && args[0] === "6" ? [] : args;
+  return `${normalizedBaseType}${normalizedArgs.length ? `(${normalizedArgs.join(",")})` : ""}`;
+}
+
+function arePostgreSqlColumnTypesEquivalent(left, right) {
+  return normalizePostgreSqlColumnType(left) === normalizePostgreSqlColumnType(right);
+}
+
+function areColumnTypesEquivalent(left, right, sourceType = "mysql") {
+  if (isPostgreSqlSource(sourceType)) {
+    return arePostgreSqlColumnTypesEquivalent(left, right);
+  }
+  return String(left || "").trim().toLowerCase() === String(right || "").trim().toLowerCase();
+}
+
 function buildColumnDefinitionSql(sourceType, column) {
   let definition = `${escapeIdentifier(column.columnName, sourceType)} ${column.columnType}`;
   if (!column.isNullable) {
@@ -440,7 +483,7 @@ async function applyTableAndColumnComments(connection, dataSource, tableName, co
 function isColumnEquivalent(existingColumn, expectedColumn, sourceType = "mysql") {
   return (
     String(existingColumn.columnName) === String(expectedColumn.columnName) &&
-    String(existingColumn.columnType || "").toLowerCase() === String(expectedColumn.columnType || "").toLowerCase() &&
+    areColumnTypesEquivalent(existingColumn.columnType, expectedColumn.columnType, sourceType) &&
     Boolean(existingColumn.isNullable) === Boolean(expectedColumn.isNullable) &&
     Boolean(existingColumn.isPrimaryKey) === Boolean(expectedColumn.isPrimaryKey) &&
     normalizeDefaultValueForCompare(existingColumn.columnDefault) ===
@@ -1409,26 +1452,50 @@ async function getPostgreSqlPrimaryKeyConstraintName(connection, dataSource, tab
   return rows[0]?.constraintName || null;
 }
 
-async function applyPostgreSqlColumnAlterations(connection, dataSource, tableName, column) {
-  const qualifiedTable = escapeIdentifier(buildQualifiedTableName(dataSource, tableName), POSTGRESQL);
-  const qualifiedColumn = escapeIdentifier(column.columnName, POSTGRESQL);
-  const existingColumns = await getExistingColumns(connection, dataSource, tableName);
-  const existingColumn = existingColumns.find((item) => item.columnName === column.columnName);
-  const usingExpression = existingColumn
-    ? buildPostgreSqlUsingExpression(column.columnName, existingColumn.columnType, column.columnType)
-    : null;
-  const statements = [
-    `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} TYPE ${column.columnType}${usingExpression ? ` USING ${usingExpression}` : ""}`,
-    column.isNullable
-      ? `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} DROP NOT NULL`
-      : `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} SET NOT NULL`
-  ];
+function buildPostgreSqlColumnAlterationStatements(tableName, existingColumn, expectedColumn) {
+  const qualifiedTable = escapeIdentifier(tableName, POSTGRESQL);
+  const qualifiedColumn = escapeIdentifier(expectedColumn.columnName, POSTGRESQL);
+  const statements = [];
 
-  const formattedDefault = formatDefaultValue(POSTGRESQL, column.columnDefault);
-  statements.push(
-    formattedDefault === null
-      ? `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} DROP DEFAULT`
-      : `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} SET DEFAULT ${formattedDefault}`
+  if (!arePostgreSqlColumnTypesEquivalent(existingColumn.columnType, expectedColumn.columnType)) {
+    const usingExpression = buildPostgreSqlUsingExpression(
+      expectedColumn.columnName,
+      existingColumn.columnType,
+      expectedColumn.columnType
+    );
+    statements.push(
+      `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} TYPE ${expectedColumn.columnType}${usingExpression ? ` USING ${usingExpression}` : ""}`
+    );
+  }
+
+  if (Boolean(existingColumn.isNullable) !== Boolean(expectedColumn.isNullable)) {
+    statements.push(
+      expectedColumn.isNullable
+        ? `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} DROP NOT NULL`
+        : `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} SET NOT NULL`
+    );
+  }
+
+  if (
+    normalizeDefaultValueForCompare(existingColumn.columnDefault) !==
+    normalizeDefaultValueForCompare(expectedColumn.columnDefault)
+  ) {
+    const formattedDefault = formatDefaultValue(POSTGRESQL, expectedColumn.columnDefault);
+    statements.push(
+      formattedDefault === null
+        ? `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} DROP DEFAULT`
+        : `ALTER TABLE ${qualifiedTable} ALTER COLUMN ${qualifiedColumn} SET DEFAULT ${formattedDefault}`
+    );
+  }
+
+  return statements;
+}
+
+async function applyPostgreSqlColumnAlterations(connection, dataSource, tableName, existingColumn, column) {
+  const statements = buildPostgreSqlColumnAlterationStatements(
+    buildQualifiedTableName(dataSource, tableName),
+    existingColumn,
+    column
   );
 
   for (const sql of statements) {
@@ -1451,8 +1518,15 @@ async function syncTableColumnsPostgreSql(connection, dataSource, tableName, col
       changes.push(`add:${column.columnName}`);
     }
 
+    const existingColumnMap = new Map(existingColumns.map((column) => [column.columnName, column]));
     for (const column of plan.modifications) {
-      await applyPostgreSqlColumnAlterations(connection, dataSource, tableName, column);
+      await applyPostgreSqlColumnAlterations(
+        connection,
+        dataSource,
+        tableName,
+        existingColumnMap.get(column.columnName),
+        column
+      );
       changes.push(`modify:${column.columnName}`);
     }
 
@@ -1571,5 +1645,7 @@ module.exports = {
     formatDefaultValue,
     normalizePostgreSqlColumnDefault,
     normalizeDefaultValueForCompare,
+    arePostgreSqlColumnTypesEquivalent,
+    buildPostgreSqlColumnAlterationStatements,
   }
 };

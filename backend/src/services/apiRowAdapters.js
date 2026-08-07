@@ -12,6 +12,42 @@ function adaptApiRows(adapterCode, rows = [], now = new Date()) {
   throw new Error(`Unsupported API row adapter: ${code}`);
 }
 
+function resolveApiRowAdapter(task = {}, sourceConfig = {}) {
+  const explicit = String(sourceConfig.rowAdapter || "").trim();
+  if (explicit) return explicit;
+
+  const sourceType = String(task.sourceType || task.sourceDialect || "").toLowerCase();
+  const sourceTable = String(task.sourceTable || "").trim().toLowerCase();
+  const targetTable = String(task.targetTable || "").trim().toLowerCase();
+  if (sourceType === "api" && sourceTable === "/flights" && targetTable === "ods_flight_schedule") {
+    return "aviationstack_flight_schedule";
+  }
+  return "";
+}
+
+function resolveApiSourceConfig(task = {}, sourceConfig = {}) {
+  const normalizedSourceConfig = sourceConfig && typeof sourceConfig === "object" ? sourceConfig : {};
+  const adapterCode = resolveApiRowAdapter(task, normalizedSourceConfig);
+  if (adapterCode !== "aviationstack_flight_schedule") {
+    return normalizedSourceConfig;
+  }
+
+  const queryParams = Array.isArray(normalizedSourceConfig.queryParams)
+    ? [...normalizedSourceConfig.queryParams]
+    : Object.entries(normalizedSourceConfig.queryParams || {}).map(([name, value]) => ({ name, value }));
+  const existingNames = new Set(queryParams.map((item) => String(item?.name || item?.key || "").trim().toLowerCase()).filter(Boolean));
+  const requiredParams = [
+    { name: "airline_iata", value: "CZ" },
+    { name: "dep_iata", value: "CAN" },
+  ];
+
+  return {
+    ...normalizedSourceConfig,
+    rowAdapter: adapterCode,
+    queryParams: queryParams.concat(requiredParams.filter((item) => !existingNames.has(item.name))),
+  };
+}
+
 function adaptAviationstackFlight(row, now) {
   const flightNo = firstText(row.flight_iata, `${row.airline_iata || ""}${row.flight_number || ""}`);
   const depAirport = "ZGGG";
@@ -93,4 +129,6 @@ function firstText(...values) {
 
 module.exports = {
   adaptApiRows,
+  resolveApiRowAdapter,
+  resolveApiSourceConfig,
 };

@@ -536,7 +536,7 @@ export function DataSourcesPage() {
         clientId: nextType === "kafka" ? "medata-ingestion-preview" : undefined,
         topicPattern: undefined,
         fromBeginning: nextType === "kafka" ? true : undefined,
-        baseUrl: nextType === "api" ? "http://127.0.0.1:45121" : undefined,
+        baseUrl: nextType === "api" ? "http://127.0.0.1:46121" : undefined,
         timeoutMs: nextType === "api" ? 30000 : undefined,
       });
     }
@@ -1414,7 +1414,7 @@ export function DataSourcesPage() {
                     <>
                       <Col span={16}>
                         <Form.Item name="baseUrl" label="Base URL" rules={[{ required: true, message: "请输入 API Base URL" }]}>
-                          <Input placeholder="例如：http://127.0.0.1:45121" />
+                          <Input placeholder="例如：http://127.0.0.1:46121" />
                         </Form.Item>
                       </Col>
                       <Col span={8}>

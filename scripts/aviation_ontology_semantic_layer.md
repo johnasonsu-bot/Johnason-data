@@ -90,3 +90,11 @@
 ## 9. 执行入口
 
 数据库迁移脚本：`scripts/aviation_ontology_governance.sql`。脚本为 PostgreSQL 方言，可在 `ods` 库重复运行。
+
+## 10. 语义层知识库与可视化交付
+
+- 行业知识库（术语、规则、案例、动作）：`scripts/aviation_ontology_knowledge_base.md` / `scripts/aviation_ontology_knowledge_base.json`
+- 概念到物理字段级血缘：`scripts/aviation_ontology_field_lineage.md` / `scripts/aviation_ontology_field_lineage.json`
+- 字段级血缘元数据与查询视图：`scripts/aviation_ontology_field_lineage.sql`
+- Obsidian 风格分层动态图谱（支持 Force 切换、搜索、筛选、详情和邻居跳转）：`outputs/aviation_ontology_knowledge_graph.html`
+- 航空延误处置模拟（天气推理、机组约束、跑道容量、动作审计）：`outputs/aviation_delay_decision_simulation.html`

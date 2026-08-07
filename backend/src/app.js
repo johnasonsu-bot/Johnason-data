@@ -11,6 +11,7 @@ const notFoundHandler = require("./common/middleware/not-found");
 const asyncHandler = require("./common/utils/async-handler");
 const authMiddleware = require("./common/middleware/auth");
 const optionalAuthMiddleware = require("./common/middleware/optional-auth");
+const activationMiddleware = require("./common/middleware/activation");
 const requireFeature = require("./common/middleware/license-feature");
 const { validateBody } = require("./common/middleware/validate");
 const authRoutes = require("./modules/auth/auth.routes");
@@ -37,6 +38,7 @@ const dataModelingRoutes = require("./modules/data-lab/data-lab.routes");
 const qualityControlRoutes = require("./modules/quality-control/quality-control.routes");
 const dataServiceRoutes = require("./modules/data-services/data-service.routes");
 const dataServiceRuntimeRoutes = require("./modules/data-services/data-service.runtime.routes");
+const dataServiceService = require("./modules/data-services/data-service.service");
 const reportingRoutes = require("./modules/reporting/reporting.routes");
 const reportingController = require("./modules/reporting/reporting.controller");
 const { getRuntimeDatabaseCapabilityStatus } = require("./common/utils/datasource-capabilities");
@@ -56,6 +58,14 @@ app.get("/api/health", (req, res) => {
 app.get("/api/v1/platform/database-capabilities", (req, res) => {
   res.json({ data: getRuntimeDatabaseCapabilityStatus() });
 });
+app.get("/api/v1/jobs/:id", activationMiddleware, requireFeature("services"), asyncHandler(async (req, res) => {
+  const result = await dataServiceService.inspectServiceJob(Number(req.params.id), {
+    headers: req.headers,
+    ip: req.ip,
+    req,
+  });
+  return res.json(result);
+}));
 
 app.post("/api/auth/login", validateBody(loginSchema), asyncHandler(authController.login));
 app.get("/api/auth/profile", authMiddleware, asyncHandler(authController.profile));

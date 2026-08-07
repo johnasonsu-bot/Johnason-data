@@ -10,7 +10,7 @@ const dataSourceMetadata = require("../modules/data-sources/data-source.metadata
 const { parseFileBuffer } = require("../modules/file-imports/file-import.parser");
 const hiveService = require("./hiveService");
 const apiIngestionService = require("./apiIngestionService");
-const { adaptApiRows } = require("./apiRowAdapters");
+const { adaptApiRows, resolveApiSourceConfig } = require("./apiRowAdapters");
 const { buildConflictClause, deduplicateRowsByKeys } = require("./sqlInsertBuilder");
 const { createPostgresLikeClient } = require("../common/utils/db-client");
 const { inferDatasourceDialect, resolveDatasourceConnection } = require("../common/utils/datasource-dialect");
@@ -30,7 +30,7 @@ async function executeStreamTask(task, jobRun = null) {
 }
 
 async function executeApiTask(task, jobRun = null) {
-  const sourceConfig = task.sourceConfig || {};
+  const sourceConfig = resolveApiSourceConfig(task, task.sourceConfig || {});
   const parseConfig = task.parseConfig || {};
   const errorConfig = task.errorConfig || {};
   const state = await repository.getApiSyncState(task.id, "default");
