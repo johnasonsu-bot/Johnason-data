@@ -1,12 +1,14 @@
 # Data Platform 全平台 CLI 化架构设计
 
+> 设计版本：1.1 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
+
 ## 1. 结论
 
 Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI 不启动或调用 Express HTTP 服务，而是在独立 Node.js 进程中复用与 Web 相同的应用服务、权限策略、项目上下文和数据访问层，直接连接 MySQL、DataX、Kafka 与 JDBC 运行时。
 
 架构采用“同步命令确定性受理、异步事件驱动归集”的模式：同步命令在一个本地 ACID 事务内完成业务校验、权威数据写入、审计事实和事务 Outbox 追加；daemon 将 Outbox 事件发布至 Kafka，消费者通过 Inbox 去重形成对账、预警、报表与 Agent 上下文投影。跨模块长任务使用 MySQL 持久化状态机和 daemon worker，不引入 Temporal。
 
-本设计覆盖当前后端全部业务模块。现有 Web API 路由和行为保持兼容；CLI 不成为绕过用户权限、只读限制或项目隔离的后门。
+本设计以用户提供的 Data Platform 功能入口和 API 清单为覆盖基线，明确纳入 84 个前端访问入口、23 个挂载业务模块、590 条模块路由和 6 条应用级直接接口，共 596 条 API。现有 Web API 路由和行为保持兼容；CLI 不成为绕过用户权限、只读限制或项目隔离的后门。
 
 ## 2. 目标与非目标
 
@@ -21,6 +23,7 @@ Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI �
 - 以事务 Outbox、Kafka、Inbox、任务状态机、重试、死信、补偿和证据链支撑可靠异步处理。
 - 提供无 HTTP daemon，承载 scheduler、worker、Kafka consumer 和必要的数据服务 runtime。
 - 保持 Web API 行为兼容，并使 Web 与 CLI 逐步共享相同应用服务。
+- 以机器可校验的追踪矩阵证明 `596/596` API 和 `84/84` 前端入口均已分配 CLI 能力面；任何新增、删除或修改的入口都必须先更新矩阵。
 
 ### 2.2 非目标
 
@@ -30,6 +33,122 @@ Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI �
 - 不在首期补齐许可证或激活实现。现有 `activation` 与 `license-feature` 为空实现，CLI 保持相同行为，但预留共享 policy 扩展点。
 - 不提供隐式管理员模式或权限绕过参数。
 - 不把密码、Token、模型密钥或其他敏感信息写入普通配置文件、日志或命令输出。
+
+### 2.3 覆盖清单来源与版本边界
+
+本设计使用以下三份资产，而不是仅依据仓库目录或示例路由推断功能：
+
+| 资产 | 用途 | SHA-256 |
+|---|---|---|
+| `api-inventory.json` | 596 条 API、23 个模块、84 个前端入口的机器清单 | `6cd896d1e38fb54ebd8317842eb618c4a28ede4eecf5e09f5bfb16374d696d0f` |
+| `PROJECT_OPERATION_MANUAL.md` | 模块目标、操作步骤、输入输出、完整接口目录和运行边界 | `619cf9c139ebd49788acd8a1a7440d5d8574cb9034b4bb7e13de1a14ca8db350` |
+| `project-operation-knowledge-graph.html` | 人员、页面、模块、API、数据、基础设施和治理规则之间的关系 | `1fa8acde4615bc6bed8af23ad277fde1089643781bbb1414dd45d5302c03468f` |
+
+清单扫描基线为 `dev@d2eeaca4c3fb562b9f064a6229178365998e68e4`。CLI 实施前必须将该提交与实际实施分支进行 inventory diff：新增接口进入范围，删除接口保留迁移说明，签名变化更新输入输出合同。不能用较旧分支的测试通过来替代清单对齐。
+
+机器追踪文件为 [`data-platform-cli-coverage-baseline.json`](./data-platform-cli-coverage-baseline.json)，生成器为 `scripts/generate-cli-coverage-baseline.js`。追踪文件中每条 API 都包含建议 CLI 命令、action、交互类型、输入输出方式、同步/异步模式、认证、项目范围、feature guard、校验 schema、确认要求和源码位置；每个前端入口都包含对应 CLI capability surface。
+
+### 2.4 API 全量覆盖矩阵
+
+23 个业务模块的路由覆盖如下，模块路由合计 590 条：
+
+| API 模块 | 路由数 | CLI 能力面 |
+|---|---:|---|
+| 认证与会话 `auth` | 4 | `auth` |
+| 项目空间 `projects` | 17 | `project` |
+| 平台总览 `platform` | 1 | `platform` |
+| 资产检索 `asset-search` | 8 | `asset-search` |
+| 数据地图 `data-map` | 41 | `data-map` |
+| 数据标准 `data-standards` | 31 | `standard` |
+| 数据源接入 `data-sources` | 9 | `datasource` |
+| 数据调研 `data-source-research` | 18 | `source-research` |
+| 建模数据源 `data-modeling-sources` | 9 | `data-lab source` |
+| 接入任务 `ingestion-tasks` | 14 | `ingestion` |
+| 文件导入 `file-imports` | 11 | `file-import` |
+| 模型提供商 `model-providers` | 5 | `model-provider` |
+| 接入 AI 配置 `ingestion-ai-configs` | 2 | `ingestion ai-config` |
+| 开发 AI 配置 `dev-ai-configs` | 2 | `development ai-config` |
+| 报表 AI 配置 `reporting-ai-configs` | 2 | `reporting ai-config` |
+| 系统管理 `system-management` | 27 | `system` |
+| 知识库 `system-knowledge-bases` | 12 | `knowledge-base` |
+| 数据开发 `data-development` | 82 | `development` |
+| 数据建模实验室 `data-modeling` | 135 | `data-lab` |
+| 质量管控 `quality-control` | 87 | `quality` |
+| 数据服务 `data-services` | 30 | `service` |
+| 数据服务运行时 `service-runtime` | 2 | `service invoke` |
+| 报表平台 `reporting` | 41 | `reporting` |
+
+清单还包含 6 条不在上述模块 route 文件中的应用级直接接口，必须显式映射，禁止遗漏：
+
+| 直接接口 | CLI 映射 |
+|---|---|
+| `GET /api/health` | `system doctor health` |
+| `GET /api/v1/platform/database-capabilities` | `system doctor database-capabilities` |
+| `GET /api/v1/jobs/:id` | `job show <id>` |
+| `POST /api/auth/login` | `auth login` 的兼容入口，不重复实现业务逻辑 |
+| `GET /api/auth/profile` | `auth profile` 的兼容入口，不重复实现业务逻辑 |
+| `GET /api/v1/reporting/runtime/dashboards/:id` | `reporting runtime dashboard show <id>` |
+
+596 条 API 按传输形态分为 230 条 JSON 读取、339 条 JSON 写入、12 条 multipart 上传、13 条下载和 2 条流式接口。CLI 对每种形态采用统一适配：
+
+| API 交互 | 数量 | CLI 输入输出合同 |
+|---|---:|---|
+| `json-read` | 230 | flags/query → human table/detail 或 JSON envelope |
+| `json-write` | 339 | flags 或 `--file` JSON/YAML → JSON envelope；写操作纳入幂等与审计 |
+| `multipart` | 12 | `--file`/`--files` + flags；保留文件名、类型、大小与摘要证据 |
+| `download` | 13 | 必须指定 `--output`；校验文件存在、大小、摘要和格式 |
+| `stream` | 2 | human stream 或 NDJSON；日志写 stderr，取消信号可安全中止 |
+
+### 2.5 前端功能入口全量覆盖
+
+84 个前端入口按 CLI 能力域归集如下。追踪矩阵仍保留每一条具体路径，不能仅凭本表的汇总数声明完成：
+
+| 功能入口域 | 入口数 | CLI 能力面 |
+|---|---:|---|
+| 资产检索 | 3 | `asset-search` |
+| 数据开发与处理 | 13 | `development`、`development processing`、`development scheduling` |
+| 数据接入、文件与调研 | 6 | `datasource`、`source-research`、`ingestion`、`file-import` |
+| 数据地图 | 6 | `data-map` |
+| 数据建模 | 10 | `data-lab` |
+| 数据标准 | 8 | `standard` |
+| 平台总览 | 1 | `platform` |
+| 质量管控 | 10 | `quality` |
+| 报表平台 | 8 | `reporting` |
+| 数据服务 | 8 | `service` 及其 datasource/app/authorization/usage/audit/ops 子组 |
+| 系统管理 | 11 | `system`、`project`、`model-provider`、`knowledge-base` |
+
+对每个页面入口，CLI 覆盖对象是页面上用户可触发的业务动作和可读取的业务状态，而不是页面布局、CSS、拖拽手势等表现层细节。一个页面只有在以下条件同时满足时才能标记 `verified`：
+
+1. 页面调用的所有 API 已关联至少一个已实现 CLI capability；
+2. 纯前端但具有业务含义的操作已有 CLI 等价输入，例如图编辑器使用 `--file` 接收图模型；
+3. 页面产生的下载、上传、流式、预览和长任务均有对应 CLI I/O 合同；
+4. 页面权限、项目隔离和只读限制有 Web/CLI 契约测试；
+5. 无 CLI 意义的纯表现功能必须逐项标记 `notApplicable` 并写明理由，不能整页豁免。
+
+### 2.6 覆盖状态与硬门禁
+
+追踪矩阵使用四种状态：
+
+- `designed`：已分配 CLI 能力面和 I/O 策略，但不声称已经实现。
+- `implemented`：命令注册表、application service 和 adapter 均存在。
+- `verified`：Web/CLI 契约测试与 CLI subprocess 测试通过。
+- `notApplicable`：仅允许用于没有业务语义的表现层能力，必须有书面理由和审查记录。
+
+CI 必须执行覆盖校验并满足：
+
+```text
+API inventory total       = 596
+API mapped                = 596
+API unmapped              = 0
+Frontend entry total      = 84
+Frontend entry mapped     = 84
+Frontend entry unmapped   = 0
+Duplicate API key         = 0
+Unknown CLI group         = 0
+Stale source fingerprint  = 0
+```
+
+正式发布还要求所有条目从 `designed` 收敛为 `verified` 或经审查的 `notApplicable`。只做到命令名称映射不构成完成。
 
 ## 3. 总体架构
 
@@ -75,12 +194,14 @@ data-platform[prod/project-a]> datasource list
 
 - 基础：`auth`、`config`、`project`、`platform`。
 - 数据资产：`asset-search`、`data-map`、`standard`。
-- 数据接入：`datasource`、`source-research`、`ingestion`、`file-import`。
+- 数据接入：`datasource`、`source-research`、`ingestion`、`ingestion ai-config`、`file-import`。
 - 模型与建模：`model-provider`、`data-lab`。
-- 开发与质量：`development`、`quality`。
-- 服务与报表：`service`、`reporting`。
-- 平台管理：`knowledge-base`、`system`。
+- 开发与质量：`development`、`development ai-config`、`quality`。
+- 服务与报表：`service`、`service invoke`、`reporting`、`reporting ai-config`。
+- 平台管理：`knowledge-base`、`system`、`system doctor`。
 - 治理与可靠性：`event`、`job`、`reconcile`、`audit`、`daemon`。
+
+命令组允许多个 API alias 或多个页面入口汇聚到同一 application capability，但每条命令必须通过 `sourceApiKeys` 和 `sourceFrontendKeys` 反向列出覆盖来源。一个 API 只能在明确标注 alias 时与另一 API 共用 capability，避免“看起来有相似命令”却遗漏不同业务语义。
 
 ### 4.3 统一命令规则
 
@@ -100,6 +221,9 @@ data-platform[prod/project-a]> datasource list
 ```js
 {
   command: "quality task run",
+  capabilityId: "quality.task.run",
+  sourceApiKeys: ["POST /api/v1/quality-control/tasks/:id/run"],
+  sourceFrontendKeys: ["/dashboard/quality-control/tasks"],
   modules: ["quality"],
   action: "execute",
   mutates: true,
@@ -317,7 +441,9 @@ DataX、外部数据库、Kafka、模型供应商和文件导入统一通过 ada
 
 ### 14.2 全平台完成条件
 
-- 每条现有 Express route 都映射到 CLI 命令，或在能力清单中记录经审查的不适用原因。
+- 覆盖清单必须显示 `596/596` API、`84/84` 前端入口已映射，且 unmapped、duplicate key、unknown group 和 stale fingerprint 均为 0。
+- 每条 API 必须关联已注册 capability，并在 registry 中保留 `sourceApiKeys`；每个前端入口必须关联 `sourceFrontendKeys`。
+- 所有清单项必须是 `verified` 或经审查的 `notApplicable`；`designed`、`implemented` 均不能进入正式发布。
 - 每个业务域至少有一个使用真实数据库的闭环测试。
 - 所有危险命令、长任务、流式输出和文件输入输出均有 subprocess 测试。
 - Outbox/Inbox、任务状态机、重试、死信、重放、补偿和证据链均有故障注入测试。
@@ -334,7 +460,7 @@ DataX、外部数据库、Kafka、模型供应商和文件导入统一通过 ada
 3. 核心数据闭环：project、datasource、development、ingestion、quality。
 4. 资产与建模：asset-search、data-map、standard、source-research、file-import、model-provider、data-lab。
 5. 服务与消费：service、reporting、knowledge-base、system。
-6. 能力清单收口、全域 E2E、故障注入、Agent 验收、文档与 npm 包验证。
+6. 将 596 条 API 和 84 个前端入口的追踪状态逐项收口，全域 E2E、故障注入、Agent 验收、文档与 npm 包验证。
 
 每个阶段都必须保持 Web API 回归通过，并交付可独立验证的命令闭环。
 
@@ -345,4 +471,3 @@ DataX、外部数据库、Kafka、模型供应商和文件导入统一通过 ada
 - npm 全局包直连多种原生或可选数据库驱动，安装兼容性风险高。包应按能力延迟加载驱动，并在 `system doctor` 中给出精确诊断。
 - Kafka 或 daemon 暂时不可用时，同步业务事务仍可提交并积压 Outbox；系统必须暴露 backlog、最老事件年龄和恢复状态。
 - 全平台范围较大，能力清单是范围控制和完成判定的唯一依据；不得以“已有通用命令”替代逐路由核对。
-
