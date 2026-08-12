@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "acceptanceId": "build-aviation-ontology-v1",
+  "purpose": "Verify that an agent can execute the build-aviation-ontology skill end to end through data-platform CLI only.",
+  "skillSource": {
+    "path": "/Users/sushi/Downloads/FDE 源码/data-platform-source-20260804-222702/build-aviation-ontology/SKILL.md",
+    "sha256": "be6646cfa4e499e21c97152ee5b2311afbd0a2f995e4966af7656e47ea03f64c",
+    "referencePath": "/Users/sushi/Downloads/FDE 源码/data-platform-source-20260804-222702/build-aviation-ontology/references/reference-workflow.md",
+    "referenceSha256": "474ea88c6bcdb0662515f4117a8f14eaa9ba2182eec2a0bc26bd4bfd80b2199f"
+  },
+  "executionPolicy": {
+    "allowedPlatformInterface": "data-platform CLI",
+    "forbiddenBypasses": [
+      "curl or direct HTTP calls",
+      "browser actions used to complete or verify platform work",
+      "mysql, psql, or direct database clients",
+      "direct imports of backend controllers, services, or repositories",
+      "bootstrap-aviation-demo.js or other repository bootstrap scripts",
+      "manual database edits"
+    ],
+    "allowedExternalPrerequisites": [
+      "install and start the data-platform CLI and daemon",
+      "provide source files and non-secret contract files",
+      "inject secret references through the configured system keychain",
+      "start externally managed MySQL, Kafka, PostgreSQL, DataX, or JDBC dependencies"
+    ]
+  },
+  "requiredCliOnlyCapabilities": [
+    "project resolve/access check",
+    "standard field-mapping apply",
+    "knowledge-base wait/search",
+    "reconcile project",
+    "ontology contract validate/import/show/diff",
+    "ontology lineage validate/import/show",
+    "ontology graph export/verify",
+    "ontology simulation export/verify",
+    "acceptance aviation-ontology preflight/run/verify/report"
+  ],
+  "phases": [
+    {
+      "id": "baseline",
+      "name": "环境与基线",
+      "requiredCommands": [
+        "data-platform system doctor --all --json",
+        "data-platform project resolve --code <project-code> --require-one --json",
+        "data-platform project access check --project <project-id> --action write --json",
+        "data-platform project asset import preview --file <package> --json",
+        "data-platform acceptance aviation-ontology preflight --contract <contract.json> --json"
+      ],
+      "evidence": [
+        "profile and dependency status",
+        "resolved project ID and write authorization",
+        "baseline test results and pre-existing failure classification",
+        "project package compatibility findings when a package is supplied"
+      ]
+    },
+    {
+      "id": "ingestion",
+      "name": "数据接入与 ODS",
+      "requiredCommands": [
+        "data-platform datasource test-connection --id <source-id> --json",
+        "data-platform ingestion preview-source-data --file <ingestion.json> --json",
+        "data-platform ingestion create-task --file <ingestion.json> --json",
+        "data-platform ingestion run-task-now <task-id> --wait --json",
+        "data-platform ingestion get-job-runs <task-id> --json"
+      ],
+      "evidence": [
+        "input, filtered, written, rejected, and duplicate counts",
+        "target table, business key, incremental cursor, audit fields, and raw payload strategy",
+        "real response shape and exceptional METAR value handling",
+        "separate fixed-demo and realtime-weather destinations"
+      ]
+    },
+    {
+      "id": "red",
+      "name": "首轮试跑 RED",
+      "requiredCommands": [
+        "data-platform quality create-task --file <red-quality-task.json> --json",
+        "data-platform quality run-task-now <task-id> --wait --json",
+        "data-platform quality list-task-runs <task-id> --json",
+        "data-platform quality create-quality-report --file <report.json> --json",
+        "data-platform audit show <audit-id> --json"
+      ],
+      "evidence": [
+        "immutable pre-governance quality snapshot",
+        "NULL, empty, duplicate, conversion, temporal, airport-code, and relationship-join statistics",
+        "expected-versus-actual RED findings",
+        "traceable source evidence retained"
+      ]
+    },
+    {
+      "id": "governance",
+      "name": "ODS 治理",
+      "requiredCommands": [
+        "data-platform development query execute --datasource <source-id> --sql-file <precheck.sql> --transaction --json",
+        "data-platform development query execute --datasource <source-id> --sql-file <governance.sql> --transaction --json",
+        "data-platform standard create-data-element --file <element.json> --json",
+        "data-platform standard field-mapping apply --file <mapping.json> --json",
+        "data-platform quality save-dictionary --file <dictionary.json> --json"
+      ],
+      "evidence": [
+        "precondition result proves constraint-dependent anomaly counts are zero",
+        "before/after row counts and non-loss assertion",
+        "keys, audit fields, comments, owner, business system, publication status",
+        "deduplicated consumption layer while original duplicate evidence remains"
+      ]
+    },
+    {
+      "id": "ontology",
+      "name": "本体与字段血缘",
+      "requiredCommands": [
+        "data-platform ontology contract validate --file <ontology.json> --json",
+        "data-platform ontology contract import --file <ontology.json> --json",
+        "data-platform ontology lineage validate --file <lineage.json> --json",
+        "data-platform ontology lineage import --file <lineage.json> --json",
+        "data-platform ontology contract diff --project <project-id> --file <ontology.json> --json"
+      ],
+      "evidence": [
+        "entity identifiers and core attributes",
+        "relation subject, object, source/target table, source/target field, key roles, and join condition",
+        "executable inference and constraint rules",
+        "no dangling relation endpoint or lineage reference",
+        "JSON, Markdown, SQL, models, and graph use one semantic contract version"
+      ]
+    },
+    {
+      "id": "platform-load",
+      "name": "平台装载与产物",
+      "requiredCommands": [
+        "data-platform data-map register-resources --file <resources.json> --json",
+        "data-platform source-research create-research-task-run <task-id> --wait --json",
+        "data-platform data-lab save-business-system-template-logical-model <template-id> --file <logical-model.json> --json",
+        "data-platform data-lab save-business-system-instance-physical-model <instance-id> --file <physical-model.json> --json",
+        "data-platform knowledge-base upload-knowledge-document <kb-id> --file <document> --wait --json",
+        "data-platform reporting create-report-dataset --file <dataset.json> --json",
+        "data-platform reporting create-report-dashboard --file <dashboard.json> --json",
+        "data-platform ontology graph export --contract <ontology.json> --output <graph.html> --json",
+        "data-platform ontology simulation export --contract <ontology.json> --output <simulation.html> --json"
+      ],
+      "evidence": [
+        "ODS metadata and data-map resource counts are greater than zero",
+        "logical and physical model IDs are queryable",
+        "knowledge document ID reaches parse-success and vector-ready states within a bounded timeout",
+        "dataset query returns real rows and dashboard runtime resolves the correct data source",
+        "offline graph and simulation HTML files exist and pass structural verification",
+        "rerun produces content-equivalent assets without duplicate business keys"
+      ]
+    },
+    {
+      "id": "green",
+      "name": "最终验收 GREEN",
+      "requiredCommands": [
+        "data-platform acceptance aviation-ontology verify --run <acceptance-run-id> --json",
+        "data-platform ontology graph verify --contract <ontology.json> --html <graph.html> --json",
+        "data-platform reporting preview-report-dataset --file <dataset-query.json> --json",
+        "data-platform asset-search business-data-search --file <search.json> --json",
+        "data-platform reconcile project --project <project-id> --json",
+        "data-platform acceptance aviation-ontology report --run <acceptance-run-id> --output <report.json> --json"
+      ],
+      "evidence": [
+        "source/target counts, non-null and uniqueness checks, cursor and exceptional-value handling",
+        "entity/relation/rule counts match the selected contract rather than historical fixed counts",
+        "all relation endpoints and lineage references resolve",
+        "RED findings turn GREEN while original evidence remains traceable",
+        "knowledge search, business-data search, dataset query, dashboard runtime, graph, and simulation work",
+        "specialized tests, syntax checks, frontend build, secret scan, and diff check results"
+      ]
+    }
+  ],
+  "hardFailures": [
+    "project ID differs between CLI context, governance execution, or platform assets",
+    "ODS metadata count is zero",
+    "data-map resource count is zero",
+    "a relation endpoint or lineage reference is dangling",
+    "knowledge-base documents are absent, unparsed, or not vector-ready",
+    "a report references the wrong data source or returns no real query result",
+    "governance applies only partially after dirty-data constraint failure",
+    "a platform mutation or verification was completed through a forbidden bypass",
+    "a real dependency was unavailable but the report claims end-to-end success"
+  ],
+  "demoRegressionReference": {
+    "projectCode": "aviation_ontology_demo",
+    "tables": 7,
+    "rows": 89,
+    "entities": 5,
+    "relationTypes": 3,
+    "rules": 2,
+    "semanticGraphNodes": 40,
+    "semanticGraphEdges": 57,
+    "semanticGraphLayers": 5,
+    "warning": "These values apply only to the historical aviation demo and must not be treated as generic acceptance constants."
+  }
+}

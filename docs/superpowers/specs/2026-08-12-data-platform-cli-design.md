@@ -1,6 +1,6 @@
 # Data Platform 全平台 CLI 化架构设计
 
-> 设计版本：1.1 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
+> 设计版本：1.2 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
 
 ## 1. 结论
 
@@ -199,6 +199,7 @@ data-platform[prod/project-a]> datasource list
 - 开发与质量：`development`、`development ai-config`、`quality`。
 - 服务与报表：`service`、`service invoke`、`reporting`、`reporting ai-config`。
 - 平台管理：`knowledge-base`、`system`、`system doctor`。
+- 语义与验收：`ontology`、`acceptance aviation-ontology`。
 - 治理与可靠性：`event`、`job`、`reconcile`、`audit`、`daemon`。
 
 命令组允许多个 API alias 或多个页面入口汇聚到同一 application capability，但每条命令必须通过 `sourceApiKeys` 和 `sourceFrontendKeys` 反向列出覆盖来源。一个 API 只能在明确标注 alias 时与另一 API 共用 capability，避免“看起来有相似命令”却遗漏不同业务语义。
@@ -450,6 +451,109 @@ DataX、外部数据库、Kafka、模型供应商和文件导入统一通过 ada
 - 现有 Web API 回归测试全部通过。
 - `npm pack` 后的包可全局安装，`data-platform --help`、REPL、JSON 输出和 daemon 可从任意目录运行。
 - `SKILL.md` 自包含安装、命令组、JSON/NDJSON、错误处理、危险操作和真实工作流示例。
+
+### 14.3 `build-aviation-ontology` Skill 端到端验收
+
+CLI 的业务验收基准采用用户提供的外部 `build-aviation-ontology/SKILL.md`。由于该 Skill 源文件不属于本仓库，设计以内容摘要锁定版本：
+
+| Skill 资产 | SHA-256 |
+|---|---|
+| `build-aviation-ontology/SKILL.md` | `be6646cfa4e499e21c97152ee5b2311afbd0a2f995e4966af7656e47ea03f64c` |
+| `build-aviation-ontology/references/reference-workflow.md` | `474ea88c6bcdb0662515f4117a8f14eaa9ba2182eec2a0bc26bd4bfd80b2199f` |
+
+完整机器验收规范见 [`aviation-ontology-cli-acceptance.json`](./aviation-ontology-cli-acceptance.json)。该规范把 Skill 的环境基线、数据接入、RED 首轮试跑、ODS 治理、本体与血缘、平台装载、GREEN 验收七个阶段映射到明确 CLI 命令、证据和失败条件。
+
+#### 14.3.1 验收结论标准
+
+验收目标不是证明 596 个 API 都有命令名称，而是证明一个 Agent 仅阅读以下三类材料即可完成真实业务闭环：
+
+1. `build-aviation-ontology/SKILL.md`；
+2. `data-platform --help` 与各级命令帮助；
+3. CLI 的 JSON/NDJSON 输出和生成的本地证据文件。
+
+除安装/启动 CLI、提供非敏感输入文件、向系统钥匙串注入凭据引用、启动外部依赖外，Agent 对平台的所有读取、写入、上传、等待、导出、验证和证据采集都必须经由 `data-platform`。以下旁路一律使验收失败：
+
+- `curl` 或直接 HTTP；
+- 浏览器操作代替平台验证；
+- `mysql`、`psql` 或其他直连数据库客户端；
+- 直接 import backend controller/service/repository；
+- 执行 `bootstrap-aviation-demo.js` 或其他仓库 bootstrap 脚本；
+- 人工修改数据库以使验收变绿。
+
+CLI 内部可以复用 application service、adapter、DataX/JDBC 和数据库事务；禁止的是 Agent 绕开 CLI 接口。验收工具通过进程审计、命令轨迹和证据链记录检测旁路。
+
+#### 14.3.2 七阶段 CLI 验收链路
+
+| 阶段 | 必须由 CLI 完成的能力 | 核心证据 |
+|---|---|---|
+| 环境与基线 | `system doctor`、项目唯一反查、写权限检查、资产包预检、依赖/基线检查 | 实际 project ID、profile、依赖状态、既有失败分类 |
+| 数据接入与 ODS | 数据源测试、API/文件预览、任务创建、运行、等待、运行明细 | 输入/过滤/写入/拒绝数、目标表、业务键、游标、异常值处理 |
+| RED 首轮试跑 | 创建质量任务、运行、保存不可变快照、生成报告 | NULL/空串/重复/类型/时序/代码/关系统计及预期失败 |
+| ODS 治理 | 预检 SQL、事务化治理 SQL、标准元、字段映射、字典和质量规则 | 前后计数、无丢行、原始重复保留、消费层去重 |
+| 本体与血缘 | 契约验证/导入/比对，血缘验证/导入，规则可执行性检查 | 实体/关系/规则、连接条件、字段键角色、无悬空引用 |
+| 平台装载 | 数据地图、调研、逻辑/物理模型、知识库、报表、图谱、模拟页 | 可查询 ID、资源数大于 0、知识解析/向量就绪、真实报表行、HTML 产物 |
+| GREEN 最终验收 | RED→GREEN 对比、搜索/报表 runtime、图谱一致性、对账和报告 | 最新运行证据、完整证据链、限制/跳过项、无敏感信息 |
+
+历史航空 Demo 可作为固定回归夹具：项目编码 `aviation_ontology_demo`、7 张 ODS 表、89 行、5 个实体、3 类关系、2 条规则，以及曾验证的 40 节点/57 边/5 层图谱。但这些值仅在明确选择历史 Demo 契约时生效；新航空项目必须从输入合同推导期望计数，禁止把历史 ID `7`、数据源 ID或历史计数硬编码为通用断言。
+
+#### 14.3.3 为 Skill 补充的 CLI 原生能力
+
+596 条 API 映射覆盖平台现有业务表面，但 Skill 还需要跨模块语义合同与验收编排。新增以下 CLI 原生命令组；它们不新增第二套业务逻辑，而是组合已注册 capability 并调用共享 application service：
+
+```text
+data-platform ontology contract validate|import|show|diff
+data-platform ontology lineage validate|import|show
+data-platform ontology graph export|verify
+data-platform ontology simulation export|verify
+data-platform acceptance aviation-ontology preflight|run|verify|report
+```
+
+- `ontology contract` 使用版本化 JSON 作为实体、关系和规则的单一事实来源，并验证 Markdown、SQL、模型和图谱的一致性。
+- `ontology lineage` 要求每条边具备主语、宾语、源/目标表、源/目标字段、键角色和连接条件，拒绝悬空端点。
+- `ontology graph export` 生成单文件离线 HTML，支持搜索、筛选、详情、分层与力导向布局；`verify` 机器比对合同与 HTML 节点/边。
+- `ontology simulation export` 将天气、延误、容量、值勤/休息约束映射为可解释决策，并提供结构校验。
+- `acceptance aviation-ontology run` 是可恢复的 daemon job，按七阶段记录 checkpoint；它只编排普通 CLI capability，不能调用历史 bootstrap 脚本或直接写库。
+- `verify` 必须重新读取权威数据和最新运行状态，不接受仅凭命令退出码或旧产物通过。
+- `report` 输出项目、分支/提交、环境、实际 ID、接入计数、RED/GREEN 对比、语义资产计数、知识库/图谱/报表路径、测试证据、限制与跳过项；先经过统一脱敏。
+
+此外，下列跨接口操作必须提供 CLI 原生 facade，并在内部回落到已有 application capability：`project resolve`、`project access check`、`standard field-mapping apply`、`knowledge-base wait`、`knowledge-base search`、`reconcile project`。这些 facade 不能直接操作 repository，也必须进入权限、项目、幂等、审计和覆盖注册表。
+
+#### 14.3.4 必须判定失败的条件
+
+以下任一项发生，航空本体 Skill 验收状态必须为 `failed`，不能标记“部分成功”或“端到端通过”：
+
+- CLI 项目上下文、治理执行和平台资产的 project ID 不一致；
+- ODS 元数据数量为 0，或数据地图资源数量为 0；
+- 关系端点或字段血缘存在悬空引用；
+- 知识库未同步、解析失败或向量未就绪；
+- 报表引用错误数据源，或数据集未实际返回结果；
+- 脏数据导致约束治理仅执行一部分；
+- 使用任何禁止旁路完成平台操作或验证；
+- Oracle、达梦、外部 API 等真实依赖不可用，却仍宣称端到端通过。
+
+依赖确实不可用时可以记录 `skipped` 或 `limited`，但报告必须列出未验证边界；硬失败项不能被 skip 覆盖。
+
+#### 14.3.5 自动化通过门槛
+
+正式发布候选必须在干净环境中运行两次：第一次完成构建，第二次验证幂等重跑。两次均由安装后的 `data-platform` 命令从任意目录执行，并满足：
+
+```text
+acceptance workflow status             = succeeded
+forbidden bypass count                 = 0
+project ID mismatch                    = 0
+ODS metadata count                     > 0
+data-map resource count                > 0
+dangling semantic endpoints            = 0
+dangling lineage references            = 0
+knowledge documents parse-success      = all
+knowledge documents vector-ready       = all
+report dataset real result rows        > 0
+graph contract mismatch                = 0
+second-run duplicate business keys     = 0
+secret scan findings                   = 0
+```
+
+专项测试还必须覆盖固定 Demo 回归、动态项目 ID、METAR `VRB`/`M`/`6+`、无当前报文的 `NO_CURRENT_REPORT`、脏数据事务回滚、daemon 中断恢复、知识库超时重试、错误报表数据源、旧图谱与新合同不一致、真实依赖缺失时禁止虚假成功。
 
 ## 15. 分阶段交付
 
