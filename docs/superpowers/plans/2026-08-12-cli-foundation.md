@@ -4,9 +4,11 @@
 
 **Goal:** Within the single full-platform modification stage, build the foundation required by every API-classified and database-classified command: installable package, profile-scoped direct runtime, keychain, authentication, policies, output, registry classification, foundation commands, and REPL.
 
-**Architecture:** Add an installable CommonJS package under `packages/data-platform-cli` and extract transport-neutral execution policies under `backend/src/application/runtime`. The CLI injects a profile-scoped database runtime into shared auth/project services; both CLI and Web middleware use the same session, permission, project, license, and activation policies. A declarative registry drives Commander, REPL, help, output, and coverage source metadata.
+**Architecture:** The installable CommonJS CLI under `packages/data-platform-cli` consumes the independently publishable aggregate core defined in `2026-08-12-shared-core-packaging-and-risk-gates.md`. The CLI injects a profile-scoped database runtime into packaged auth/project capabilities; Web and CLI use the same kernel policies without importing repository-local backend source. A declarative registry drives Commander, REPL, help, output, and coverage source metadata.
 
 **Tech Stack:** Node.js 22.20+, npm, CommonJS, Commander 15, Zod 3.24, YAML 2.9, `@napi-rs/keyring` 1.3, MySQL2 3.11, cli-table3 0.6, Node built-in test runner.
+
+> **Approved plan revision:** Tasks 1–3 are complete. Before Task 4, execute `2026-08-12-shared-core-packaging-and-risk-gates.md` Tasks 1–6. Its kernel replaces the originally planned `backend/src/application/runtime` package boundary. This prevents the globally installed CLI from depending on repository-local backend source. Foundation Tasks 4–5 are replaced by shared-core Tasks 3–5.
 
 ## Global Constraints
 
@@ -31,14 +33,11 @@
 
 ### Shared application runtime
 
-- `backend/src/application/runtime/database-runtime.js`: create and close profile-scoped MySQL pools; expose `runWithDatabaseRuntime()` and `getDatabaseRuntime()` through AsyncLocalStorage.
-- `backend/src/application/runtime/session-policy.js`: verify JWT, active session, current user profile, and touch session.
-- `backend/src/application/runtime/authorization-policy.js`: enforce module and read-only action metadata without URL coupling.
-- `backend/src/application/runtime/project-policy.js`: resolve and enter project context.
-- `backend/src/application/runtime/license-policy.js`: allow-all extension point matching current Web behavior.
-- `backend/src/application/runtime/activation-policy.js`: allow-all extension point matching current Web behavior.
-- `backend/src/application/runtime/execution-context.js`: compose database, identity, authorization, project, audit ID, and cleanup around a command handler.
-- `backend/src/application/runtime/*.test.js`: isolated policy/runtime tests with injected repositories and fake pools.
+- `packages/data-platform-core-kernel/src/runtime/database-runtime.js`: create and close profile-scoped MySQL pools; expose `runWithDatabaseRuntime()` and `getDatabaseRuntime()` through AsyncLocalStorage.
+- `packages/data-platform-core-kernel/src/runtime/*-policy.js`: session, authorization, project, license, and activation policies without transport coupling.
+- `packages/data-platform-core-kernel/src/runtime/execution-context.js`: compose database, identity, authorization, project, audit ID, and cleanup around a capability handler.
+- `packages/data-platform-module-auth` and `packages/data-platform-module-project-spaces`: publishable foundation business capabilities.
+- `packages/data-platform-core`: aggregate catalog consumed by installed CLI and Web.
 
 ### Existing backend integration
 
@@ -308,134 +307,9 @@ git add packages/data-platform-cli/src/runtime/keychain.js packages/data-platfor
 git commit -m "feat(cli): store profile secrets in system keychain"
 ```
 
-### Task 4: Add Profile-Scoped Database Runtime Injection
+### Tasks 4–5: Replaced by Publishable Shared Core Tasks
 
-**Files:**
-- Create: `backend/src/application/runtime/database-runtime.js`
-- Create: `backend/src/application/runtime/database-runtime.test.js`
-- Modify: `backend/src/config/database.js`
-- Modify: `backend/src/modules/auth/auth.repository.js`
-- Modify: `backend/src/modules/auth/auth-session.repository.js`
-- Modify: `backend/src/modules/auth/auth.service.js`
-- Modify: `backend/src/modules/project-spaces/project-space.repository.js`
-- Create: `packages/data-platform-cli/src/runtime/database.js`
-- Create: `packages/data-platform-cli/tests/database-runtime.test.js`
-
-**Interfaces:**
-- Produces: `createDatabaseRuntime(config, mysqlImpl) -> { pool, testConnection, close }`.
-- Produces: `runWithDatabaseRuntime(runtime, callback) -> Promise<T>`.
-- Produces: `getDatabaseRuntime() -> runtime`, falling back to Web default runtime only when explicitly configured.
-- CLI produces: `createProfileDatabaseRuntime(profile, keychain, mysqlImpl) -> runtime`.
-
-- [ ] **Step 1: Write failing AsyncLocalStorage isolation tests**
-
-Test two concurrent callbacks receive different fake pools and that nested repository calls resolve the correct executor:
-
-```js
-const values = await Promise.all([
-  runWithDatabaseRuntime({ pool: { id: "a" } }, async () => getDatabaseRuntime().pool.id),
-  runWithDatabaseRuntime({ pool: { id: "b" } }, async () => getDatabaseRuntime().pool.id),
-]);
-assert.deepEqual(values, ["a", "b"]);
-```
-
-Also test `close()` executes exactly once after success and error, and profile runtime reads password only from keychain.
-
-- [ ] **Step 2: Run tests and observe failure**
-
-Run: `node --test backend/src/application/runtime/database-runtime.test.js packages/data-platform-cli/tests/database-runtime.test.js`
-
-Expected: FAIL with missing runtime modules.
-
-- [ ] **Step 3: Implement runtime and replace singleton imports in foundation repositories**
-
-Use `AsyncLocalStorage`. Export `getDatabaseExecutor()` returning the injected pool. In `backend/src/config/database.js`, construct the existing Web runtime once and export its `pool` and `testConnection` unchanged for backward compatibility.
-
-Change foundation repositories from imported `pool` calls to `getDatabaseExecutor()` calls. Change `auth.service.js` transaction acquisition to `getDatabaseExecutor().getConnection()`.
-
-- [ ] **Step 4: Run focused and existing auth/project tests**
-
-Run:
-
-```bash
-node --test backend/src/application/runtime/database-runtime.test.js packages/data-platform-cli/tests/database-runtime.test.js
-cd backend && npm test
-```
-
-Expected: all focused tests and existing backend suite pass.
-
-- [ ] **Step 5: Commit database injection**
-
-```bash
-git add backend/src/application/runtime backend/src/config/database.js backend/src/modules/auth backend/src/modules/project-spaces/project-space.repository.js packages/data-platform-cli/src/runtime/database.js packages/data-platform-cli/tests/database-runtime.test.js
-git commit -m "refactor(core): inject profile-scoped database runtime"
-```
-
-### Task 5: Extract Shared Session, Authorization, Project, License, and Activation Policies
-
-**Files:**
-- Create: `backend/src/application/runtime/session-policy.js`
-- Create: `backend/src/application/runtime/authorization-policy.js`
-- Create: `backend/src/application/runtime/project-policy.js`
-- Create: `backend/src/application/runtime/license-policy.js`
-- Create: `backend/src/application/runtime/activation-policy.js`
-- Create: `backend/src/application/runtime/execution-context.js`
-- Create: `backend/src/application/runtime/execution-context.test.js`
-- Modify: `backend/src/common/middleware/auth.js`
-- Modify: `backend/src/common/middleware/license-feature.js`
-- Modify: `backend/src/common/middleware/activation.js`
-
-**Interfaces:**
-- `authenticateSession(token, dependencies) -> Promise<user>`.
-- `authorizeCommand(user, { modules, action, readOnlyAllowed }) -> void`.
-- `resolveProject(user, requestedProjectId, projectService) -> Promise<{ project, member }>`.
-- `executeWithContext({ token, command, projectId, auditId, dependencies }, handler) -> Promise<{ data, auditId, user, project }>`.
-- Policy errors include stable `code`, `statusCode`, `message`, `retryable`, and optional redacted `details`.
-
-- [ ] **Step 1: Write failing policy tests**
-
-Cover exact cases:
-
-```js
-await assert.rejects(() => authenticateSession("bad", deps), { code: "INVALID_SESSION" });
-assert.throws(() => authorizeCommand(viewer, { modules: ["quality"], action: "execute" }), { code: "READ_ONLY_FORBIDDEN" });
-assert.throws(() => authorizeCommand(user, { modules: ["quality"], action: "read" }), { code: "MODULE_PERMISSION_FORBIDDEN" });
-assert.deepEqual(await licensePolicy.check({ feature: "quality" }), { allowed: true });
-```
-
-Also test revoked session, disabled user, token/user mismatch, project membership failure, audit ID preservation, project AsyncLocalStorage, and resource cleanup on handler error.
-
-- [ ] **Step 2: Run tests and observe failure**
-
-Run: `node --test backend/src/application/runtime/execution-context.test.js`
-
-Expected: FAIL because policy modules do not exist.
-
-- [ ] **Step 3: Implement transport-neutral policies**
-
-Reuse existing `auth.repository`, `auth-session.repository`, `project-space.service`, `user-permissions`, and `project-context`. Do not pass a fake Express request or URL. Authorization uses command metadata `{ modules, action, readOnlyAllowed }`.
-
-- [ ] **Step 4: Adapt Web middleware without changing responses**
-
-`auth.js` translates the request to policy inputs and translates policy errors back to the existing `{ success:false, message, code, details }` response. Preserve `req.user`, `req.project`, `req.projectId`, and `req.projectMember`.
-
-- [ ] **Step 5: Run policy and Web regression tests**
-
-Run:
-
-```bash
-node --test backend/src/application/runtime/execution-context.test.js
-cd backend && npm test
-```
-
-Expected: policy tests and existing backend tests pass; no route response regression.
-
-- [ ] **Step 6: Commit shared policies**
-
-```bash
-git add backend/src/application/runtime backend/src/common/middleware
-git commit -m "refactor(core): share access policies across web and CLI"
-```
+Do not implement repository-local `backend/src/application/runtime` modules. Execute Tasks 1–6 in [`2026-08-12-shared-core-packaging-and-risk-gates.md`](./2026-08-12-shared-core-packaging-and-risk-gates.md), including its required failing tests, packed-package installation proof, auth/project extraction, Web compatibility checks, and commits. Resume this foundation plan at Task 6 only after the installed aggregate core executes auth and project capabilities from an arbitrary working directory without reading backend source.
 
 ### Task 6: Implement Stable Envelopes, Redaction, Exit Codes, and Command Registry
 
@@ -621,7 +495,7 @@ The E2E test must:
 6. directly call `main()` with fake runtime for login/project workflow;
 7. prove no HTTP module or URL is used.
 
-Coverage test asserts `sourceApiKeys` for `auth login`, `auth profile`, `project list`, `platform overview`, `system doctor database-capabilities`, and `job show` exist in the baseline.
+Coverage test asserts `sourceApiKeys` for `auth login`, `auth profile`, `project list`, `platform overview`, and `system doctor database-capabilities` exist in the baseline. `job show` enters the coverage test after the durable-job runtime is implemented in master Task 11.
 
 - [ ] **Step 2: Run tests and observe failure**
 

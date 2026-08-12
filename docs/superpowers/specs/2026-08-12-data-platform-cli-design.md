@@ -1,10 +1,10 @@
 # Data Platform 全平台 CLI 化架构设计
 
-> 设计版本：1.3 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
+> 设计版本：1.4 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
 
 ## 1. 结论
 
-Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI 不启动或调用 Express HTTP 服务，而是在独立 Node.js 进程中复用与 Web 相同的应用服务、权限策略、项目上下文和数据访问层，直接连接 MySQL、DataX、Kafka 与 JDBC 运行时。
+Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI 不启动或调用 Express HTTP 服务，而是在独立 Node.js 进程中通过可发布的 `@johnason/data-platform-core` 聚合包复用与 Web 相同的应用能力、权限策略、项目上下文和数据访问层，直接连接 MySQL、DataX、Kafka 与 JDBC 运行时。共享能力由 transport-neutral kernel 和 21 个精确版本业务模块包承载，CLI 不引用 repository-local backend 源码。
 
 架构采用“同步命令确定性受理、异步事件驱动归集”的模式：同步命令在一个本地 ACID 事务内完成业务校验、权威数据写入、审计事实和事务 Outbox 追加；daemon 将 Outbox 事件发布至 Kafka，消费者通过 Inbox 去重形成对账、预警、报表与 Agent 上下文投影。跨模块长任务使用 MySQL 持久化状态机和 daemon worker，不引入 Temporal。
 
@@ -23,6 +23,7 @@ Data Platform 将新增可通过 npm 全局安装的 `data-platform` CLI。CLI �
 - 以事务 Outbox、Kafka、Inbox、任务状态机、重试、死信、补偿和证据链支撑可靠异步处理。
 - 提供无 HTTP daemon，承载 scheduler、worker、Kafka consumer 和必要的数据服务 runtime。
 - 保持 Web API 行为兼容，并使 Web 与 CLI 逐步共享相同应用服务。
+- 将共享能力发布为 kernel、21 个独立业务模块包和 aggregate core；每个模块必须通过逐项风险门禁、真实包回退和重新升级验收。
 - 以机器可校验的追踪矩阵证明 `596/596` API 和 `84/84` 前端入口均已分配 CLI 能力面；任何新增、删除或修改的入口都必须先更新矩阵。
 
 ### 2.2 非目标
@@ -249,23 +250,30 @@ Command Schema（解析、默认值、Zod 校验）
           ↓
 ExecutionContext（会话、权限、项目、审计）
           ↓
-Application Service（Web 与 CLI 共享）
+Aggregate Core → Versioned Module Capability（Web 与 CLI 共享）
           ↓
 Repository / MySQL / DataX / Kafka / JDBC
           ↓
 Result DTO → human table / JSON / NDJSON / 文件
 ```
 
-目录职责建议如下：
+目录职责如下；模块版本、风险门禁、测试环境渐进升级与回退细则以 [`2026-08-12-shared-core-risk-gates-and-rollback-design.md`](./2026-08-12-shared-core-risk-gates-and-rollback-design.md) 为准：
 
 ```text
+packages/data-platform-core-kernel/
+├── contracts/                    # capability、错误、结果、模块版本合同
+├── runtime/                      # 会话、权限、项目、事务与 ExecutionContext
+└── infrastructure/               # Outbox、Inbox、Kafka、任务状态机
+
+packages/data-platform-module-*/  # 21 个独立版本业务模块
+├── package.json                  # 精确 module/schema 版本
+└── src/                          # capability、Service、Repository、adapter
+
+packages/data-platform-core/      # 聚合 manifest、能力目录与运行时工厂
+
 backend/src/
-├── application/                  # Web 与 CLI 共享的用例编排
-│   └── <domain>/
-├── common/policies/              # 会话、权限、项目、license/activation policy
-├── infrastructure/events/        # Outbox、Inbox、Kafka、事件合同
-├── infrastructure/jobs/          # 持久化任务状态机、租约、重试、补偿
-└── modules/                       # 现有模块；controller 逐步瘦身
+├── common/middleware/            # Express policy adapter
+└── modules/                      # route/controller 与迁移期兼容导出
 
 packages/data-platform-cli/
 ├── package.json                  # @johnason/data-platform-cli
@@ -279,7 +287,7 @@ packages/data-platform-cli/
     └── daemon/                   # scheduler、worker、PID、锁、日志
 ```
 
-现有 controller 不被 CLI 调用。需要共享的 controller 编排逻辑移入 application service；controller 只处理 HTTP 输入输出，CLI adapter 只处理命令行输入输出。
+现有 controller 不被 CLI 调用。需要共享的 controller 编排逻辑移入版本化 module capability；controller 只处理 HTTP 输入输出，CLI adapter 只处理命令行输入输出。Web 与 CLI 只依赖 aggregate core，禁止跨包引用 `src` 路径。
 
 ## 6. Profile、钥匙串与登录会话
 
@@ -586,7 +594,7 @@ secret scan findings                   = 0
 
 ## 15. 单阶段交付
 
-全平台 CLI 在一个改造阶段交付，阶段内按依赖顺序完成：CLI 基础运行时；审计、Outbox/Inbox、Kafka、任务状态机和 daemon；全部业务模块；多数据库 adapter；本体与航空验收；覆盖矩阵、SKILL.md 和 npm 包。
+全平台 CLI 在一个改造阶段交付，阶段内按依赖顺序完成：CLI 基础运行时；可发布 kernel、21 个模块包与 aggregate core；审计、Outbox/Inbox、Kafka、任务状态机和 daemon；全部业务模块；逐模块风险门禁、`0.1.0 legacy-accepted → 0.2.0 core-candidate → 0.1.0 rollback → 0.2.0 re-upgrade` 测试环境演练；多数据库 adapter；本体与航空验收；覆盖矩阵、SKILL.md 和 npm 包。生产不执行 shadow/canary，也不在运行时热切换模块代码。
 
 阶段退出门槛为：596/596 API、84/84 功能入口全部实现并验证；所有业务命令完成 API/数据库分类；API 调用测试通过；MySQL、PostgreSQL、Oracle、达梦数据库测试全部通过；航空本体连续两次 CLI-only 运行成功且幂等；Web 回归、全局安装与秘密扫描通过。未满足任一条件时，整个阶段保持 `in_progress` 或 `blocked`，不能声明部分阶段完成。
 

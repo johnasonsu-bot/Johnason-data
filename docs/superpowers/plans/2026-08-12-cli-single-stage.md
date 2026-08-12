@@ -27,6 +27,17 @@
 
 Execute every task in [`2026-08-12-cli-foundation.md`](./2026-08-12-cli-foundation.md). This produces the installable package, keychain, profiles, database runtime injection, shared policies, registry/output, foundation commands, REPL, and installed-command test. It is not a release or separate phase.
 
+Tasks 1–3 of the foundation plan are complete. The authoritative remaining execution order is:
+
+1. Shared-core Tasks 1–6: workspace, kernel, auth/project packages and packed aggregate.
+2. Foundation Tasks 6–9: CLI output, registry, commands, REPL and installed foundation test.
+3. Master Tasks 10–12: target classification, reliable events/jobs and no-HTTP daemon.
+4. Shared-core Tasks 7–9 (master Task 13): risk evidence and all 21 module migrations with rollback/re-upgrade.
+5. Master Tasks 14–16: complete CLI tree, four-engine contract and aviation ontology acceptance.
+6. Master Tasks 17–18 followed by shared-core Task 10: external API gate, four real database gates and aggregate acceptance.
+
+This ordering replaces the earlier assumption that CLI can import `backend/src/application/*` directly. If another task conflicts with the shared-core plan, the approved shared-core design and plan are authoritative.
+
 Before continuing, run:
 
 ```bash
@@ -96,13 +107,13 @@ git commit -m "feat(cli): classify API and database command targets"
 ### Task 11: Add Audit, Idempotency, Outbox, Inbox, and Durable Job Schema
 
 **Files:**
-- Create: `backend/src/infrastructure/cli-runtime/cli-runtime.migration.js`
-- Create: `backend/src/infrastructure/cli-runtime/command.repository.js`
-- Create: `backend/src/infrastructure/cli-runtime/event.repository.js`
-- Create: `backend/src/infrastructure/cli-runtime/job.repository.js`
-- Create: `backend/src/infrastructure/cli-runtime/cli-runtime.test.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/cli-runtime.migration.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/command.repository.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/event.repository.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/job.repository.js`
+- Create: `packages/data-platform-core-kernel/tests/cli-runtime.test.js`
 - Modify: `backend/src/database/migrate.js`
-- Modify: `backend/src/application/runtime/execution-context.js`
+- Modify: `packages/data-platform-core-kernel/src/runtime/execution-context.js`
 
 **Interfaces:**
 - `acceptCommand({ idempotencyKey, capabilityId, actor, projectId, inputDigest }, connection)`.
@@ -116,7 +127,7 @@ Tests use a disposable MySQL schema and assert one transaction can write busines
 
 - [ ] **Step 2: Run and observe failure**
 
-Run: `node --test backend/src/infrastructure/cli-runtime/cli-runtime.test.js`
+Run: `node --test packages/data-platform-core-kernel/tests/cli-runtime.test.js`
 
 Expected: FAIL because migration and repositories are missing.
 
@@ -126,27 +137,27 @@ Create tables `cli_commands`, `cli_audit_facts`, `domain_events`, `event_deliver
 
 - [ ] **Step 4: Integrate transaction wrapper**
 
-`execution-context.js` exposes `context.transaction(handler)` and ensures command acceptance, business mutation, audit, event append, and result fixation share the injected MySQL connection.
+Kernel `execution-context.js` exposes `context.transaction(handler)` and ensures command acceptance, business mutation, audit, event append, and result fixation share the injected MySQL connection.
 
 - [ ] **Step 5: Run tests and commit**
 
-Run: `node --test backend/src/infrastructure/cli-runtime/cli-runtime.test.js backend/src/database/migrate.test.js`
+Run: `node --test packages/data-platform-core-kernel/tests/cli-runtime.test.js backend/src/database/migrate.test.js`
 
 Expected: PASS.
 
 ```bash
-git add backend/src/infrastructure/cli-runtime backend/src/database backend/src/application/runtime/execution-context.js
+git add packages/data-platform-core-kernel/src/infrastructure packages/data-platform-core-kernel/tests/cli-runtime.test.js backend/src/database packages/data-platform-core-kernel/src/runtime/execution-context.js
 git commit -m "feat(core): persist CLI audit events and durable jobs"
 ```
 
 ### Task 12: Implement Kafka Delivery and No-HTTP Daemon
 
 **Files:**
-- Create: `backend/src/infrastructure/cli-runtime/outbox-publisher.js`
-- Create: `backend/src/infrastructure/cli-runtime/inbox-consumer.js`
-- Create: `backend/src/infrastructure/cli-runtime/job-worker.js`
-- Create: `backend/src/infrastructure/cli-runtime/daemon-runtime.js`
-- Create: `backend/src/infrastructure/cli-runtime/daemon-runtime.test.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/outbox-publisher.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/inbox-consumer.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/job-worker.js`
+- Create: `packages/data-platform-core-kernel/src/infrastructure/daemon-runtime.js`
+- Create: `packages/data-platform-core-kernel/tests/daemon-runtime.test.js`
 - Create: `packages/data-platform-cli/src/daemon/process-manager.js`
 - Create: `packages/data-platform-cli/src/commands/daemon.js`
 - Create: `packages/data-platform-cli/tests/daemon.test.js`
@@ -163,7 +174,7 @@ Test publish-after-commit, duplicate Kafka delivery, ordered entity keys, retry 
 
 - [ ] **Step 2: Run and observe failure**
 
-Run: `node --test backend/src/infrastructure/cli-runtime/daemon-runtime.test.js packages/data-platform-cli/tests/daemon.test.js`
+Run: `node --test packages/data-platform-core-kernel/tests/daemon-runtime.test.js packages/data-platform-cli/tests/daemon.test.js`
 
 Expected: FAIL with missing modules.
 
@@ -174,74 +185,14 @@ Kafka key is `${projectId}:${aggregateType}:${aggregateId}`. Inbox insert and pr
 - [ ] **Step 4: Run tests and commit**
 
 ```bash
-node --test backend/src/infrastructure/cli-runtime/daemon-runtime.test.js packages/data-platform-cli/tests/daemon.test.js
-git add backend/src/infrastructure/cli-runtime packages/data-platform-cli/src/daemon packages/data-platform-cli/src/commands/daemon.js packages/data-platform-cli/tests/daemon.test.js
+node --test packages/data-platform-core-kernel/tests/daemon-runtime.test.js packages/data-platform-cli/tests/daemon.test.js
+git add packages/data-platform-core-kernel/src/infrastructure packages/data-platform-core-kernel/tests/daemon-runtime.test.js packages/data-platform-cli/src/daemon packages/data-platform-cli/src/commands/daemon.js packages/data-platform-cli/tests/daemon.test.js
 git commit -m "feat(cli): add durable no-HTTP daemon"
 ```
 
-### Task 13: Build All Domain Application-Capability Adapters
+### Task 13: Package All Domain Application Capabilities
 
-**Files:**
-- Create: `backend/src/application/capabilities/auth.js`
-- Create: `backend/src/application/capabilities/projects.js`
-- Create: `backend/src/application/capabilities/platform.js`
-- Create: `backend/src/application/capabilities/asset-search.js`
-- Create: `backend/src/application/capabilities/data-map.js`
-- Create: `backend/src/application/capabilities/data-standards.js`
-- Create: `backend/src/application/capabilities/data-sources.js`
-- Create: `backend/src/application/capabilities/data-source-research.js`
-- Create: `backend/src/application/capabilities/data-modeling-sources.js`
-- Create: `backend/src/application/capabilities/ingestion-tasks.js`
-- Create: `backend/src/application/capabilities/file-imports.js`
-- Create: `backend/src/application/capabilities/model-providers.js`
-- Create: `backend/src/application/capabilities/ai-configs.js`
-- Create: `backend/src/application/capabilities/system-management.js`
-- Create: `backend/src/application/capabilities/system-knowledge-bases.js`
-- Create: `backend/src/application/capabilities/data-development.js`
-- Create: `backend/src/application/capabilities/data-modeling.js`
-- Create: `backend/src/application/capabilities/quality-control.js`
-- Create: `backend/src/application/capabilities/data-services.js`
-- Create: `backend/src/application/capabilities/reporting.js`
-- Create: `backend/src/application/capabilities/index.js`
-- Create: `backend/src/application/capabilities/capabilities.contract.test.js`
-- Modify: corresponding `backend/src/modules/*/*.controller.js`
-
-**Interfaces:**
-- Every capability exports `(input, context) -> Promise<ResultDTO>` and never accepts `req` or `res`.
-- Capability catalog exports `{ capabilityId, handler, inputSchema, outputSchema, modules, action, executionTargets, sourceApiKeys, sourceFrontendKeys }[]`.
-- Controllers translate HTTP input/output only; CLI definitions call the same handler.
-
-- [ ] **Step 1: Generate a failing 596-key contract test**
-
-Load the coverage baseline and application capability catalog. Assert every API key occurs exactly once or in an explicit alias set; call each handler with schema-valid generated fixture and injected fake services; reject any handler importing a controller or Express.
-
-- [ ] **Step 2: Run and observe coverage failure**
-
-Run: `node --test backend/src/application/capabilities/capabilities.contract.test.js`
-
-Expected: FAIL listing all missing API keys.
-
-- [ ] **Step 3: Extract controller orchestration domain by domain**
-
-For each listed file, move service orchestration into the capability handler and keep response formatting in the controller. Preserve validation schemas and status semantics. File upload capabilities accept `{ files:[{ path, originalName, mimeType, size, sha256 }], fields }`; downloads return `{ path, filename, mimeType, sha256, size }`; streams return an async iterable of typed events.
-
-- [ ] **Step 4: Rerun contract and Web tests after each domain commit**
-
-Run:
-
-```bash
-node --test backend/src/application/capabilities/capabilities.contract.test.js
-cd backend && npm test
-```
-
-Expected at task completion: 596 source keys accounted for and all Web tests pass.
-
-- [ ] **Step 5: Commit complete shared capability layer**
-
-```bash
-git add backend/src/application/capabilities backend/src/modules
-git commit -m "refactor(core): expose all platform use cases as shared capabilities"
-```
+Execute Tasks 7–9 in [`2026-08-12-shared-core-packaging-and-risk-gates.md`](./2026-08-12-shared-core-packaging-and-risk-gates.md). The fixed migration matrix creates 21 independently versioned modules whose aggregate catalog accounts for exactly 596 API keys and 84 frontend entries. Do not create `backend/src/application/capabilities`; capabilities live in their publishable module packages, Controllers remain Web adapters, and each module must pass all risk gates plus rollback/re-upgrade before Task 14.
 
 ### Task 14: Generate and Bind the Full CLI Command Tree
 
@@ -290,13 +241,13 @@ git commit -m "feat(cli): expose every platform capability as commands"
 ### Task 15: Complete Four-Engine Database Adapter Contract
 
 **Files:**
-- Modify: `backend/src/modules/data-development/adapters/mysql.adapter.js`
-- Modify: `backend/src/modules/data-development/adapters/postgres.adapter.js`
-- Modify: `backend/src/modules/data-development/adapters/managed-jdbc.adapter.js`
-- Modify: `backend/src/common/utils/datasource-capabilities.js`
-- Modify: `backend/src/common/utils/datasource-dialect.js`
-- Create: `backend/src/application/capabilities/database-contract.js`
-- Create: `backend/src/application/capabilities/database-contract.test.js`
+- Modify: `packages/data-platform-module-data-development/src/adapters/mysql.adapter.js`
+- Modify: `packages/data-platform-module-data-development/src/adapters/postgres.adapter.js`
+- Modify: `packages/data-platform-module-data-development/src/adapters/managed-jdbc.adapter.js`
+- Create: `packages/data-platform-core-kernel/src/database/capabilities.js`
+- Create: `packages/data-platform-core-kernel/src/database/dialect.js`
+- Create: `packages/data-platform-core-kernel/src/database/contract.js`
+- Create: `packages/data-platform-core-kernel/tests/database-contract.test.js`
 - Create: `packages/data-platform-cli/tests/database-gate.test.js`
 
 **Interfaces:**
@@ -310,7 +261,7 @@ The same contract checks identifier quoting, placeholder style, pagination, type
 
 - [ ] **Step 2: Run and observe engine gaps**
 
-Run: `node --test backend/src/application/capabilities/database-contract.test.js`
+Run: `node --test packages/data-platform-core-kernel/tests/database-contract.test.js`
 
 Expected: FAIL with missing or inconsistent adapter methods.
 
@@ -324,24 +275,24 @@ MySQL uses backticks and `?`; PostgreSQL uses double quotes and `$n`; Oracle use
 
 - [ ] **Step 5: Run adapter unit contract and commit**
 
-Run: `node --test backend/src/application/capabilities/database-contract.test.js`
+Run: `node --test packages/data-platform-core-kernel/tests/database-contract.test.js`
 
 Expected: PASS for dialect/unit contract; real gate runs at final Task 18.
 
 ```bash
-git add backend/src/modules/data-development/adapters backend/src/common/utils backend/src/application/capabilities/database-contract* packages/data-platform-cli/tests/database-gate.test.js
+git add packages/data-platform-module-data-development/src/adapters packages/data-platform-core-kernel/src/database packages/data-platform-core-kernel/tests/database-contract.test.js packages/data-platform-cli/tests/database-gate.test.js
 git commit -m "feat(cli): normalize MySQL PostgreSQL Oracle and DM access"
 ```
 
 ### Task 16: Implement Ontology Facades and Aviation Acceptance Job
 
 **Files:**
-- Create: `backend/src/application/ontology/contract.js`
-- Create: `backend/src/application/ontology/lineage.js`
-- Create: `backend/src/application/ontology/graph.js`
-- Create: `backend/src/application/ontology/simulation.js`
-- Create: `backend/src/application/ontology/aviation-acceptance.js`
-- Create: `backend/src/application/ontology/aviation-acceptance.test.js`
+- Create: `packages/data-platform-core/src/ontology/contract.js`
+- Create: `packages/data-platform-core/src/ontology/lineage.js`
+- Create: `packages/data-platform-core/src/ontology/graph.js`
+- Create: `packages/data-platform-core/src/ontology/simulation.js`
+- Create: `packages/data-platform-core/src/ontology/aviation-acceptance.js`
+- Create: `packages/data-platform-core/tests/aviation-acceptance.test.js`
 - Create: `packages/data-platform-cli/src/commands/ontology.js`
 - Create: `packages/data-platform-cli/src/commands/aviation-acceptance.js`
 - Create: `packages/data-platform-cli/tests/aviation-acceptance.test.js`
@@ -357,7 +308,7 @@ Use historical Demo contract fixtures but inject dynamic project/data-source IDs
 
 - [ ] **Step 2: Run and observe failure**
 
-Run: `node --test backend/src/application/ontology/aviation-acceptance.test.js packages/data-platform-cli/tests/aviation-acceptance.test.js`
+Run: `node --test packages/data-platform-core/tests/aviation-acceptance.test.js packages/data-platform-cli/tests/aviation-acceptance.test.js`
 
 Expected: FAIL with missing ontology modules.
 
@@ -368,8 +319,8 @@ Use versioned JSON as the semantic authority. Run all platform work through regi
 - [ ] **Step 4: Run ontology tests and commit**
 
 ```bash
-node --test backend/src/application/ontology/aviation-acceptance.test.js packages/data-platform-cli/tests/aviation-acceptance.test.js
-git add backend/src/application/ontology packages/data-platform-cli/src/commands/ontology.js packages/data-platform-cli/src/commands/aviation-acceptance.js packages/data-platform-cli/tests/aviation-acceptance.test.js
+node --test packages/data-platform-core/tests/aviation-acceptance.test.js packages/data-platform-cli/tests/aviation-acceptance.test.js
+git add packages/data-platform-core/src/ontology packages/data-platform-core/tests/aviation-acceptance.test.js packages/data-platform-cli/src/commands/ontology.js packages/data-platform-cli/src/commands/aviation-acceptance.js packages/data-platform-cli/tests/aviation-acceptance.test.js
 git commit -m "feat(cli): add aviation ontology acceptance workflow"
 ```
 
