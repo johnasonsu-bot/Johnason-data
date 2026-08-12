@@ -1,6 +1,6 @@
 # Data Platform 全平台 CLI 化架构设计
 
-> 设计版本：1.2 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
+> 设计版本：1.3 · 覆盖清单基线：`dev@d2eeaca4c3fb562b9f064a6229178365998e68e4` · 清单生成时间：2026-08-12T02:19:27.335Z
 
 ## 1. 结论
 
@@ -225,6 +225,10 @@ data-platform[prod/project-a]> datasource list
   capabilityId: "quality.task.run",
   sourceApiKeys: ["POST /api/v1/quality-control/tasks/:id/run"],
   sourceFrontendKeys: ["/dashboard/quality-control/tasks"],
+  executionTargets: [
+    { kind: "database", engine: "mysql", role: "platform-authority" },
+    { kind: "database", engine: "postgresql", role: "business-datasource" }
+  ],
   modules: ["quality"],
   action: "execute",
   mutates: true,
@@ -432,17 +436,42 @@ DataX、外部数据库、Kafka、模型供应商和文件导入统一通过 ada
 
 ## 14. 测试与验收
 
-### 14.1 五层测试
+### 14.1 单阶段改造与两段测试
 
-1. **单元测试**：命令 schema、注册表、输出、脱敏、权限映射、幂等键、任务状态机和错误分类。
-2. **共享服务契约测试**：同一输入分别经过 Web controller 与 CLI adapter，验证权限判定与业务结果一致。
-3. **集成测试**：使用真实 MySQL 与 Kafka，验证本地 ACID + Outbox、Inbox 去重、分区顺序、重试、死信、重放、租约回收和补偿。
-4. **CLI/daemon E2E**：全局安装后从任意目录调用，验证登录、profile、项目切换、全平台关键闭环、文件导入导出、daemon 重启和崩溃恢复。
-5. **Agent 验收**：Agent 仅依赖 `--help`、`SKILL.md` 和 JSON 输出完成数据接入、开发、质量、服务与报表端到端任务。
+全部 CLI 能力在一个改造阶段完成。基础运行时、可靠性底座、23 个业务模块、596 条 API 映射、84 个功能入口、daemon、本体工具和航空验收不能被拆成多个独立交付阶段；内部任务组和提交仅用于评审与故障定位。
+
+完成全部代码后，使用同一个安装包依次执行两段测试：
+
+1. **API 调用测试**：这里的 API 指 CLI 通过共享 application service 调用外部 API、AI 模型提供商或已发布数据服务运行时，不是调用 Data Platform Express。覆盖真实响应、分页、数组路径、过滤、超时、限流、重试、流式 NDJSON、取消、幂等、死信、授权、审计与秘密脱敏。
+2. **数据库访问测试**：依次验证 MySQL、PostgreSQL、Oracle、达梦。覆盖连接、schema/table/column、CRUD、SQL、分页、事务回滚、DataX/JDBC、方言、类型转换、项目隔离、幂等、连接失败和驱动缺失诊断。
+
+任何代码修复都会使之前的测试证据失效：若 API 测试后修改代码，必须重新从 API 测试开始，再执行四种数据库测试。Oracle 或达梦真实环境不可用时，整个数据库测试段状态为 `blocked`，不能用 skip 或 mock 声称通过。
+
+单元测试、Web/CLI 契约测试、故障注入、subprocess、全局安装和 Agent 验收仍然保留，但统一归入上述两段门禁：纯本地基础测试在 API 段前执行；数据库相关集成测试按目标引擎进入数据库段。
+
+### 14.1.1 命令执行目标分类
+
+命令注册表和逐项覆盖矩阵必须声明 `executionTargets`：
+
+```js
+executionTargets: [
+  { kind: "api", provider: "external-api" },
+  { kind: "database", engine: "postgresql", role: "business-datasource" }
+]
+```
+
+- API provider 只允许 `external-api`、`model-provider`、`service-runtime`。
+- 数据库 engine 只允许 `mysql`、`postgresql`、`oracle`、`dm`。
+- 平台权威元数据、登录、项目、权限、审计、任务和资产至少标为 `database/mysql`。
+- 数据源、开发、接入、质量、服务和报表命令按真实支持引擎声明，运行时动态命令必须在 JSON `meta.executionTargets` 返回实际目标。
+- 外部 API 读取后写数据库的复合命令同时声明 API 和数据库目标，进入两个测试段。
+- `help`、版本、普通配置查看和本地图谱校验可声明 `{ kind: "local" }`，不进入两个业务测试分母，但仍需单元和 subprocess 测试。
+- 任一非本地业务命令没有 API 或数据库分类时，覆盖门禁失败。
 
 ### 14.2 全平台完成条件
 
 - 覆盖清单必须显示 `596/596` API、`84/84` 前端入口已映射，且 unmapped、duplicate key、unknown group 和 stale fingerprint 均为 0。
+- 所有业务命令均有执行目标分类，`unclassifiedBusinessCommands = 0`。
 - 每条 API 必须关联已注册 capability，并在 registry 中保留 `sourceApiKeys`；每个前端入口必须关联 `sourceFrontendKeys`。
 - 所有清单项必须是 `verified` 或经审查的 `notApplicable`；`designed`、`implemented` 均不能进入正式发布。
 - 每个业务域至少有一个使用真实数据库的闭环测试。
@@ -531,7 +560,7 @@ data-platform acceptance aviation-ontology preflight|run|verify|report
 - 使用任何禁止旁路完成平台操作或验证；
 - Oracle、达梦、外部 API 等真实依赖不可用，却仍宣称端到端通过。
 
-依赖确实不可用时可以记录 `skipped` 或 `limited`，但报告必须列出未验证边界；硬失败项不能被 skip 覆盖。
+外部可选依赖确实不可用时可以记录 `limited`，但报告必须列出未验证边界；MySQL、PostgreSQL、Oracle、达梦属于本次数据库验收的强制依赖，任一不可用均标记整个测试段 `blocked`，不能发布。
 
 #### 14.3.5 自动化通过门槛
 
@@ -555,18 +584,11 @@ secret scan findings                   = 0
 
 专项测试还必须覆盖固定 Demo 回归、动态项目 ID、METAR `VRB`/`M`/`6+`、无当前报文的 `NO_CURRENT_REPORT`、脏数据事务回滚、daemon 中断恢复、知识库超时重试、错误报表数据源、旧图谱与新合同不一致、真实依赖缺失时禁止虚假成功。
 
-## 15. 分阶段交付
+## 15. 单阶段交付
 
-全平台能力进入首个正式版本，但采用垂直闭环分批实现：
+全平台 CLI 在一个改造阶段交付，阶段内按依赖顺序完成：CLI 基础运行时；审计、Outbox/Inbox、Kafka、任务状态机和 daemon；全部业务模块；多数据库 adapter；本体与航空验收；覆盖矩阵、SKILL.md 和 npm 包。
 
-1. CLI 基础运行时：package、registry、profile、钥匙串、登录、ExecutionContext、输出与 REPL。
-2. 可靠性底座：审计事实、幂等命令、Outbox/Inbox、Kafka、任务状态机和 daemon。
-3. 核心数据闭环：project、datasource、development、ingestion、quality。
-4. 资产与建模：asset-search、data-map、standard、source-research、file-import、model-provider、data-lab。
-5. 服务与消费：service、reporting、knowledge-base、system。
-6. 将 596 条 API 和 84 个前端入口的追踪状态逐项收口，全域 E2E、故障注入、Agent 验收、文档与 npm 包验证。
-
-每个阶段都必须保持 Web API 回归通过，并交付可独立验证的命令闭环。
+阶段退出门槛为：596/596 API、84/84 功能入口全部实现并验证；所有业务命令完成 API/数据库分类；API 调用测试通过；MySQL、PostgreSQL、Oracle、达梦数据库测试全部通过；航空本体连续两次 CLI-only 运行成功且幂等；Web 回归、全局安装与秘密扫描通过。未满足任一条件时，整个阶段保持 `in_progress` 或 `blocked`，不能声明部分阶段完成。
 
 ## 16. 风险与约束
 

@@ -160,6 +160,96 @@ function confirmationRequired(route) {
   return route.method === "DELETE" || /\/(run|start|publish|activate|reject|stop)(\/|$)/.test(route.path);
 }
 
+function hasAnyText(route, patterns) {
+  const text = [route.module, route.path, route.controller, ...(route.validation || [])].join(" ").toLowerCase();
+  return patterns.some((pattern) => text.includes(pattern));
+}
+
+function executionTargets(route) {
+  if (route.path === "/api/health") {
+    return [{ kind: "local" }];
+  }
+
+  const targets = [{ kind: "database", engine: "mysql", role: "platform-authority" }];
+  const datasourceModules = new Set([
+    "data-sources",
+    "data-source-research",
+    "data-modeling-sources",
+    "ingestion-tasks",
+    "data-development",
+    "quality-control",
+    "data-services",
+    "service-runtime",
+    "reporting",
+  ]);
+  const datasourceOperation = hasAnyText(route, [
+    "datasource",
+    "data-source",
+    "source/",
+    "source:",
+    "connection",
+    "database",
+    "table",
+    "column",
+    "query",
+    "sql",
+    "sample",
+    "preview",
+    "run",
+    "invoke",
+  ]);
+
+  if (datasourceModules.has(route.module) && datasourceOperation) {
+    for (const engine of ["postgresql", "oracle", "dm"]) {
+      targets.push({ kind: "database", engine, role: "business-datasource" });
+    }
+  }
+
+  if (route.module === "service-runtime") {
+    targets.push({ kind: "api", provider: "service-runtime" });
+  }
+
+  if (route.module === "model-providers" && route.path.endsWith("/test-connection")) {
+    targets.push({ kind: "api", provider: "model-provider" });
+  }
+
+  const invokesExternalApi = route.method !== "GET" && hasAnyText(route, [
+    "preview-source",
+    "internet-research",
+    "auto-research",
+    "copilot",
+    "/ai/",
+    "ai-analysis",
+    "ai-business-data",
+    "recommend",
+    "analyze",
+    "robot/query",
+    "debug-lab-model",
+    "debug-prompt-template",
+  ]);
+  const dynamicApiIngestion = route.module === "ingestion-tasks" && hasAnyText(route, [
+    "start-task",
+    "run-task-now",
+    "preview-source-data",
+  ]);
+  const dynamicApiDatasource = route.module === "data-sources" && hasAnyText(route, [
+    "test-connection",
+    "sample",
+    "preview",
+  ]);
+
+  if (invokesExternalApi || dynamicApiIngestion || dynamicApiDatasource) {
+    targets.push({
+      kind: "api",
+      provider: route.module === "model-providers" ? "model-provider" : "external-api",
+    });
+  }
+
+  return targets.filter((target, index, values) => (
+    values.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(target)) === index
+  ));
+}
+
 const apiCoverageRaw = inventory.routes.map((route, index) => ({
   apiKey: `${route.method} ${route.path}`,
   ordinal: index + 1,
@@ -172,6 +262,7 @@ const apiCoverageRaw = inventory.routes.map((route, index) => ({
   inputMode: inputMode(route.interaction),
   outputMode: outputMode(route.interaction),
   executionMode: executionMode(route),
+  executionTargets: executionTargets(route),
   authRequired: route.authRequired,
   projectScoped: PROJECT_SCOPED_MODULES.has(route.module),
   featureGuard: route.featureGuard,
@@ -212,11 +303,15 @@ const apiKeyCounts = apiCoverage.reduce((counts, entry) => {
 }, new Map());
 const duplicateApiKeys = Array.from(apiKeyCounts.entries()).filter(([, count]) => count > 1);
 const staleSourceFingerprint = inventorySha256 === approvedInventorySha256 ? 0 : 1;
+const unclassifiedBusinessCommands = apiCoverage.filter((entry) => (
+  !entry.executionTargets.some((target) => ["api", "database", "local"].includes(target.kind))
+));
 
 if (
   missingApiGroups.length ||
   missingFrontendGroups.length ||
   duplicateApiKeys.length ||
+  unclassifiedBusinessCommands.length ||
   staleSourceFingerprint ||
   apiCoverage.length !== inventory.summary.routeCount ||
   frontendCoverage.length !== inventory.summary.frontendPathCount
@@ -225,7 +320,16 @@ if (
     missingApiGroups,
     missingFrontendGroups,
     duplicateApiKeys,
+    unclassifiedBusinessCommandEntries: unclassifiedBusinessCommands,
     staleSourceFingerprint,
+    unclassifiedBusinessCommands: unclassifiedBusinessCommands.length,
+    apiClassified: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "api")).length,
+    databaseClassified: {
+      mysql: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "mysql")).length,
+      postgresql: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "postgresql")).length,
+      oracle: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "oracle")).length,
+      dm: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "dm")).length,
+    },
   }, null, 2));
   process.exit(1);
 }
@@ -253,6 +357,14 @@ const result = {
     duplicateApiKeys: duplicateApiKeys.length,
     unknownCliGroups: missingApiGroups.length + missingFrontendGroups.length,
     staleSourceFingerprint,
+    unclassifiedBusinessCommands: unclassifiedBusinessCommands.length,
+    apiClassified: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "api")).length,
+    databaseClassified: {
+      mysql: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "mysql")).length,
+      postgresql: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "postgresql")).length,
+      oracle: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "oracle")).length,
+      dm: apiCoverage.filter((entry) => entry.executionTargets.some((target) => target.kind === "database" && target.engine === "dm")).length,
+    },
   },
   statusSemantics: {
     designed: "A CLI capability surface and I/O strategy are assigned; implementation is not yet claimed.",
