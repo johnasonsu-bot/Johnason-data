@@ -26,6 +26,7 @@ type RelationshipNodeData = {
   entity: RelationshipEntity;
   relationCount: number;
   accent: string;
+  relatedFieldNames: string[];
 };
 
 type Props = {
@@ -44,6 +45,8 @@ const LAYOUT_START_X = 80;
 const LAYOUT_START_Y = 70;
 const SOURCE_HANDLE_IDS = { left: "source-left", right: "source-right", top: "source-top", bottom: "source-bottom" };
 const TARGET_HANDLE_IDS = { left: "target-left", right: "target-right", top: "target-top", bottom: "target-bottom" };
+const fieldSourceHandleId = (fieldName: string) => `field-source:${fieldName}`;
+const fieldTargetHandleId = (fieldName: string) => `field-target:${fieldName}`;
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: "业务表",
@@ -277,6 +280,10 @@ function buildNodes(entities: RelationshipEntity[], relations: RelationshipRelat
         entity,
         relationCount: relationCountMap.get(entity.tableName) || 0,
         accent: meta.accent,
+        relatedFieldNames: Array.from(new Set(relations.flatMap((relation) => [
+          ...(relation.fromTable === entity.tableName ? [relation.fromField] : []),
+          ...(relation.toTable === entity.tableName ? [relation.toField] : []),
+        ]))),
       },
     };
   });
@@ -291,15 +298,15 @@ function buildEdges(relations: RelationshipRelation[], nodes: Node<RelationshipN
       const targetPosition = nodePositionMap.get(relation.toTable) || { x: 0, y: 0 };
       const active = !selectedTableName || relation.fromTable === selectedTableName || relation.toTable === selectedTableName;
       const color = relation.source === "constraint" ? "#1677ff" : relation.source === "ai" ? "#7c3aed" : "#0f766e";
-      const { sourceHandle, targetHandle } = resolveHandleDirections(sourcePosition, targetPosition);
+      resolveHandleDirections(sourcePosition, targetPosition);
       return {
         id: relationKey(relation),
         source: relation.fromTable,
         target: relation.toTable,
-        sourceHandle,
-        targetHandle,
+        sourceHandle: fieldSourceHandleId(relation.fromField),
+        targetHandle: fieldTargetHandleId(relation.toField),
         type: "smoothstep",
-        label: relation.relationType,
+        label: `${relation.fromField} (${relation.fromFieldRole === "FOREIGN_KEY" ? "FK" : "REF"}) → ${relation.toField} (${relation.toFieldRole === "PRIMARY_KEY" ? "PK" : relation.toFieldRole === "UNIQUE_KEY" ? "UK" : "BK"}) · ${relation.relationType}`,
         animated: relation.source === "constraint",
         style: { stroke: color, strokeWidth: active ? 3.2 : 2, opacity: active ? 0.95 : 0.25 },
         labelStyle: { fill: "#1f2937", fontSize: 12, fontWeight: 700, opacity: active ? 1 : 0.35 },
@@ -341,7 +348,12 @@ function relationMatchesQuery(relation: RelationshipRelation, query: string) {
 
 function RelationshipTableNode({ data, selected }: NodeProps<RelationshipNodeData>) {
   const fields = data.entity.fields || [];
-  const previewFields = fields.slice(0, 5);
+  const relatedFieldNames = new Set(data.relatedFieldNames);
+  const previewFields = [
+    ...fields.filter((field) => relatedFieldNames.has(field.columnName)),
+    ...fields.filter((field) => field.isPrimaryKey && !relatedFieldNames.has(field.columnName)),
+    ...fields.filter((field) => !field.isPrimaryKey && !relatedFieldNames.has(field.columnName)),
+  ].slice(0, Math.max(8, data.relatedFieldNames.length));
   const hiddenFieldCount = Math.max(0, fields.length - previewFields.length);
   const meta = getRoleMeta(data.entity.category);
 
@@ -419,11 +431,13 @@ function RelationshipTableNode({ data, selected }: NodeProps<RelationshipNodeDat
         <div style={{ marginTop: 12, borderRadius: 8, border: "1px solid #e5e7eb", background: "#ffffff", padding: 10 }}>
           <Space direction="vertical" size={5} style={{ display: "flex" }}>
             {previewFields.map((field) => (
-              <div key={field.columnName} style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, lineHeight: 1.5 }}>
+              <div key={field.columnName} style={{ position: "relative", display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, lineHeight: 1.5, background: relatedFieldNames.has(field.columnName) ? "#f0f7ff" : "transparent", borderRadius: 4, padding: "2px 4px" }}>
+                {relatedFieldNames.has(field.columnName) ? <Handle id={fieldTargetHandleId(field.columnName)} type="target" position={Position.Left} style={{ left: -16, width: 9, height: 9, background: data.accent, border: "2px solid #fff" }} /> : null}
                 <Typography.Text style={{ fontFamily: "Consolas, Menlo, monospace", color: field.isPrimaryKey ? data.accent : "#111827" }} ellipsis>
                   {field.isPrimaryKey ? "PK " : ""}{field.columnName}
                 </Typography.Text>
                 <Typography.Text type="secondary" style={{ flex: "0 0 auto" }}>{field.dataType || "-"}</Typography.Text>
+                {relatedFieldNames.has(field.columnName) ? <Handle id={fieldSourceHandleId(field.columnName)} type="source" position={Position.Right} style={{ right: -16, width: 9, height: 9, background: data.accent, border: "2px solid #fff" }} /> : null}
               </div>
             ))}
             {hiddenFieldCount > 0 ? <Typography.Text type="secondary" style={{ fontSize: 12 }}>+{hiddenFieldCount} 个字段</Typography.Text> : null}
@@ -623,6 +637,8 @@ export function ResearchRelationshipErGraph({ value, height = 640 }: Props) {
             { title: "引用方", key: "from", width: 260, render: (_value, record) => `${record.fromTable}.${record.fromField}` },
             { title: "被引用方", key: "to", width: 260, render: (_value, record) => `${record.toTable}.${record.toField}` },
             { title: "关系", dataIndex: "relationType", key: "relationType", width: 90 },
+            { title: "引用字段角色", dataIndex: "fromFieldRole", key: "fromFieldRole", width: 120, render: (value) => value === "FOREIGN_KEY" ? "FK 外键" : "REF 引用" },
+            { title: "目标字段角色", dataIndex: "toFieldRole", key: "toFieldRole", width: 130, render: (value) => value === "PRIMARY_KEY" ? "PK 主键" : value === "UNIQUE_KEY" ? "UK 唯一键" : "BK 业务键" },
             { title: "来源", dataIndex: "source", key: "source", width: 120, render: (value) => relationSourceLabel(value) },
             { title: "置信度", dataIndex: "confidence", key: "confidence", width: 90, render: (value) => formatConfidence(value) },
             { title: "依据", dataIndex: "evidence", key: "evidence", render: (value) => Array.isArray(value) && value.length ? value.join("；") : "-" },

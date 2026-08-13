@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>航空延误处置决策模拟</title>
+<style>
+:root{--bg:#0b1220;--panel:#111c30;--panel2:#16253d;--line:#29405f;--ink:#e8eef8;--muted:#91a4c2;--cyan:#41d4d8;--blue:#5b8ff0;--amber:#e8b84b;--red:#e0574f;--green:#5fb87a;--purple:#a47be0;--font:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 420px at 10% -10%,#1b3d62 0%,transparent 70%),var(--bg);color:var(--ink);font-family:var(--font)}
+.app{max-width:1420px;margin:0 auto;padding:24px 26px 36px}.eyebrow{font:12px var(--mono);letter-spacing:.18em;color:#9ab7e9}.title-row{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin:8px 0 24px}.title-row h1{font-size:30px;letter-spacing:.02em;margin:0}.title-row p{max-width:560px;margin:0;color:var(--muted);line-height:1.7}.badge{border:1px solid #385b88;border-radius:99px;padding:8px 13px;color:#c8ddff;font:12px var(--mono);white-space:nowrap}
+.grid{display:grid;grid-template-columns:340px minmax(0,1fr) 320px;gap:16px}.panel{background:rgba(17,28,48,.9);border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 36px rgba(0,0,0,.18)}.panel h2{font-size:15px;margin:0;padding:18px 18px 12px;border-bottom:1px solid #233754}.panel-body{padding:16px 18px}.field{margin-bottom:13px}.field label{display:flex;justify-content:space-between;color:#b6c7e0;font-size:12px;margin-bottom:7px}.field label span{font:11px var(--mono);color:#6f89ad}.field input,.field select{width:100%;border:1px solid #355071;background:#0e192b;color:var(--ink);border-radius:9px;padding:10px 11px;font:13px var(--font)}.field input[type=range]{padding:0;accent-color:var(--cyan)}.value{color:var(--cyan);font-family:var(--mono)}.button-row{display:flex;gap:8px;margin-top:18px}.btn{flex:1;border:1px solid #355071;background:#172844;color:#dbe8ff;border-radius:10px;padding:10px 11px;cursor:pointer;font-weight:600}.btn.primary{background:linear-gradient(135deg,#2563eb,#0ea5a9);border-color:#4ec8d2;color:white}.btn:hover{filter:brightness(1.12)}
+.hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px;border-bottom:1px solid #233754;background:linear-gradient(115deg,rgba(35,75,121,.38),rgba(12,22,40,.2))}.flight{display:flex;align-items:center;gap:16px}.flight-no{font:700 27px var(--mono);color:#fff}.route{font-size:15px;color:#cad8ee}.route b{color:var(--cyan);font-size:18px}.route small{display:block;color:var(--muted);margin-top:4px}.status{border-radius:10px;padding:8px 12px;font:12px var(--mono);border:1px solid #8c5e2e;color:#ffd993;background:#4b3217}.status.ok{border-color:#2a8154;color:#a8efc1;background:#153d2b}.status.block{border-color:#a94c49;color:#ffb5b0;background:#4b2021}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:14px 18px}.metric{background:#0c1729;border:1px solid #253b5a;border-radius:10px;padding:11px}.metric label{display:block;color:var(--muted);font-size:11px}.metric b{display:block;font:18px var(--mono);margin-top:6px;color:#eff6ff}.metric b.red{color:#ff9d97}.metric b.amber{color:#ffd176}.metric b.green{color:#a8efc1}
+.decision{margin:0 18px 16px;border:1px solid #405577;border-radius:12px;overflow:hidden}.decision-head{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;background:#152642}.decision-head strong{font-size:14px}.decision-head span{font:11px var(--mono);color:#88a8d8}.decision-body{padding:12px 14px;color:#c7d4e8;font-size:13px;line-height:1.7}.decision-body b{color:#fff}.timeline{padding:16px 18px}.timeline h3,.trace h3{font-size:13px;margin:0 0 12px;color:#b9cae4}.step{position:relative;display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:0 0 16px}.step:not(:last-child):before{content:"";position:absolute;left:7px;top:17px;bottom:0;border-left:1px dashed #3d587e}.dot{width:15px;height:15px;border-radius:50%;border:3px solid #17304d;background:var(--muted);z-index:1}.dot.ok{background:var(--green);border-color:#25583d}.dot.warn{background:var(--amber);border-color:#634e20}.dot.block{background:var(--red);border-color:#672f31}.step strong{font-size:13px}.step p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.5}.step code{font:10px var(--mono);color:#88a8d8;text-align:right}.trace{padding:16px 18px;border-top:1px solid #233754}.trace-item{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #20334e}.trace-item:last-child{border-bottom:0}.trace-item i{width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-top:6px;flex:none}.trace-item b{display:block;color:#dbe8ff;font:12px var(--mono)}.trace-item span{display:block;color:var(--muted);font-size:11px;margin-top:3px;line-height:1.45}.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.chip{font:11px var(--mono);border:1px solid #355071;border-radius:99px;padding:4px 7px;color:#a9c4e8}.footer{margin-top:18px;color:#7188aa;font:11px var(--mono);display:flex;justify-content:space-between;gap:10px}.footer a{color:#81b8ff;text-decoration:none}
+@media(max-width:1100px){.grid{grid-template-columns:300px minmax(0,1fr)}.grid>.panel:last-child{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.grid>.panel:last-child h2{grid-column:1/-1}.grid>.panel:last-child .trace{border-top:0;border-left:1px solid #233754}}
+@media(max-width:720px){.app{padding:18px 13px}.title-row{display:block}.badge{display:inline-block;margin-top:12px}.grid{display:block}.panel{margin-bottom:14px}.grid>.panel:last-child{display:block}.grid>.panel:last-child .trace{border-left:0;border-top:1px solid #233754}.metrics{grid-template-columns:repeat(2,1fr)}.hero{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="eyebrow">AVIATION ONTOLOGY · DECISION SIMULATOR · OFFLINE DEMO</div>
+  <div class="title-row"><div><h1>航空延误后的处理决策</h1><p>模拟真实运行场景：广州出发的南方航空航班遭遇强雷暴，在天气推理、机组约束和跑道容量共同作用下形成可解释的处置建议。</p></div><div class="badge">5 ENTITIES · 3 RELATIONS · 2 RULES</div></div>
+  <section class="grid">
+    <aside class="panel">
+      <h2>场景输入</h2>
+      <div class="panel-body">
+        <div class="field"><label>航班 <span>FlightSegment</span></label><input id="flightNo" value="CZ3098" aria-label="航班号"></div>
+        <div class="field"><label>航线 <span>固定演示</span></label><input value="广州白云 ZGGG → 北京大兴 ZBAD" disabled></div>
+        <div class="field"><label>延误分钟 <span class="value" id="delayValue">85 min</span></label><input id="delay" type="range" min="0" max="240" value="85"></div>
+        <div class="field"><label>天气严重度 <span>WeatherEvent</span></label><select id="weather"><option value="SEVERE">强雷暴 · SEVERE</option><option value="MODERATE">中度天气 · MODERATE</option><option value="CLEAR">正常天气 · CLEAR</option></select></div>
+        <div class="field"><label>跑道可用容量 <span class="value" id="capacityValue">45%</span></label><input id="capacity" type="range" min="20" max="100" value="45"></div>
+        <div class="field"><label>候选机组值勤 <span class="value" id="dutyValue">13.6 h</span></label><input id="duty" type="range" min="6" max="16" step="0.1" value="13.6"></div>
+        <div class="field"><label>候选机组休息 <span class="value" id="restValue">8.0 h</span></label><input id="rest" type="range" min="4" max="16" step="0.5" value="8"></div>
+        <div class="button-row"><button class="btn primary" id="run">执行决策</button><button class="btn" id="reset">恢复基线</button></div>
+      </div>
+    </aside>
+    <section class="panel">
+      <div class="hero"><div class="flight"><div class="flight-no" id="heroFlight">CZ3098</div><div class="route"><b>ZGGG</b> 广州 → 北京 <b>ZBAD</b><small>南方航空 · 计划起飞 14:20 · 机尾 B-1234</small></div></div><div class="status" id="status">待执行</div></div>
+      <div class="metrics"><div class="metric"><label>延误分钟</label><b id="metricDelay" class="amber">85</b></div><div class="metric"><label>WeatherEvent</label><b id="metricWeather" class="red">SEVERE</b></div><div class="metric"><label>跑道容量</label><b id="metricCapacity" class="amber">45%</b></div><div class="metric"><label>机组合规</label><b id="metricCrew" class="red">待判断</b></div></div>
+      <div class="decision"><div class="decision-head"><strong id="decisionTitle">点击“执行决策”开始推理</strong><span id="decisionCode">SIMULATION_IDLE</span></div><div class="decision-body" id="decisionBody">系统会按 <b>impacts → WeatherDelayedFlight → SHACL-CREW-DUTY</b> 的顺序计算，并给出可落到动作审计表的建议。</div></div>
+      <div class="timeline"><h3>推理与处置时间线</h3><div id="timeline"></div></div>
+    </section>
+    <aside class="panel trace"><h2>服务与字段追踪</h2><div class="panel-body"><h3>本次调用后的动态服务</h3><div id="traceList"></div><div class="legend"><span class="chip">ODS 原始证据</span><span class="chip">DWD 推理视图</span><span class="chip">动作审计</span></div></div><div class="trace"><h3>语义层证据</h3><div class="trace-item"><i></i><div><b>FlightSegment</b><span>ods_flight_schedule.flight_segment_id / delay_minutes</span></div></div><div class="trace-item"><i></i><div><b>WeatherEvent</b><span>ods_weather_metar.airport_icao + observe_time</span></div></div><div class="trace-item"><i></i><div><b>CrewMember</b><span>ods_crew_roster.duty_hours / rest_hours</span></div></div><div class="trace-item"><i></i><div><b>RunwayCapacity</b><span>ods_runway_slot.capacity_ratio</span></div></div></div></aside>
+  </section>
+  <div class="footer"><span>离线模拟 · 不调用真实 API · 不写入生产数据</span><a href="aviation_ontology_knowledge_graph.html">查看分层知识图谱 →</a></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const baseline={delay:85,weather:"SEVERE",capacity:45,duty:13.6,rest:8,flightNo:"CZ3098"};
+const els={delay:$('delay'),weather:$('weather'),capacity:$('capacity'),duty:$('duty'),rest:$('rest'),flightNo:$('flightNo')};
+function syncLabels(){ $('delayValue').textContent=els.delay.value+' min'; $('capacityValue').textContent=els.capacity.value+'%'; $('dutyValue').textContent=Number(els.duty.value).toFixed(1)+' h'; $('restValue').textContent=Number(els.rest.value).toFixed(1)+' h'; $('heroFlight').textContent=els.flightNo.value||'CZ3098'; $('metricDelay').textContent=els.delay.value; $('metricWeather').textContent=els.weather.value; $('metricCapacity').textContent=els.capacity.value+'%'; }
+['input','change'].forEach(evt=>Object.values(els).forEach(el=>el.addEventListener(evt,syncLabels)));
+function timelineStep(kind,title,detail,ref){return `<div class="step"><span class="dot ${kind}"></span><div><strong>${title}</strong><p>${detail}</p></div><code>${ref}</code></div>`;}
+function traceItem(name,detail){return `<div class="trace-item"><i></i><div><b>${name}</b><span>${detail}</span></div></div>`;}
+function execute(){
+  syncLabels();
+  const delay=Number(els.delay.value), weather=els.weather.value, capacity=Number(els.capacity.value), duty=Number(els.duty.value), rest=Number(els.rest.value);
+  const weatherImpact=weather==='SEVERE' && delay>0;
+  const weatherDelayed=weatherImpact;
+  const dutyViolation=duty>13;
+  const restViolation=rest<10;
+  const crewBlocked=dutyViolation||restViolation;
+  const capacityLow=capacity<70;
+  const actions=[];
+  if(capacityLow&&weatherDelayed) actions.push('申请后移时隙');
+  if(crewBlocked) actions.push('改派合规机组');
+  if(delay>=30) actions.push('旅客延误通知');
+  $('metricCrew').textContent=crewBlocked?'阻断':'合规'; $('metricCrew').className=crewBlocked?'red':'green'; $('metricWeather').className=weatherDelayed?'red':'green'; $('metricCapacity').className=capacityLow?'amber':'green';
+  $('status').textContent=crewBlocked?'已阻断，需改派':(weatherDelayed?'建议执行':'可放行'); $('status').className='status '+(crewBlocked?'block':(weatherDelayed?'':'ok'));
+  $('decisionTitle').textContent=crewBlocked?'调配方案被 SHACL 约束阻断':(weatherDelayed?'识别为 WeatherDelayedFlight':'未命中天气延误规则'); $('decisionCode').textContent=crewBlocked?'CREW_DUTY_BLOCK':(weatherDelayed?'WEATHER_DELAY_INFERRED':'NO_WEATHER_DELAY');
+  $('decisionBody').innerHTML=weatherDelayed?`航班 <b>${els.flightNo.value||'CZ3098'}</b> 在广州机场天气窗口内受到 <b>${weather}</b> 影响，延误 <b>${delay} 分钟</b>。${crewBlocked?'候选机组不满足值勤约束，原调配方案不得执行。':'候选机组合规，可按容量建议执行。'}推荐动作：<b>${actions.join('、')||'持续观察'}</b>。`:'当前天气条件未形成天气延误推理，保持运行监控。';
+  const weatherText=weatherDelayed?`METAR 事件与起飞机场/计划小时相交，且 delay_minutes=${delay} > 0。`:'天气严重度或延误条件不足，未形成 impacts 推理边。';
+  const crewText=dutyViolation?`连续值勤 ${duty.toFixed(1)}h > 13h。`:''; const restText=restViolation?`休息 ${rest.toFixed(1)}h < 10h。`:'';
+  const crewDetail=crewBlocked?[crewText,restText].filter(Boolean).join(' '):'值勤与休息均通过 SHACL 阈值。';
+  $('timeline').innerHTML=timelineStep(weatherDelayed?'warn':'ok','1 · impacts 气象影响匹配',weatherText,'dwd_rel_weather_impacts_flight')+timelineStep(weatherDelayed?'warn':'ok','2 · SWRL 天气延误推理',weatherDelayed?'分类为 WeatherDelayedFlight。':'未分类为天气延误。','dwd_rule_weather_delay_inferred')+timelineStep(crewBlocked?'block':'ok','3 · SHACL 机组约束',crewDetail,'dwd_rule_crew_duty_violation')+timelineStep(actions.length?'ok':'warn','4 · 处置动作建议',actions.length?actions.join(' · '):'暂无自动动作，保持人工观察。','ods_action_log_clean');
+  const traces=[traceItem('API / 语义推理','WeatherEvent → FlightSegment → WeatherDelayedFlight'),traceItem('写入表','ods_action_log_clean · '+(actions.length?'写入 '+actions.length+' 条建议动作':'本次不写入动作')),traceItem('DWD 视图','dwd_rule_weather_delay_inferred / dwd_rule_crew_duty_violation'),traceItem('字段级证据',`delay_minutes=${delay} · capacity_ratio=${(capacity/100).toFixed(2)} · duty_hours=${duty.toFixed(1)} · rest_hours=${rest.toFixed(1)}`)]; $('traceList').innerHTML=traces.join('');
+}
+function reset(){Object.entries(baseline).forEach(([key,value])=>{if(els[key])els[key].value=value;});syncLabels();$('status').textContent='待执行';$('status').className='status';$('decisionTitle').textContent='点击“执行决策”开始推理';$('decisionCode').textContent='SIMULATION_IDLE';$('decisionBody').innerHTML='系统会按 <b>impacts → WeatherDelayedFlight → SHACL-CREW-DUTY</b> 的顺序计算，并给出可落到动作审计表的建议。';$('timeline').innerHTML='';$('traceList').innerHTML=traceItem('等待执行','设置场景参数后点击执行，查看调用后的动态服务和写入表。');$('metricCrew').textContent='待判断';$('metricCrew').className='red';$('metricWeather').className='red';$('metricCapacity').className='amber';}
+Object.values(els).forEach(el=>el.addEventListener('input',syncLabels));$('run').addEventListener('click',execute);$('reset').addEventListener('click',reset);syncLabels();reset();
+</script>
+</body>
+</html>

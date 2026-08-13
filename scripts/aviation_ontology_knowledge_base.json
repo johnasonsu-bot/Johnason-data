@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "domain": "aviation_ontology_demo",
+    "title": "航空本体语义层知识库",
+    "version": "1.0.0",
+    "semantic_contract": "5 entities + 3 relations + 2 rules",
+    "source_of_truth": [
+      "scripts/aviation_ontology_semantic_layer.md",
+      "scripts/aviation_ontology_governance.sql"
+    ]
+  },
+  "terms": [
+    {"term":"FlightSegment","label":"航班架次","definition":"具有稳定架次标识、计划时刻、航路和执行状态的一次航班运行单元。","aliases":["航班段","航班实例"],"source":"运行计划"},
+    {"term":"AircraftTail","label":"航空器机尾","definition":"以机尾号识别的物理飞机资产，承载机型、MEL 缺陷、当前站点和可飞能力。","aliases":["尾号","机尾号"],"source":"机务台账"},
+    {"term":"CrewMember","label":"机组成员","definition":"参与航班执飞或保障的机组人员，包含角色、机型资质、值勤时长和休息时长。","aliases":["机组","飞行员/乘务员"],"source":"机组资源"},
+    {"term":"WeatherEvent","label":"气象事件","definition":"在机场和观测时刻发生、且可能影响航班运行的天气观测事件。","aliases":["METAR事件","雷暴事件"],"source":"航空气象"},
+    {"term":"RunwayCapacity","label":"跑道容量","definition":"机场跑道在指定小时的公布容量、可用容量及容量限制。","aliases":["时隙容量","跑道时刻"],"source":"机场运行"},
+    {"term":"METAR","label":"机场例行天气报告","definition":"描述机场当前风、能见度、天气现象和飞行规则类别的标准航空气象报文。","aliases":["航空气象报文"],"source":"航空气象"},
+    {"term":"CODA delay code","label":"CODA 延误代码","definition":"将天气、机组、技术、机场和空管等源系统原因统一到可比较的延误分类。","aliases":["延误原因标准码"],"source":"运行统计"},
+    {"term":"business key","label":"业务唯一键","definition":"跨来源识别同一业务航班的稳定组合键，用于增量更新、去重和来源融合。","aliases":["业务键"],"source":"数据治理"},
+    {"term":"operatedBy","label":"由航空器执飞","definition":"FlightSegment 与 AircraftTail 之间的执飞关系，连接字段为 tail_no。","aliases":["执飞关系"],"source":"本体关系"},
+    {"term":"staffedBy","label":"由机组保障","definition":"FlightSegment 与 CrewMember 之间的配备关系，连接字段为 flight_no/assigned_flight_no。","aliases":["配备关系"],"source":"本体关系"},
+    {"term":"impacts","label":"气象影响航班","definition":"WeatherEvent 在航班起降机场和时刻窗口内影响 FlightSegment 的关系。","aliases":["天气影响"],"source":"本体关系"},
+    {"term":"WeatherDelayedFlight","label":"天气延误航班","definition":"同时满足气象事件影响和延误分钟大于零的航班推理类别。","aliases":["天气原因延误"],"source":"SWRL 风格规则"},
+    {"term":"DUTY_OVER_LIMIT","label":"值勤超限","definition":"机组连续值勤时长超过允许上限，调配方案必须阻断。","aliases":["连续值勤超 13 小时"],"source":"SHACL 风格约束"},
+    {"term":"REST_UNDER_MIN","label":"休息不足","definition":"机组休息时长低于最低休息要求，调配方案必须阻断。","aliases":["休息不足 10 小时"],"source":"SHACL 风格约束"},
+    {"term":"incremental cursor","label":"增量游标","definition":"用于识别新增或变更记录的时间字段，如 std、source_updated_at 或 last_fetched_at。","aliases":["更新时间字段"],"source":"数据接入"}
+  ],
+  "entities": [
+    {"id":"FlightSegment","label":"航班架次","view":"dwd_ent_flight_segment","table":"ods_flight_schedule","key":"flight_segment_id","grain":"一条航班架次记录","core_fields":["flight_no","dep_airport","arr_airport","std","sta","atd","flight_status","delay_minutes","delay_code_raw","tail_no","carrier_code"]},
+    {"id":"AircraftTail","label":"物理飞机与 MEL","view":"dwd_ent_aircraft_tail","table":"ods_aircraft_tail","key":"tail_no","grain":"一架物理飞机","core_fields":["aircraft_model","cabin_class","remain_flight_hours","mel_defect","tail_status","current_station"]},
+    {"id":"CrewMember","label":"机组与值勤时长","view":"dwd_ent_crew_member","table":"ods_crew_roster","key":"crew_id","grain":"一名机组成员的一段排班","core_fields":["crew_name","crew_role","qualified_model","duty_start","duty_hours","duty_limit_hours","rest_hours","rest_min_hours","assigned_flight_no","compliance_flag"]},
+    {"id":"WeatherEvent","label":"强雷暴气象事件","view":"dwd_ent_weather_event","table":"ods_weather_metar","alternate_table":"ods_china_airport_current_weather","key":"airport_icao#observe_time","grain":"一个机场观测时刻的天气事件","core_fields":["airport_icao","observe_time","weather_phenomenon","visibility_m","wind_gust_kt","severity_level","flight_category"]},
+    {"id":"RunwayCapacity","label":"跑道容量时刻","view":"dwd_ent_runway_capacity","table":"ods_runway_slot","key":"airport_icao#runway_id#slot_hour","grain":"一个机场跑道小时容量快照","core_fields":["airport_icao","runway_id","slot_hour","declared_capacity","available_capacity","capacity_ratio","restriction_reason"]}
+  ],
+  "relations": [
+    {"id":"operatedBy","label":"执飞","source":"FlightSegment","target":"AircraftTail","join":"ods_flight_schedule.tail_no = ods_aircraft_tail.tail_no","view":"dwd_rel_flight_operated_by_tail","evidence_fields":["flight_segment_id","tail_no"]},
+    {"id":"staffedBy","label":"配备机组","source":"FlightSegment","target":"CrewMember","join":"ods_flight_schedule.flight_no = ods_crew_roster.assigned_flight_no","view":"dwd_rel_flight_staffed_by_crew","evidence_fields":["flight_segment_id","flight_no","assigned_flight_no","crew_id"]},
+    {"id":"impacts","label":"影响","source":"WeatherEvent","target":"FlightSegment","join":"weather.airport_icao = flight.dep_airport AND plan/observe hour overlaps","view":"dwd_rel_weather_impacts_flight","evidence_fields":["airport_icao","observe_time","dep_airport","std"]}
+  ],
+  "rules": [
+    {"id":"SWRL-WEATHER-DELAY","kind":"SWRL","label":"天气延误推理","when":["WeatherEvent impacts FlightSegment","FlightSegment.delay_minutes > 0"],"then":"FlightSegment inferred_class = WeatherDelayedFlight","view":"dwd_rule_weather_delay_inferred","severity":"INFO"},
+    {"id":"SHACL-CREW-DUTY","kind":"SHACL","label":"机组值勤约束","when":["CrewMember.duty_hours > duty_limit_hours","OR CrewMember.rest_hours < rest_min_hours"],"then":"调配方案 violation_type = DUTY_OVER_LIMIT/REST_UNDER_MIN 并阻断","view":"dwd_rule_crew_duty_violation","severity":"BLOCK"}
+  ],
+  "dictionaries": [
+    {"code":"71","name":"天气","values":["WX","weather-thunderstorm","71","天气原因"]},
+    {"code":"63","name":"机组","values":["CREW_OVER"]},
+    {"code":"41","name":"航空器技术","values":["TECH-MEL"]},
+    {"code":"89","name":"机场设施与时刻","values":["AIRPORT_SLOT","89"]},
+    {"code":"81","name":"空管流量","values":["ATC_FLOW"]},
+    {"code":"00","name":"无延误","values":[""]}
+  ],
+  "quality_rules": [
+    {"id":"Q001","field":"ods_action_log_clean.action_id","check":"去重后唯一","severity":"HIGH"},
+    {"id":"Q002","field":"ods_flight_schedule.flight_segment_id","check":"非空且稳定","severity":"HIGH"},
+    {"id":"Q003","field":"ods_flight_schedule.delay_code_raw","check":"命中 dim_delay_code_coda","severity":"HIGH"},
+    {"id":"Q004","field":"ods_crew_roster.duty_hours","check":"0 <= 值勤小时 <= 13，超限进入违规视图","severity":"HIGH"},
+    {"id":"Q005","field":"ods_crew_roster.rest_hours","check":"休息小时 >= 10，不足进入违规视图","severity":"HIGH"},
+    {"id":"Q006","field":"ods_flight_schedule.business_key","check":"非空且跨来源重复需复核","severity":"HIGH"},
+    {"id":"Q007","field":"ods_runway_slot.capacity_ratio","check":"0 <= ratio <= 1","severity":"MEDIUM"}
+  ],
+  "cases": [
+    {"id":"CASE-WX-001","title":"广州雷暴导致航班延误","context":"广州出发航班的 METAR 标记强雷暴，计划起飞小时与观测小时相交，且 delay_minutes=85。","evidence":["dwd_rel_weather_impacts_flight","dwd_rule_weather_delay_inferred"],"decision":"标记 WeatherDelayedFlight，优先申请后移时隙并通知旅客。"},
+    {"id":"CASE-CREW-001","title":"机组连续值勤超限","context":"候选机组 duty_hours=13.6，超过 duty_limit_hours=13。","evidence":["dwd_rel_flight_staffed_by_crew","dwd_rule_crew_duty_violation"],"decision":"阻断原调配方案，改派合规备份机组。"},
+    {"id":"CASE-CAPACITY-001","title":"雷暴窗口叠加跑道容量下降","context":"起飞机场同小时 available_capacity/declared_capacity=0.45，且 restriction_reason=THUNDERSTORM。","evidence":["dwd_ent_runway_capacity","dwd_rel_weather_impacts_flight"],"decision":"建议申请下一可用时隙，保留原始航班架次和动作审计。"}
+  ],
+  "decision_actions": [
+    {"id":"ACTION-SLOT-DEFER","label":"申请后移时隙","trigger":"WeatherDelayedFlight 且 capacity_ratio < 0.7","writes":"ods_action_log_clean(action_type=REQUEST_SLOT, plan_code=WX_SLOT_DEFER)"},
+    {"id":"ACTION-CREW-REASSIGN","label":"改派合规机组","trigger":"存在 DUTY_OVER_LIMIT 或 REST_UNDER_MIN","writes":"ods_action_log_clean(action_type=REASSIGN_CREW, plan_code=CREW_COMPLIANT)"},
+    {"id":"ACTION-PAX-NOTIFY","label":"旅客延误通知","trigger":"delay_minutes >= 30","writes":"ods_action_log_clean(action_type=PAX_NOTIFY, plan_code=DELAY_NOTICE)"}
+  ]
+}

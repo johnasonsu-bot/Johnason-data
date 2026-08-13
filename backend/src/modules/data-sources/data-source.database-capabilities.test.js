@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 const test = require("node:test");
 const {
   buildJdbcUrl,
@@ -65,6 +66,17 @@ test("DataX distribution contains Oracle and DM plugins and JDBC jars", () => {
   assert.ok(containsJar("writer/oraclewriter/libs", /^ojdbc.*\.jar$/i));
   assert.ok(containsJar("reader/rdbmsreader/libs", /^Dm.*JdbcDriver.*\.jar$/i));
   assert.ok(containsJar("writer/rdbmswriter/libs", /^Dm.*JdbcDriver.*\.jar$/i));
+});
+
+test("DataX enterprise plugin verifier validates executable classes", () => {
+  const verifierPath = path.resolve(__dirname, "../../../../scripts/verify-datax-enterprise-plugins.js");
+  const result = spawnSync(process.execPath, [verifierPath], {
+    cwd: path.resolve(__dirname, "../../../.."),
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /Oracle DataX reader: ready/);
+  assert.match(result.stdout, /DM DataX writer: ready/);
 });
 
 const integrationTargets = [

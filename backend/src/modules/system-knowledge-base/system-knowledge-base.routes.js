@@ -10,6 +10,7 @@ router.get("/",asyncHandler(controller.listKnowledgeBases));
 router.post("/",validateBody(knowledgeBaseSchema),asyncHandler(controller.createKnowledgeBase));
 router.post("/documents/:documentId/reparse",asyncHandler(controller.reparseKnowledgeDocument));
 router.get("/documents/:documentId/preview",asyncHandler(controller.previewKnowledgeDocument));
+router.get("/documents/:documentId/content",asyncHandler(controller.streamKnowledgeDocumentContent));
 router.get("/documents/:documentId/download",asyncHandler(controller.downloadKnowledgeDocument));
 router.delete("/documents/:documentId",asyncHandler(controller.deleteKnowledgeDocument));
 router.post("/sync/incubation/:incubationId",validateBody(incubationKnowledgeSyncSchema),asyncHandler(controller.syncIncubationKnowledgeBase));

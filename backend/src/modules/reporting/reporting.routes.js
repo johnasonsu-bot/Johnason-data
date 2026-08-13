@@ -1,5 +1,6 @@
 const express = require("express");
 const authMiddleware = require("../../common/middleware/auth");
+const optionalAuthMiddleware = require("../../common/middleware/optional-auth");
 const activationMiddleware = require("../../common/middleware/activation");
 const asyncHandler = require("../../common/utils/async-handler");
 const { validateBody } = require("../../common/middleware/validate");
@@ -24,8 +25,8 @@ const {
 
 const router = express.Router();
 
-router.get("/runtime/dashboards/:id/theme-templates", asyncHandler(controller.listRuntimeReportThemeTemplates));
-router.post("/runtime/dashboards/:id/preview-chart", validateBody(dashboardPreviewSchema), asyncHandler(controller.previewRuntimeDashboardChart));
+router.get("/runtime/dashboards/:id/theme-templates", optionalAuthMiddleware, asyncHandler(controller.listRuntimeReportThemeTemplates));
+router.post("/runtime/dashboards/:id/preview-chart", optionalAuthMiddleware, validateBody(dashboardPreviewSchema), asyncHandler(controller.previewRuntimeDashboardChart));
 
 router.use(authMiddleware, activationMiddleware);
 

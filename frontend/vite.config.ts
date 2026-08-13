@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { brotliCompress, gzip } from "node:zlib";
 import { promisify } from "node:util";
 
-const proxyTarget = process.env.VITE_PROXY_TARGET || "http://127.0.0.1:45121";
+const proxyTarget = process.env.VITE_PROXY_TARGET || "http://127.0.0.1:46121";
 const dbxProxyTarget = process.env.VITE_DBX_PROXY_TARGET || "http://127.0.0.1:45123";
 const chartdbProxyTarget = process.env.VITE_CHARTDB_PROXY_TARGET || "http://127.0.0.1:45124";
 const gzipAsync = promisify(gzip);
@@ -38,7 +38,7 @@ function splitVendorChunk(id: string): string | undefined {
   ) {
     return "vendor-core";
   }
-  if (id.includes("/echarts") || id.includes("/zrender/")) {
+  if (id.includes("/echarts") || id.includes("/@echarts-x/") || id.includes("/zrender/")) {
     return "vendor-echarts";
   }
   if (id.includes("/mermaid/") || id.includes("/@mermaid-js/") || id.includes("/katex/") || id.includes("/dompurify/") || id.includes("/marked/")) {

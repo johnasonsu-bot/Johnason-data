@@ -6,6 +6,8 @@ const { pool } = require("../../config/database");
 const AppError = require("../../common/errors/app-error");
 const { getCurrentProjectId } = require("../../common/utils/project-context");
 const incubationService = require("../data-lab/data-lab.incubation-runtime");
+const { buildPreviewDescriptor } = require("./system-knowledge-base.preview");
+const { resolveDocumentContent } = require("./system-knowledge-base.content");
 
 function queryFirst(rows) {
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
@@ -340,7 +342,11 @@ function resolveExistingKnowledgeDocumentPath(document) {
 async function readDocumentText(filePath, fileType) {
   const ext = String(fileType || "").toLowerCase();
 
-  if (["txt", "md", "csv", "json", "log"].includes(ext)) {
+  if ([
+    "txt", "md", "markdown", "csv", "json", "log", "html", "htm",
+    "sql", "yaml", "yml", "xml", "js", "jsx", "ts", "tsx", "css",
+    "scss", "sh", "py", "java"
+  ].includes(ext)) {
     const buffer = fs.readFileSync(filePath);
     const utf8Text = buffer.toString("utf8");
     if (!isLikelyMojibakeText(utf8Text)) {
@@ -668,14 +674,26 @@ async function getKnowledgeDocumentPreview(documentId) {
   }
 
   const maxPreviewLength = 20000;
+  const publicDocument = { ...document };
+  delete publicDocument.filePath;
   return {
-    document,
+    document: publicDocument,
     chunks,
     totalChunks: Number(document.chunkCount || chunks.length || 0),
     previewSource,
     previewText: String(previewText || "").slice(0, maxPreviewLength),
-    truncated: String(previewText || "").length > maxPreviewLength
+    truncated: String(previewText || "").length > maxPreviewLength,
+    viewer: buildPreviewDescriptor(document),
   };
+}
+
+async function resolveKnowledgeDocumentContent(documentId, variant) {
+  const document = await getKnowledgeDocumentById(documentId);
+  return resolveDocumentContent(document, variant, {
+    resolvePath: resolveExistingKnowledgeDocumentPath,
+    readText: readDocumentText,
+    cacheDir: path.resolve(process.cwd(), "runtime/system-knowledge-base-preview-cache"),
+  });
 }
 
 async function uploadKnowledgeDocument(kbId, file) {
@@ -1015,7 +1033,9 @@ module.exports = {
   upsertGeneratedKnowledgeDocument,
   reparseKnowledgeDocument,
   getKnowledgeDocumentPreview,
+  resolveKnowledgeDocumentContent,
   getKnowledgeDocumentById,
   deleteKnowledgeDocument,
   syncIncubationKnowledgeBase,
+  readDocumentText,
 };

@@ -1357,6 +1357,24 @@ async function debugService(id, runtimeInput = {}) {
   return executeServiceQuery(serviceApi, dataSource, runtimeInput);
 }
 
+async function inspectServiceJob(id, context = {}) {
+  const serviceApi = await repository.getServiceById(id);
+  if (!serviceApi || serviceApi.status !== "published") {
+    throw new AppError("服务不存在或未发布", 404);
+  }
+
+  await validateAuthorization(serviceApi, context, { forceToken: true });
+  const recentLogs = await repository.listServiceLogs({ serviceId: serviceApi.id, limit: 20 });
+  return {
+    id: String(serviceApi.id),
+    job_id: String(serviceApi.id),
+    status: serviceApi.status,
+    logs: recentLogs.map((item) =>
+      `${item.calledAt || item.createdAt || ""} ${item.responseStatus || "unknown"}`.trim()
+    ),
+  };
+}
+
 function extractAppToken(headers = {}) {
   const authorization = String(headers.authorization || headers.Authorization || "").trim();
   if (authorization.toLowerCase().startsWith("bearer ")) {
@@ -1367,16 +1385,17 @@ function extractAppToken(headers = {}) {
 }
 
 function extractClientIp(context = {}) {
-  const forwarded = String(context.headers?.["x-forwarded-for"] || "").trim();
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
+  const requestIp = String(context.req?.ip || context.ip || "").trim();
+  if (requestIp) {
+    return requestIp;
   }
 
-  return String(context.ip || context.req?.ip || "").trim() || "unknown";
+  const forwarded = String(context.headers?.["x-forwarded-for"] || "").trim();
+  return forwarded ? forwarded.split(",")[0].trim() : "unknown";
 }
 
-async function validateAuthorization(serviceApi, context) {
-  if (serviceApi.authType === "anonymous") {
+async function validateAuthorization(serviceApi, context, options = {}) {
+  if (serviceApi.authType === "anonymous" && options.forceToken !== true) {
     return { app: null, authorization: null };
   }
 
@@ -1516,6 +1535,7 @@ module.exports = {
   getOpsDashboard,
   getActiveServiceAiConfigByCode,
   invokeService,
+  inspectServiceJob,
   listAuthorizations,
   listServiceAiConfigs,
   listServiceDataSourceColumns,

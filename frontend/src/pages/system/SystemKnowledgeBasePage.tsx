@@ -1,5 +1,5 @@
 import { CloudUploadOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Button, Card, Descriptions, Drawer, Form, Input, Modal, Select, Space, Table, Tag, Typography, Upload, message } from "antd";
+import { Button, Card, Descriptions, Drawer, Form, Input, Modal, Select, Space, Table, Tag, Upload, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../app/providers/AuthProvider";
@@ -18,6 +18,7 @@ import {
 } from "../../services/systemKnowledgeBases";
 import type { SystemKnowledgeBaseRecord, SystemKnowledgeDocumentPreview, SystemKnowledgeDocumentRecord } from "../../types/api";
 import { StatusTag } from "../../components/ui/StatusTag";
+import { UniversalFilePreview } from "../../components/file-preview";
 import { SystemPageLayout } from "./SystemPageLayout";
 
 type Scope = "industry" | "platform" | "personal";
@@ -52,6 +53,7 @@ export function SystemKnowledgeBasePage() {
   const [editing, setEditing] = useState<SystemKnowledgeBaseRecord | null>(null);
   const [detail, setDetail] = useState<SystemKnowledgeBaseRecord | null>(null);
   const [preview, setPreview] = useState<SystemKnowledgeDocumentPreview | null>(null);
+  const [previewingDocumentId, setPreviewingDocumentId] = useState<number | null>(null);
 
   async function loadData() {
     if (!token) return;
@@ -145,6 +147,19 @@ export function SystemKnowledgeBasePage() {
     await loadData();
   }
 
+  async function openDocumentPreview(document: SystemKnowledgeDocumentRecord) {
+    if (!token) return;
+    setPreviewingDocumentId(document.id);
+    try {
+      const response = await fetchSystemKnowledgeDocumentPreview(token, document.id);
+      setPreview(response.data);
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : "文档预览加载失败");
+    } finally {
+      setPreviewingDocumentId(null);
+    }
+  }
+
   const columns = [
     { title: "知识库名称", dataIndex: "kbName", key: "kbName" },
     { title: "说明", dataIndex: "kbDesc", key: "kbDesc", render: (value: string) => value || "-" },
@@ -198,7 +213,7 @@ export function SystemKnowledgeBasePage() {
               { title: "解析状态", dataIndex: "parseStatus", key: "parseStatus", width: 110 },
               { title: "片段数", dataIndex: "chunkCount", key: "chunkCount", width: 90 },
               { title: "操作", key: "actions", width: 280, render: (_, document) => <Space>
-                <Button type="link" onClick={async () => { if (!token) return; const response = await fetchSystemKnowledgeDocumentPreview(token, document.id); setPreview(response.data); }}>预览</Button>
+                <Button type="link" loading={previewingDocumentId === document.id} onClick={() => void openDocumentPreview(document)}>预览</Button>
                 <Button type="link" onClick={() => token && void reparseSystemKnowledgeDocument(token, document.id).then(() => openDetail(detail))}>重新解析</Button>
                 <Button type="link" icon={<DownloadOutlined />} onClick={() => token && void downloadSystemKnowledgeDocument(token, document.id, document.fileName)}>下载</Button>
                 <Button type="link" danger onClick={() => void removeDocument(document)}>删除</Button>
@@ -208,9 +223,13 @@ export function SystemKnowledgeBasePage() {
         </Space> : null}
       </Drawer>
 
-      <Modal open={Boolean(preview)} width={900} title={preview?.document.fileName || "文档预览"} footer={null} onCancel={() => setPreview(null)}>
-        <Typography.Paragraph style={{ whiteSpace: "pre-wrap", maxHeight: 620, overflow: "auto" }}>{preview?.previewText || "暂无可预览内容"}</Typography.Paragraph>
-      </Modal>
+      <UniversalFilePreview
+        open={Boolean(preview)}
+        preview={preview}
+        token={token || ""}
+        onClose={() => setPreview(null)}
+        onDownload={preview && token ? () => void downloadSystemKnowledgeDocument(token, preview.document.id, preview.document.fileName) : undefined}
+      />
     </SystemPageLayout>
   );
 }

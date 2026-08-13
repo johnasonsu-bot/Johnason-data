@@ -48,10 +48,10 @@ import type {
   IngestionWriteMode
 } from "../../types/api";
 import { inferDatasourceDialect } from "../../utils/datasource";
+import { inferTargetTableMode, type TargetTableMode } from "./task-target-mode";
 
 type BusinessScheduleType = "manual" | "interval" | "daily" | "weekly" | "monthly" | "cron";
 type IncrementalMode = "timestamp" | "id";
-type TargetTableMode = "existing" | "create";
 
 type MappingRow = FieldMapping & {
   enabled: boolean;
@@ -1604,7 +1604,16 @@ export function TaskConfigPage() {
       targetTableMode: values.targetTableMode,
       syncMode: values.syncMode,
       targetConfig: {
-        writeMode: values.writeMode || "append"
+        writeMode: values.writeMode || "append",
+        ...(values.writeMode === "upsert"
+          ? {
+              keyFields:
+                currentTask?.targetConfig?.keyFields ||
+                fieldMappings
+                  .filter((item) => item.enabled && item.isPrimaryKey && item.targetField)
+                  .map((item) => item.targetField)
+            }
+          : {})
       },
       fieldMappings: fieldMappings
         .filter((item) => item.enabled && item.targetField)
@@ -3759,6 +3768,7 @@ function getWriteModeOptions(
   if (normalizedTargetType === "postgresql") {
     return [
       { value: "append", label: "追加写入" },
+      { value: "upsert", label: "主键更新（幂等）" },
       { value: "overwrite", label: "覆盖写入" }
     ];
   }
@@ -3831,14 +3841,6 @@ function resolveScheduleType(scheduleConfig?: IngestionTask["scheduleConfig"]): 
   return type && ["manual", "interval", "daily", "weekly", "monthly", "cron"].includes(type)
     ? (type as BusinessScheduleType)
     : "manual";
-}
-
-function inferTargetTableMode(task: IngestionTask): TargetTableMode {
-  if (task.targetConfig?.table && task.targetConfig.table.length > 0) {
-    return "create";
-  }
-
-  return "existing";
 }
 
 function buildRecommendedTaskCode(taskName?: string, sourceTable?: string) {

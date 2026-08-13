@@ -165,8 +165,8 @@ const ANALYSIS_ADVICE_PROMPT = `
   "analysisSuggestions": ["分析建议"]
 }`.trim();
 const TABLE_RELATIONSHIP_PROMPT = `
-你是资深数据建模专家。你会收到用户本次选定表范围内的表结构摘要和规则候选关系。
-请只基于输入范围分析表之间的稳定关联关系，不要补充输入中不存在的表。
+你是资深数据建模专家。你会收到用户本次选定表及系统自动补充的关联表结构摘要和规则候选关系。
+请只基于输入中的表分析稳定关联关系，不要补充输入中不存在的表。
 
 要求：
 1. 只输出 JSON 对象，不要输出 Markdown。
@@ -185,6 +185,8 @@ const TABLE_RELATIONSHIP_PROMPT = `
       "relationType": "1:1|1:N|N:1|N:N",
       "confidence": 0.86,
       "source": "constraint|name_rule|ai",
+      "fromFieldRole": "FOREIGN_KEY|REFERENCE",
+      "toFieldRole": "PRIMARY_KEY|UNIQUE_KEY|BUSINESS_KEY",
       "evidence": ["判断依据"]
     }
   ]
@@ -777,7 +779,7 @@ function buildTableAliases(tableName = "") {
 function getProfileFields(profile) {
   const fields = Array.isArray(profile?.fieldProfiles) && profile.fieldProfiles.length
     ? profile.fieldProfiles
-    : (Array.isArray(profile?.columns) ? profile.columns : []);
+    : (Array.isArray(profile?.columns) ? profile.columns : (Array.isArray(profile?.fields) ? profile.fields : []));
   return fields
     .map((field) => ({
       columnName: String(field?.columnName || "").trim(),
@@ -786,6 +788,7 @@ function getProfileFields(profile) {
       ordinalPosition: Number(field?.ordinalPosition || 0),
       isPrimaryKey: Boolean(field?.isPrimaryKey),
       columnComment: String(field?.columnComment || "").trim(),
+      distinctRatio: Number(field?.distinctRatio ?? field?.distinctRate ?? 0),
     }))
     .filter((field) => field.columnName);
 }
@@ -840,6 +843,29 @@ function buildRelationshipEntities(tableProfiles = []) {
       columnComment: field.columnComment || "",
     })),
   }));
+}
+
+function getProfileField(profile, columnName) {
+  const normalized = normalizeIdentifier(columnName);
+  return getProfileFields(profile).find((field) => normalizeIdentifier(field.columnName) === normalized) || null;
+}
+
+function inferTargetFieldRole(profile, columnName) {
+  const field = getProfileField(profile, columnName);
+  if (field?.isPrimaryKey) return "PRIMARY_KEY";
+  if (Number(field?.distinctRatio ?? field?.distinctRate ?? 0) >= 0.98) return "UNIQUE_KEY";
+  return "BUSINESS_KEY";
+}
+
+function enrichRelationFieldRoles(relation, tableProfiles = []) {
+  const tableMap = buildProfileLookupMap(tableProfiles);
+  const targetProfile = findProfileByTableReference(tableMap, relation.toTable);
+  return {
+    ...relation,
+    fromFieldRole: relation.fromFieldRole || (relation.source === "constraint" ? "FOREIGN_KEY" : "REFERENCE"),
+    toFieldRole: relation.toFieldRole || inferTargetFieldRole(targetProfile, relation.toField),
+    joinCondition: relation.joinCondition || `${relation.fromTable}.${relation.fromField} = ${relation.toTable}.${relation.toField}`,
+  };
 }
 
 function buildProfileLookupMap(tableProfiles = []) {
@@ -903,6 +929,9 @@ function inferConstraintRelations(tableProfiles = []) {
           relationType: "N:1",
           confidence: 0.98,
           source: "constraint",
+          fromFieldRole: "FOREIGN_KEY",
+          toFieldRole: inferTargetFieldRole(target, toField),
+          constraintName: constraint.constraintName || "",
           evidence: uniqueStrings([
             `显式外键 ${constraint.constraintName || ""}`.trim(),
             `${profile.tableName}.${fromField} 引用 ${target.tableName}.${toField}`,
@@ -920,14 +949,14 @@ function findLikelyTargetField(targetProfile, suffix) {
   const exactPrimary = primaryFields.find((field) => normalizeIdentifier(field.columnName) === normalizedSuffix);
   if (exactPrimary) return exactPrimary;
   if (normalizedSuffix === "id") {
-    return primaryFields.find((field) => /(^id$|_id$)/i.test(normalizeIdentifier(field.columnName))) || primaryFields[0] || null;
+    return primaryFields.find((field) => /(^id$|_id$)/i.test(normalizeIdentifier(field.columnName))) || null;
   }
   if (["code", "no", "num", "number", "key"].includes(normalizedSuffix)) {
     const matched = primaryFields.find((field) => normalizeIdentifier(field.columnName).endsWith(`_${normalizedSuffix}`) || normalizeIdentifier(field.columnName).endsWith(normalizedSuffix));
     if (matched) return matched;
-    return getProfileFields(targetProfile).find((field) => normalizeIdentifier(field.columnName).endsWith(`_${normalizedSuffix}`) || normalizeIdentifier(field.columnName).endsWith(normalizedSuffix)) || primaryFields[0] || null;
+    return getProfileFields(targetProfile).find((field) => normalizeIdentifier(field.columnName).endsWith(`_${normalizedSuffix}`) || normalizeIdentifier(field.columnName).endsWith(normalizedSuffix)) || null;
   }
-  return primaryFields[0] || null;
+  return null;
 }
 
 function matchFieldAgainstTarget(field, targetProfile) {
@@ -937,6 +966,15 @@ function matchFieldAgainstTarget(field, targetProfile) {
   const primaryFields = getPrimaryFields(targetProfile);
   const normalizedPrimaryNames = primaryFields.map((item) => normalizeIdentifier(item.columnName));
   const suffixes = ["id", "code", "no", "num", "number", "key"];
+
+  const declaredPrimaryField = getProfileFields(targetProfile).find((item) => item.isPrimaryKey && normalizeIdentifier(item.columnName) === fieldName);
+  if (declaredPrimaryField) {
+    return {
+      toField: declaredPrimaryField.columnName,
+      confidence: 0.9,
+      evidence: `字段 ${field.columnName} 与 ${targetProfile.tableName} 的主键字段同名`,
+    };
+  }
 
   for (const alias of aliases) {
     for (const suffix of suffixes) {
@@ -954,11 +992,38 @@ function matchFieldAgainstTarget(field, targetProfile) {
 
   if (fieldName !== "id" && normalizedPrimaryNames.includes(fieldName) && /(code|no|num|number|key)$/i.test(fieldName)) {
     const targetField = primaryFields.find((item) => normalizeIdentifier(item.columnName) === fieldName);
+    if (!targetField?.isPrimaryKey && Number(targetField?.distinctRatio || 0) < 0.98) return null;
     return {
       toField: targetField?.columnName || field.columnName,
       confidence: 0.72,
       evidence: `字段名 ${field.columnName} 与 ${targetProfile.tableName} 的业务键名称一致`,
     };
+  }
+
+  const semanticName = fieldName.replace(/^(assigned|inbound|outbound|related|source|target|current|base|dep|arr|origin|destination)_/, "");
+  if (semanticName !== fieldName && /(id|code|no|num|number|key|icao)$/i.test(semanticName)) {
+    const targetField = getProfileFields(targetProfile).find((item) => normalizeIdentifier(item.columnName) === semanticName);
+    if (targetField) {
+      return {
+        toField: targetField.columnName,
+        confidence: targetField.isPrimaryKey ? 0.86 : 0.8,
+        evidence: `字段 ${field.columnName} 去除业务方向前缀后与 ${targetProfile.tableName}.${targetField.columnName} 一致`,
+      };
+    }
+  }
+
+
+  const airportAliases = new Set(["airport_icao", "dep_airport", "arr_airport", "origin_airport", "destination_airport"]);
+  if (airportAliases.has(fieldName)) {
+    const targetField = getProfileFields(targetProfile).find((item) => airportAliases.has(normalizeIdentifier(item.columnName)) && item.isPrimaryKey);
+    if (targetField) {
+      return {
+        toField: targetField.columnName,
+        confidence: 0.84,
+        multiTarget: true,
+        evidence: `字段 ${field.columnName} 与 ${targetProfile.tableName}.${targetField.columnName} 同属机场 ICAO 业务键`,
+      };
+    }
   }
 
   return null;
@@ -972,7 +1037,7 @@ function inferNameRuleRelations(tableProfiles = [], existingRelations = []) {
     for (const field of fields) {
       if (field.isPrimaryKey) continue;
       const fieldName = normalizeIdentifier(field.columnName);
-      if (!/(^|_)(id|code|no|num|number|key)$/i.test(fieldName) && !/(id|code|no|num|number|key)$/i.test(fieldName)) continue;
+      if (!/(^|_)(id|code|no|num|number|key)$/i.test(fieldName) && !/(id|code|no|num|number|key)$/i.test(fieldName) && !/(^|_)(airport|icao)$/i.test(fieldName)) continue;
       for (const targetProfile of tableProfiles) {
         if (targetProfile.tableName === sourceProfile.tableName) continue;
         const matched = matchFieldAgainstTarget(field, targetProfile);
@@ -991,7 +1056,7 @@ function inferNameRuleRelations(tableProfiles = [], existingRelations = []) {
         if (existingKeys.has(key)) continue;
         existingKeys.add(key);
         relations.push(relation);
-        break;
+        if (!matched.multiTarget) break;
       }
     }
   }
@@ -1012,6 +1077,10 @@ function dedupeRelations(relations = []) {
       relationType: normalizeRelationType(relation.relationType),
       confidence: clampConfidence(relation.confidence),
       source: normalizeRelationSource(relation.source),
+      fromFieldRole: relation.fromFieldRole || (normalizeRelationSource(relation.source) === "constraint" ? "FOREIGN_KEY" : "REFERENCE"),
+      toFieldRole: relation.toFieldRole || "BUSINESS_KEY",
+      constraintName: relation.constraintName || "",
+      joinCondition: relation.joinCondition || `${relation.fromTable}.${relation.fromField} = ${relation.toTable}.${relation.toField}`,
       evidence: uniqueStrings(Array.isArray(relation.evidence) ? relation.evidence : [relation.evidence].filter(Boolean)),
     };
     if (!current || normalized.confidence > current.confidence) {
@@ -1032,7 +1101,57 @@ function dedupeRelations(relations = []) {
 function buildRuleRelationshipReport(tableProfiles = []) {
   const constraintRelations = inferConstraintRelations(tableProfiles);
   const nameRuleRelations = inferNameRuleRelations(tableProfiles, constraintRelations);
-  return dedupeRelations([...constraintRelations, ...nameRuleRelations]);
+  return dedupeRelations([...constraintRelations, ...nameRuleRelations].map((relation) => enrichRelationFieldRoles(relation, tableProfiles)));
+}
+
+async function expandRelationshipProfiles(source, allTables, selectedProfiles, config, signal) {
+  if (isObjectPreviewSource(source)) return selectedProfiles;
+  const selectedNames = new Set(selectedProfiles.map((profile) => profile.tableName));
+  const allTableNames = new Set(allTables.map((table) => table.tableName));
+  const registeredTableNames = new Set();
+  selectedProfiles.forEach((profile) => {
+    (profile.sampleRows || []).forEach((row) => {
+      Object.values(row || {}).forEach((value) => {
+        const candidate = String(value || "").trim();
+        if (allTableNames.has(candidate)) registeredTableNames.add(candidate);
+      });
+    });
+    (profile.constraintDetails || []).forEach((constraint) => {
+      (constraint.references || []).forEach((reference) => {
+        const candidate = String(reference?.tableName || "").trim();
+        if (allTableNames.has(candidate)) registeredTableNames.add(candidate);
+      });
+    });
+  });
+  const candidates = allTables
+    .filter((table) => registeredTableNames.has(table.tableName) && !selectedNames.has(table.tableName))
+    .slice(0, Math.max(0, Number(config.relationshipDiscoveryMaxTables || 100) - selectedProfiles.length));
+  if (!candidates.length) return selectedProfiles;
+
+  const discoveredProfiles = await runWithConcurrency(candidates, Math.min(4, Number(config.metadataConcurrency || 3)), async (table) => {
+    if (signal?.aborted) throw createResearchRunCancelledError();
+    try {
+      const profile = await previewService.inspectObjectProfile(source, table.tableName, {
+        sampleSize: Math.min(10, Number(config.sampleSize || 50)),
+        tableInfo: table,
+      });
+      const fieldProfiles = buildFieldProfiles(profile.columns || [], profile.sampleRows || []);
+      return {
+        tableName: table.tableName,
+        tableComment: profile.tableComment || table.tableComment || "",
+        rowCount: null,
+        category: "business",
+        priority: "medium",
+        constraintDetails: Array.isArray(profile.constraints) ? profile.constraints : [],
+        fieldProfiles,
+        columns: profile.columns || [],
+      };
+    } catch (_error) {
+      return null;
+    }
+  });
+
+  return [...selectedProfiles, ...discoveredProfiles.filter(Boolean)];
 }
 
 function buildRelationshipSummary(entities = [], relations = []) {
@@ -1086,10 +1205,10 @@ function normalizeAiRelationships(parsed, entities, candidateRelations = []) {
       const fromTable = tableMap.get(String(item?.fromTable || "")) || tableMap.get(getUnqualifiedTableName(item?.fromTable || "")) || tableMap.get(normalizeIdentifier(item?.fromTable || ""));
       const toTable = tableMap.get(String(item?.toTable || "")) || tableMap.get(getUnqualifiedTableName(item?.toTable || "")) || tableMap.get(normalizeIdentifier(item?.toTable || ""));
       if (!fromTable || !toTable || fromTable === toTable) return null;
-      const fromField = fieldMap.get(fromTable)?.get(String(item?.fromField || "")) || fieldMap.get(fromTable)?.get(normalizeIdentifier(item?.fromField || "")) || String(item?.fromField || "").trim();
-      const toField = fieldMap.get(toTable)?.get(String(item?.toField || "")) || fieldMap.get(toTable)?.get(normalizeIdentifier(item?.toField || "")) || String(item?.toField || "").trim();
+      const fromField = fieldMap.get(fromTable)?.get(String(item?.fromField || "")) || fieldMap.get(fromTable)?.get(normalizeIdentifier(item?.fromField || ""));
+      const toField = fieldMap.get(toTable)?.get(String(item?.toField || "")) || fieldMap.get(toTable)?.get(normalizeIdentifier(item?.toField || ""));
       if (!fromField || !toField) return null;
-      return {
+      return enrichRelationFieldRoles({
         fromTable,
         fromField,
         toTable,
@@ -1097,8 +1216,10 @@ function normalizeAiRelationships(parsed, entities, candidateRelations = []) {
         relationType: normalizeRelationType(item?.relationType),
         confidence: clampConfidence(item?.confidence, 0.76),
         source: normalizeRelationSource(item?.source || "ai"),
+        fromFieldRole: item?.fromFieldRole,
+        toFieldRole: item?.toFieldRole,
         evidence: uniqueStrings(Array.isArray(item?.evidence) ? item.evidence : [item?.evidence].filter(Boolean)),
-      };
+      }, entities);
     })
     .filter(Boolean);
 
@@ -3343,6 +3464,7 @@ async function executeResearchRun(runId) {
       incrementalColumn,
       metadataIssues: buildMetadataIssues(profile, fieldSummary, metrics),
       quality: { sampleCount: metrics.sampleCount, highNullColumns: metrics.highNullColumns, nullRates: metrics.nullRates },
+      sampleRows: profile.sampleRows || [],
       indexes: Array.isArray(profile.indexes) ? profile.indexes.length : 0,
       constraints: Array.isArray(profile.constraints) ? profile.constraints.length : 0,
       constraintDetails: Array.isArray(profile.constraints) ? profile.constraints : [],
@@ -3379,7 +3501,24 @@ async function executeResearchRun(runId) {
   if (hasResearchItem(config, "table_relationship")) {
     await setRunState(runId, { progressPercent: 90, currentStage: "table_relationship" }, { stageKey: "table_relationship", message: "开始进行表关系调研" });
     assertResearchRunNotCancelled(runId);
-    const relationshipResult = await analyzeTableRelationships(runId, source, { ...config, tableScope: run.tableScope }, orderedProfiles, activeRun.controller.signal);
+    const relationshipProfiles = await expandRelationshipProfiles(
+      source,
+      allTables,
+      orderedProfiles,
+      config,
+      activeRun.controller.signal,
+    );
+    const supplementedCount = Math.max(0, relationshipProfiles.length - orderedProfiles.length);
+    if (supplementedCount) {
+      await log(runId, "table_relationship", `已自动补充 ${supplementedCount} 张存在关联的物理表进入关系分析`, {
+        detail: {
+          selectedTableCount: orderedProfiles.length,
+          relationshipTableCount: relationshipProfiles.length,
+          supplementedTables: relationshipProfiles.filter((profile) => !orderedProfiles.some((item) => item.tableName === profile.tableName)).map((profile) => profile.tableName),
+        },
+      });
+    }
+    const relationshipResult = await analyzeTableRelationships(runId, source, { ...config, tableScope: run.tableScope }, relationshipProfiles, activeRun.controller.signal);
     tableRelationships = relationshipResult.report;
     if (relationshipResult.batch) {
       aiBatches = [...aiBatches, relationshipResult.batch];

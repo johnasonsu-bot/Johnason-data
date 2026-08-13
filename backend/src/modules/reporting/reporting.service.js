@@ -9,6 +9,9 @@ const { createPostgresLikeClient } = require("../../common/utils/db-client");
 const { resolveDatasourceConnection } = require("../../common/utils/datasource-dialect");
 const { getAdapter } = require("../data-development/adapters");
 const { getManagedBinding } = require("../../common/utils/managed-jdbc-runtime");
+const { pool } = require("../../config/database");
+const { decryptSecret } = require("../data-development/data-development.utils");
+const { getCurrentProjectId } = require("../../common/utils/project-context");
 const repository = require("./reporting.repository");
 const reportingAiConfigService = require("./reporting-ai-config.service");
 const { BUILTIN_THEME_TEMPLATES } = require("./reporting.theme-presets");
@@ -4009,7 +4012,55 @@ async function ensureReportDataSource(id) {
   if (!row) {
     throw new AppError("报表数据源不存在", 404);
   }
-  return row;
+  return hydrateReportDataSource(row);
+}
+
+/**
+ * Reporting assets can reference the encrypted data-development datasource
+ * instead of duplicating a plaintext database password in report metadata.
+ * This keeps dashboards executable while preserving the platform secret
+ * boundary.
+ */
+async function hydrateReportDataSource(row) {
+  const referenceId = Number(row?.connectionConfig?.devDatasourceId || 0);
+  if (!referenceId) return row;
+  const projectId = getCurrentProjectId();
+  const conditions = ["id = ?"];
+  const params = [referenceId];
+  if (projectId) {
+    conditions.push("project_id = ?");
+    params.push(projectId);
+  }
+  const [rows] = await pool.query(
+    `SELECT id, type, host, port, database_name AS databaseName, username,
+            password_encrypted AS passwordEncrypted, extra_config_json AS extraConfig
+       FROM dev_datasources
+      WHERE ${conditions.join(" AND ")}
+      LIMIT 1`,
+    params
+  );
+  const datasource = rows[0];
+  if (!datasource) {
+    throw new AppError("报表引用的数据开发数据源不存在", 400);
+  }
+  let extraConfig = datasource.extraConfig || {};
+  if (typeof extraConfig === "string") {
+    try { extraConfig = JSON.parse(extraConfig); } catch { extraConfig = {}; }
+  }
+  return {
+    ...row,
+    sourceType: datasource.type || row.sourceType,
+    connectionConfig: {
+      ...row.connectionConfig,
+      host: datasource.host,
+      port: Number(datasource.port || 0),
+      database: datasource.databaseName,
+      databaseName: datasource.databaseName,
+      username: datasource.username,
+      password: decryptSecret(datasource.passwordEncrypted),
+      ...extraConfig,
+    },
+  };
 }
 
 async function ensureReportDatasetFolder(id) {
