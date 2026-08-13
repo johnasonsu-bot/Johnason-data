@@ -4,6 +4,10 @@
   "private": false,
   "description": "Transport-neutral platform overview and runtime capabilities for Johnason Data Platform",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./contracts": "./contracts/index.js"
+  },
   "files": ["src", "contracts"],
   "engines": {
     "node": ">=22.20.0"
