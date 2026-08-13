@@ -80,3 +80,92 @@ Round 3 final verification reran `node --test packages/data-platform-module-proj
 
 1. The strict graph intentionally keeps backend from importing module or kernel packages. Task 6 must bind Web/CLI through the aggregate while retaining the compatibility factories.
 2. The disposable registry process was stopped after readback. Its local data and the rollback tarball remain unstaged; cleanup or deletion requires explicit approval.
+
+## Review round 4 — exact schemas, public port errors, and DTO serialization
+
+### RED
+
+The first transport-contract run was intentionally made before production changes:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/project-api-mapping.contract.test.js
+# exit 1
+# tests 8; pass 4; fail 4
+# Missing expected rejection: invalid project body/status/member/import/export inputs
+# Missing expected rejection: detail accepted a project record without members
+# actual code/status/retryable: PROJECT_DRIVER_FAILURE / 418 / true
+# Date values serialized as {}
+```
+
+The failing cases proved that generic `record`/`list` checks accepted operation-specific malformed results, arbitrary `PROJECT_*` port failures were trusted, and the recursive DTO mapper had no `Date`, `Buffer`, or cycle contract. A second focused RED replaced the malformed create result with a numeric-string ID:
+
+```text
+node --test --test-name-pattern='each project operation applies' packages/data-platform-module-project-spaces/tests/project-api-mapping.contract.test.js
+# exit 1
+# tests 1; pass 0; fail 1
+# Missing expected rejection: create
+```
+
+The first full package/kernel regression correctly failed only after the new source file changed the recorded candidate tree hash:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/*.test.js packages/data-platform-core-kernel/tests/*.test.js
+# exit 1
+# tests 44; pass 42; fail 2
+# both failures: acceptance evidence candidate source-tree hash mismatch
+```
+
+### GREEN
+
+`project-operation-contracts.js` now publishes transport-neutral, per-operation input/result schemas. Project create/update match the Web contract (`projectName`, formatted `projectCode`, project type/status/defaults); member roles/status/permissions and import/export options are enumerated and normalized. Detail, project records, members, transfer logs, preview, import summary, backups, and download/export artifacts each validate their own required fields before a DTO is emitted. No HTTP request/response type is imported.
+
+Port failures are always reconstructed from the package-owned public codes `PROJECT_CONFLICT`, `PROJECT_NOT_FOUND`, `PROJECT_OPERATION_INVALID`, or `PROJECT_OPERATION_FAILED`. Messages, status, and `retryable: false` are fixed; only per-code detail keys survive recursive secret-key redaction. An arbitrary `PROJECT_DRIVER_FAILURE` is reduced to the fixed 500 failure with empty details.
+
+The DTO serializer converts valid `Date` values to ISO strings, recursively removes secret/internal keys, rejects `Buffer` and unsupported values, and reports cycles as the stable `PROJECT_PORT_INVALID_RESULT` 502 error. The legacy acceptance record retains its original tarball/tag/readback and now records candidate source hash `bac4331a0a21a2ebe913b52c95c165394ea3795edee511d418d9a0bb476dcfd5`.
+
+Fresh verification output:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/project-api-mapping.contract.test.js
+# exit 0; tests 8; pass 8; fail 0
+
+node --test packages/data-platform-module-project-spaces/tests/*.test.js packages/data-platform-core-kernel/tests/*.test.js
+# exit 0; tests 44; pass 44; fail 0
+
+npm ci --ignore-scripts && npm ci --dry-run --ignore-scripts
+# exit 0; 542 packages installed; dry run up to date
+# existing audit output: 12 vulnerabilities (4 moderate, 8 high)
+
+npm run test:core
+# exit 0
+# CLI 19/19; kernel 19/19; auth 14/14; project-spaces 25/25
+# backend 32 pass, 0 fail, 4 optional integration skips
+
+npm run test:shared-core-install
+# exit 0; tests 18; pass 18; fail 0
+
+node --test backend/src/common/middleware/auth.project-context.test.js backend/src/common/middleware/access-policy.factory.test.js
+# exit 0; tests 4; pass 4; fail 0
+
+cd backend && npm test
+# exit 0; 32 pass, 0 fail, 4 optional integration skips
+
+node scripts/check-core-package-boundaries.js
+# exit 0
+
+npm --workspace @johnason/data-platform-module-project-spaces pack --dry-run
+# exit 0; @johnason/data-platform-module-project-spaces@0.2.0; six publishable files
+
+rg -q <high-confidence credential patterns> packages/data-platform-module-project-spaces evidence/module-acceptance/project-spaces task-5-report.md
+# no match; guarded scan exit 0
+
+node --check packages/data-platform-module-project-spaces/src/project-operation-contracts.js
+node --check packages/data-platform-module-project-spaces/src/index.js
+git diff --check
+# all exit 0
+```
+
+### Round 4 concerns
+
+1. `npm ci` reports 12 existing audit findings (4 moderate and 8 high); dependency remediation is outside Task 5 and no dependency changed in this round.
+2. Task 6 still owns the Web/CLI aggregate binding. The new file artifact input deliberately uses neutral `name`, `size`, `mediaType`, and optional `path` fields, so the later Web adapter must translate Multer metadata rather than passing `req`, `res`, or the raw Multer object into this package.
