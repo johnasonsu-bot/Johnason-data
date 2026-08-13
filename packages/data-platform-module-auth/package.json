@@ -1,0 +1,17 @@
+{
+  "name": "@johnason/data-platform-module-auth",
+  "version": "0.2.0",
+  "private": false,
+  "description": "Transport-neutral authentication capabilities for Johnason Data Platform",
+  "main": "src/index.js",
+  "files": ["src"],
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.1.0"
+  }
+}
