@@ -21,6 +21,13 @@ const { createOutboxPublisher } = require("./infrastructure/outbox-publisher");
 const { createInboxConsumer } = require("./infrastructure/inbox-consumer");
 const { createJobWorker } = require("./infrastructure/job-worker");
 const { createDaemonRuntime } = require("./infrastructure/daemon-runtime");
+const {
+  RISK_GATES,
+  RISK_STATUSES,
+  moduleEvidenceSchema,
+  normalizeModuleEvidence,
+} = require("./risk/evidence-schema");
+const { evaluateModuleEvidence } = require("./risk/acceptance");
 
 module.exports = {
   moduleManifestSchema,
@@ -45,4 +52,9 @@ module.exports = {
   createInboxConsumer,
   createJobWorker,
   createDaemonRuntime,
+  RISK_GATES,
+  RISK_STATUSES,
+  moduleEvidenceSchema,
+  normalizeModuleEvidence,
+  evaluateModuleEvidence,
 };
