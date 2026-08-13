@@ -1,0 +1,27 @@
+{
+  "aggregateVersion": "0.1.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "kernel": {
+    "packageName": "@johnason/data-platform-core-kernel",
+    "version": "0.1.0"
+  },
+  "modules": [
+    {
+      "packageName": "@johnason/data-platform-module-auth",
+      "moduleName": "auth",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createAuthCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-project-spaces",
+      "moduleName": "project-spaces",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createProjectCapabilities"
+    }
+  ],
+  "sourceApiAliases": []
+}

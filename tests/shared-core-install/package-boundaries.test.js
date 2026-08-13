@@ -160,7 +160,7 @@ test("reports NON_EXACT_VERSION for a direct dependency version that is not an e
   ]);
 }));
 
-test("accepts a Web and CLI to aggregate to modules to kernel dependency graph", () => withFixture([
+test("accepts consumers to aggregate to kernel and modules to kernel dependency graph", () => withFixture([
   packageFixture("frontend", "@fixture/data-platform-web", {
     dependencies: { "@fixture/data-platform-core": "0.1.0" },
   }),
@@ -168,7 +168,10 @@ test("accepts a Web and CLI to aggregate to modules to kernel dependency graph",
     dependencies: { "@fixture/data-platform-core": "0.1.0" },
   }),
   packageFixture("packages/core", "@fixture/data-platform-core", {
-    dependencies: { "@fixture/data-platform-module-a": "0.1.0" },
+    dependencies: {
+      "@fixture/data-platform-core-kernel": "0.1.0",
+      "@fixture/data-platform-module-a": "0.1.0",
+    },
   }),
   packageFixture("packages/module-a", "@fixture/data-platform-module-a", {
     dependencies: { "@fixture/data-platform-core-kernel": "0.1.0" },
@@ -180,6 +183,15 @@ test("accepts a Web and CLI to aggregate to modules to kernel dependency graph",
     cycles: [],
     sourceImports: [],
   });
+}));
+
+test("reports REVERSE_DEPENDENCY when the aggregate depends on a consumer", () => withFixture([
+  packageFixture("packages/core", "@fixture/data-platform-core", {
+    dependencies: { "@fixture/data-platform-cli": "0.1.0" },
+  }),
+  packageFixture("packages/cli", "@fixture/data-platform-cli"),
+], (root) => {
+  assert.deepEqual(violationCodes(scanPackageBoundaries(root)), ["REVERSE_DEPENDENCY"]);
 }));
 
 test("reports REVERSE_DEPENDENCY for consumer source imports of kernel or module without manifest dependencies", () => {

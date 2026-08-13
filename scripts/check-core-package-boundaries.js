@@ -124,7 +124,7 @@ function isInvalidDependencyDirection(sourceName, targetName) {
   const target = packageKind(targetName);
   if (source === "kernel") return target !== "kernel";
   if (source === "module") return target !== "kernel";
-  if (source === "aggregate") return target !== "module";
+  if (source === "aggregate") return !["kernel", "module"].includes(target);
   return target !== "aggregate";
 }
 

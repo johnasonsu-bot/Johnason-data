@@ -14,7 +14,7 @@
         "setup:preview": "bash ../scripts/install-preview-dependencies.sh",
         "verify:datax-enterprise": "node ../scripts/verify-datax-enterprise-plugins.js",
         "bootstrap": "node src/scripts/bootstrap.js",
-        "test": "node --test src/modules/data-standards/*.test.js src/modules/data-services/*.test.js src/modules/data-sources/*.test.js src/services/*.test.js",
+        "test": "node --test src/core/*.test.js src/modules/auth/*.test.js src/modules/data-standards/*.test.js src/modules/data-services/*.test.js src/modules/data-sources/*.test.js src/modules/project-spaces/*.test.js src/services/*.test.js",
         "test:data-services": "node --test src/modules/data-services/*.test.js",
         "test:quality": "node --test src/modules/quality-control/*.test.js",
         "backfill:quality-results": "node src/scripts/backfill-quality-result-facts.js",
@@ -26,6 +26,7 @@
         "start:secure": "node dist-secure/server.js"
     },
     "dependencies": {
+        "@johnason/data-platform-core": "0.1.0",
         "basic-ftp": "5.3.1",
         "bcryptjs": "2.4.3",
         "cors": "2.8.6",
