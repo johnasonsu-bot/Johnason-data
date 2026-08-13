@@ -13,6 +13,7 @@ const packageDirectories = [
   "packages/data-platform-module-asset-search",
   "packages/data-platform-module-auth",
   "packages/data-platform-module-data-sources",
+  "packages/data-platform-module-data-source-research",
   "packages/data-platform-module-platform",
   "packages/data-platform-module-project-spaces",
   "packages/data-platform-core",

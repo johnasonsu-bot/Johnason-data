@@ -95,6 +95,7 @@ test("aggregate package records exact candidate and rollback versions", () => {
     "@johnason/data-platform-module-auth": "0.2.0",
     "@johnason/data-platform-module-asset-search": "0.2.0",
     "@johnason/data-platform-module-data-sources": "0.2.0",
+    "@johnason/data-platform-module-data-source-research": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
@@ -108,6 +109,7 @@ test("aggregate package records exact candidate and rollback versions", () => {
     { moduleName: "auth", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "asset-search", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "data-sources", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-source-research", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);
@@ -435,11 +437,13 @@ test("aggregate executes packaged platform, asset-search, and data-sources capab
     platform: { health: async () => ({ status: "ok" }) },
     "asset-search": { search: async (input) => ({ keyword: input.keyword, items: [] }) },
     "data-sources": { listDataSources: async () => [{ id: 1 }] },
+    "data-source-research": { getResearchTask: async (id) => ({ id }) },
   });
 
   assert.deepEqual(await core.execute("platform.health", {}, {}), { status: "ok" });
   assert.deepEqual(await core.execute("assetSearch.search", { keyword: "flight" }, {}), { keyword: "flight", items: [] });
   assert.deepEqual(await core.execute("data-sources.list", {}, {}), [{ id: 1 }]);
+  assert.deepEqual(await core.execute("dataSourceResearch.getResearchTask", { taskId: 11 }, {}), { id: 11 });
 });
 
 test("aggregate packaged capabilities fail closed when their injected port is absent", async () => {
