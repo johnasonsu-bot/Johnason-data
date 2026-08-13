@@ -96,6 +96,7 @@ test("aggregate package records exact candidate and rollback versions", () => {
     "@johnason/data-platform-module-asset-search": "0.2.0",
     "@johnason/data-platform-module-data-sources": "0.2.0",
     "@johnason/data-platform-module-data-source-research": "0.2.0",
+    "@johnason/data-platform-module-data-lab-sources": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
@@ -110,6 +111,7 @@ test("aggregate package records exact candidate and rollback versions", () => {
     { moduleName: "asset-search", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "data-sources", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "data-source-research", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-lab-sources", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);

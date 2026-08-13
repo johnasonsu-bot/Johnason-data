@@ -3,6 +3,7 @@ const authModule = require("@johnason/data-platform-module-auth");
 const assetSearchModule = require("@johnason/data-platform-module-asset-search");
 const dataSourcesModule = require("@johnason/data-platform-module-data-sources");
 const dataSourceResearchModule = require("@johnason/data-platform-module-data-source-research");
+const dataLabSourcesModule = require("@johnason/data-platform-module-data-lab-sources");
 const platformModule = require("@johnason/data-platform-module-platform");
 const projectModule = require("@johnason/data-platform-module-project-spaces");
 const kernelPackage = require("@johnason/data-platform-core-kernel/package.json");
@@ -23,6 +24,7 @@ const moduleExports = Object.freeze({
   "@johnason/data-platform-module-asset-search": assetSearchModule,
   "@johnason/data-platform-module-data-sources": dataSourcesModule,
   "@johnason/data-platform-module-data-source-research": dataSourceResearchModule,
+  "@johnason/data-platform-module-data-lab-sources": dataLabSourcesModule,
   "@johnason/data-platform-module-platform": platformModule,
   "@johnason/data-platform-module-project-spaces": projectModule,
 });
@@ -343,11 +345,13 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   const assetSearchCapabilities = assetSearchModule.createCapabilities(moduleDependencies(runtimeDependencies, "asset-search"));
   const dataSourcesCapabilities = dataSourcesModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-sources"));
   const dataSourceResearchCapabilities = dataSourceResearchModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-source-research"));
+  const dataLabSourcesCapabilities = dataLabSourcesModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-lab-sources"));
   const moduleBindings = {
     ...moduleCapabilityBindings(platformCapabilities),
     ...moduleCapabilityBindings(assetSearchCapabilities),
     ...moduleCapabilityBindings(dataSourcesCapabilities),
     ...moduleCapabilityBindings(dataSourceResearchCapabilities),
+    ...moduleCapabilityBindings(dataLabSourcesCapabilities),
   };
   const coreRuntime = createCoreRuntime({ catalog, bindings: productionBindings(auth, project, moduleBindings) });
   return Object.freeze({
@@ -356,6 +360,7 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     assetSearch: moduleNamespace(assetSearchCapabilities, "assetSearch"),
     dataSources: moduleNamespace(dataSourcesCapabilities, "data-sources"),
     dataSourceResearch: moduleNamespace(dataSourceResearchCapabilities, "dataSourceResearch"),
+    dataLabSources: moduleNamespace(dataLabSourcesCapabilities, "dataLabSources"),
   });
 }
 
