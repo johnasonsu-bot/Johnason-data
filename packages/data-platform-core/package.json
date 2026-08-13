@@ -27,6 +27,13 @@
     "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
     "@johnason/data-platform-module-data-map": "0.2.0",
     "@johnason/data-platform-module-data-standards": "0.2.0",
+    "@johnason/data-platform-module-system-knowledge-bases": "0.2.0",
+    "@johnason/data-platform-module-system-management": "0.2.0",
+    "@johnason/data-platform-module-data-development": "0.2.0",
+    "@johnason/data-platform-module-quality-control": "0.2.0",
+    "@johnason/data-platform-module-data-services": "0.2.0",
+    "@johnason/data-platform-module-reporting": "0.2.0",
+    "@johnason/data-platform-module-data-modeling": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0"
   }

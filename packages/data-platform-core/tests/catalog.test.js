@@ -105,6 +105,13 @@ test("aggregate package records exact candidate and rollback versions", () => {
     "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
     "@johnason/data-platform-module-data-map": "0.2.0",
     "@johnason/data-platform-module-data-standards": "0.2.0",
+    "@johnason/data-platform-module-system-knowledge-bases": "0.2.0",
+    "@johnason/data-platform-module-system-management": "0.2.0",
+    "@johnason/data-platform-module-data-development": "0.2.0",
+    "@johnason/data-platform-module-quality-control": "0.2.0",
+    "@johnason/data-platform-module-data-services": "0.2.0",
+    "@johnason/data-platform-module-reporting": "0.2.0",
+    "@johnason/data-platform-module-data-modeling": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
@@ -128,6 +135,13 @@ test("aggregate package records exact candidate and rollback versions", () => {
     { moduleName: "reporting-ai-configs", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "data-map", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "data-standards", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "system-knowledge-bases", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "system-management", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-development", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "quality-control", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-services", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "reporting", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-modeling", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);
@@ -463,6 +477,13 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
     "reporting-ai-configs": { listConfigs: async () => [{ id: 5 }] },
     "data-map": { getOverview: async () => ({ id: 6 }) },
     "data-standards": { getOverview: async () => ({ id: 7 }) },
+    "system-knowledge-bases": { listKnowledgeBases: async () => [{ id: 8 }] },
+    "system-management": { listServices: async () => [{ id: 9 }] },
+    "data-development": { listDatasources: async () => [{ id: 10 }] },
+    "quality-control": { listQualitySources: async () => [{ id: 11 }] },
+    "data-services": { getOverview: async () => ({ id: 12 }) },
+    reporting: { getOverview: async () => ({ id: 13 }) },
+    "data-modeling": { listKnowledgeBases: async () => [{ id: 14 }] },
   });
 
   assert.deepEqual(await core.execute("platform.health", {}, {}), { status: "ok" });
@@ -476,6 +497,13 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
   assert.deepEqual(await core.execute("reportingAiConfigs.listConfigs", {}, {}), [{ id: 5 }]);
   assert.deepEqual(await core.execute("dataMap.getOverview", {}, {}), { id: 6 });
   assert.deepEqual(await core.execute("dataStandards.getOverview", {}, {}), { id: 7 });
+  assert.deepEqual(await core.execute("systemKnowledgeBases.listKnowledgeBases", {}, {}), [{ id: 8 }]);
+  assert.deepEqual(await core.execute("systemManagement.listServices", {}, {}), [{ id: 9 }]);
+  assert.deepEqual(await core.execute("dataDevelopment.listDatasources", {}, {}), [{ id: 10 }]);
+  assert.deepEqual(await core.execute("qualityControl.listQualitySources", {}, {}), [{ id: 11 }]);
+  assert.deepEqual(await core.execute("dataServices.getOverview", {}, {}), { id: 12 });
+  assert.deepEqual(await core.execute("reporting.getOverview", {}, {}), { id: 13 });
+  assert.deepEqual(await core.execute("dataModeling.listKnowledgeBases", {}, {}), [{ id: 14 }]);
 });
 
 test("aggregate packaged capabilities fail closed when their injected port is absent", async () => {
@@ -490,4 +518,11 @@ test("aggregate packaged capabilities fail closed when their injected port is ab
   await assert.rejects(() => core.execute("reportingAiConfigs.listConfigs", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("dataMap.getOverview", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("dataStandards.getOverview", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("systemKnowledgeBases.listKnowledgeBases", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("systemManagement.listServices", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("dataDevelopment.listDatasources", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("qualityControl.listQualitySources", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("dataServices.getOverview", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("reporting.getOverview", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("dataModeling.listKnowledgeBases", {}, {}), /port is not configured/i);
 });

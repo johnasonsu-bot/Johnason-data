@@ -111,6 +111,62 @@
       "factoryExport": "createCapabilities"
     },
     {
+      "packageName": "@johnason/data-platform-module-system-knowledge-bases",
+      "moduleName": "system-knowledge-bases",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-system-management",
+      "moduleName": "system-management",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-data-development",
+      "moduleName": "data-development",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-quality-control",
+      "moduleName": "quality-control",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-data-services",
+      "moduleName": "data-services",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-reporting",
+      "moduleName": "reporting",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-data-modeling",
+      "moduleName": "data-modeling",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
       "packageName": "@johnason/data-platform-module-platform",
       "moduleName": "platform",
       "candidateVersion": "0.2.0",

@@ -12,6 +12,13 @@ const devAiConfigsModule = require("@johnason/data-platform-module-dev-ai-config
 const reportingAiConfigsModule = require("@johnason/data-platform-module-reporting-ai-configs");
 const dataMapModule = require("@johnason/data-platform-module-data-map");
 const dataStandardsModule = require("@johnason/data-platform-module-data-standards");
+const systemKnowledgeBasesModule = require("@johnason/data-platform-module-system-knowledge-bases");
+const systemManagementModule = require("@johnason/data-platform-module-system-management");
+const dataDevelopmentModule = require("@johnason/data-platform-module-data-development");
+const qualityControlModule = require("@johnason/data-platform-module-quality-control");
+const dataServicesModule = require("@johnason/data-platform-module-data-services");
+const reportingModule = require("@johnason/data-platform-module-reporting");
+const dataModelingModule = require("@johnason/data-platform-module-data-modeling");
 const platformModule = require("@johnason/data-platform-module-platform");
 const projectModule = require("@johnason/data-platform-module-project-spaces");
 const kernelPackage = require("@johnason/data-platform-core-kernel/package.json");
@@ -41,6 +48,13 @@ const moduleExports = Object.freeze({
   "@johnason/data-platform-module-reporting-ai-configs": reportingAiConfigsModule,
   "@johnason/data-platform-module-data-map": dataMapModule,
   "@johnason/data-platform-module-data-standards": dataStandardsModule,
+  "@johnason/data-platform-module-system-knowledge-bases": systemKnowledgeBasesModule,
+  "@johnason/data-platform-module-system-management": systemManagementModule,
+  "@johnason/data-platform-module-data-development": dataDevelopmentModule,
+  "@johnason/data-platform-module-quality-control": qualityControlModule,
+  "@johnason/data-platform-module-data-services": dataServicesModule,
+  "@johnason/data-platform-module-reporting": reportingModule,
+  "@johnason/data-platform-module-data-modeling": dataModelingModule,
   "@johnason/data-platform-module-platform": platformModule,
   "@johnason/data-platform-module-project-spaces": projectModule,
 });
@@ -370,6 +384,13 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   const reportingAiConfigsCapabilities = reportingAiConfigsModule.createCapabilities(moduleDependencies(runtimeDependencies, "reporting-ai-configs"));
   const dataMapCapabilities = dataMapModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-map"));
   const dataStandardsCapabilities = dataStandardsModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-standards"));
+  const systemKnowledgeBasesCapabilities = systemKnowledgeBasesModule.createCapabilities(moduleDependencies(runtimeDependencies, "system-knowledge-bases"));
+  const systemManagementCapabilities = systemManagementModule.createCapabilities(moduleDependencies(runtimeDependencies, "system-management"));
+  const dataDevelopmentCapabilities = dataDevelopmentModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-development"));
+  const qualityControlCapabilities = qualityControlModule.createCapabilities(moduleDependencies(runtimeDependencies, "quality-control"));
+  const dataServicesCapabilities = dataServicesModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-services"));
+  const reportingCapabilities = reportingModule.createCapabilities(moduleDependencies(runtimeDependencies, "reporting"));
+  const dataModelingCapabilities = dataModelingModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-modeling"));
   const moduleBindings = {
     ...moduleCapabilityBindings(platformCapabilities),
     ...moduleCapabilityBindings(assetSearchCapabilities),
@@ -384,6 +405,13 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     ...moduleCapabilityBindings(reportingAiConfigsCapabilities),
     ...moduleCapabilityBindings(dataMapCapabilities),
     ...moduleCapabilityBindings(dataStandardsCapabilities),
+    ...moduleCapabilityBindings(systemKnowledgeBasesCapabilities),
+    ...moduleCapabilityBindings(systemManagementCapabilities),
+    ...moduleCapabilityBindings(dataDevelopmentCapabilities),
+    ...moduleCapabilityBindings(qualityControlCapabilities),
+    ...moduleCapabilityBindings(dataServicesCapabilities),
+    ...moduleCapabilityBindings(reportingCapabilities),
+    ...moduleCapabilityBindings(dataModelingCapabilities),
   };
   const coreRuntime = createCoreRuntime({ catalog, bindings: productionBindings(auth, project, moduleBindings) });
   return Object.freeze({
@@ -401,6 +429,13 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     reportingAiConfigs: moduleNamespace(reportingAiConfigsCapabilities, "reportingAiConfigs"),
     dataMap: moduleNamespace(dataMapCapabilities, "dataMap"),
     dataStandards: moduleNamespace(dataStandardsCapabilities, "dataStandards"),
+    systemKnowledgeBases: moduleNamespace(systemKnowledgeBasesCapabilities, "systemKnowledgeBases"),
+    systemManagement: moduleNamespace(systemManagementCapabilities, "systemManagement"),
+    dataDevelopment: moduleNamespace(dataDevelopmentCapabilities, "dataDevelopment"),
+    qualityControl: moduleNamespace(qualityControlCapabilities, "qualityControl"),
+    dataServices: moduleNamespace(dataServicesCapabilities, "dataServices"),
+    reporting: moduleNamespace(reportingCapabilities, "reporting"),
+    dataModeling: moduleNamespace(dataModelingCapabilities, "dataModeling"),
   });
 }
 
