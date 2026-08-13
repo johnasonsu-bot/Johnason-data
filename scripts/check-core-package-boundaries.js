@@ -85,7 +85,9 @@ function publishedJavaScriptFiles(item) {
   for (const entry of configuredFiles) entries.add(entry);
   if (typeof item.manifest.main === "string") entries.add(item.manifest.main);
   if (typeof item.manifest.bin === "string") entries.add(item.manifest.bin);
-  for (const entry of Object.values(item.manifest.bin ?? {})) entries.add(entry);
+  if (item.manifest.bin && typeof item.manifest.bin === "object" && !Array.isArray(item.manifest.bin)) {
+    for (const entry of Object.values(item.manifest.bin)) entries.add(entry);
+  }
 
   const files = new Set();
   for (const entry of entries) {

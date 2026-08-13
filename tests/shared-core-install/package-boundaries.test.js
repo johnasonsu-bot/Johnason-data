@@ -233,6 +233,22 @@ test("scans published bin files and ignores tests and generated files", () => wi
   }]);
 }));
 
+test("scans a string bin entry without traversing unpublished package-root files", () => withFixture([
+  packageFixture("packages/cli", "@fixture/data-platform-cli", {
+    package: { files: ["bin"], main: "bin/run.js", bin: "bin/run.js" },
+    files: {
+      "bin/run.js": 'require("../../backend/src");\n',
+      "unpublished.js": 'require("../../backend/src");\n',
+    },
+  }),
+  packageFixture("backend", "@fixture/data-platform-backend"),
+], (root) => {
+  assert.deepEqual(scanPackageBoundaries(root).sourceImports, [{
+    from: "packages/cli/bin/run.js",
+    target: "../../backend/src",
+  }]);
+}));
+
 test("returns deterministic output regardless of fixture creation order", () => {
   const fixtures = [
     packageFixture("packages/cli", "@fixture/data-platform-cli", { source: 'require("@fixture/data-platform-core-kernel");\n' }),

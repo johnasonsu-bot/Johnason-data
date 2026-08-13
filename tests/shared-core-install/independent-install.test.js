@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
+const { pathToFileURL } = require("node:url");
 
 const workspaceRoot = path.resolve(__dirname, "../..");
 const kernelDirectory = path.join(workspaceRoot, "packages/data-platform-core-kernel");
@@ -20,10 +21,16 @@ function writeKernelFileAuditor(auditorPath) {
   fs.writeFileSync(auditorPath, [
     'const fs = require("node:fs");',
     'const path = require("node:path");',
+    'const { fileURLToPath } = require("node:url");',
     'const prefix = fs.realpathSync(process.env.KERNEL_PREFIX);',
     'function audit(filePath) {',
-    '  if (typeof filePath !== "string" && !Buffer.isBuffer(filePath)) return;',
-    '  const resolved = path.resolve(String(filePath));',
+    '  if (typeof filePath !== "string" && !Buffer.isBuffer(filePath) && !(filePath instanceof URL)) return;',
+    '  const candidate = filePath instanceof URL ? fileURLToPath(filePath) : String(filePath);',
+    '  const absolute = path.resolve(candidate);',
+    '  let resolved = absolute;',
+    '  try { resolved = fs.realpathSync.native(absolute); } catch (error) {',
+    '    if (error.code !== "ENOENT" && error.code !== "ENOTDIR") throw error;',
+    '  }',
     '  if (resolved !== prefix && !resolved.startsWith(prefix + path.sep)) {',
     '    throw new Error(`kernel-install-audit: prefix escape: ${resolved}`);',
     '  }',
@@ -59,6 +66,8 @@ test("kernel tarball installs and loads without files outside its temporary pref
 
     const install = run("npm", ["install", "--prefix", prefix, "--ignore-scripts", tarball]);
     assert.equal(install.status, 0, install.stderr);
+    const prefixSymlink = path.join(prefix, "outside-link.txt");
+    fs.symlinkSync(outsideFile, prefixSymlink);
 
     const load = run(process.execPath, ["--require", auditor, "-e", [
       'const value = require("@johnason/data-platform-core-kernel");',
@@ -90,6 +99,28 @@ test("kernel tarball installs and loads without files outside its temporary pref
     });
     assert.notEqual(escapeAttempt.status, 0, escapeAttempt.stderr);
     assert.match(escapeAttempt.stderr, /kernel-install-audit/);
+
+    const urlEscapeAttempt = run(process.execPath, ["--require", auditor, "-e", 'require("node:fs").readFileSync(new URL(process.env.OUTSIDE_FILE_URL));'], {
+      cwd: consumer,
+      env: {
+        KERNEL_PREFIX: prefix,
+        NODE_PATH: path.join(prefix, "node_modules"),
+        OUTSIDE_FILE_URL: pathToFileURL(outsideFile).href,
+      },
+    });
+    assert.notEqual(urlEscapeAttempt.status, 0, urlEscapeAttempt.stderr);
+    assert.match(urlEscapeAttempt.stderr, /kernel-install-audit/);
+
+    const symlinkEscapeAttempt = run(process.execPath, ["--require", auditor, "-e", 'require("node:fs").readFileSync(process.env.PREFIX_SYMLINK);'], {
+      cwd: consumer,
+      env: {
+        KERNEL_PREFIX: prefix,
+        NODE_PATH: path.join(prefix, "node_modules"),
+        PREFIX_SYMLINK: prefixSymlink,
+      },
+    });
+    assert.notEqual(symlinkEscapeAttempt.status, 0, symlinkEscapeAttempt.stderr);
+    assert.match(symlinkEscapeAttempt.stderr, /kernel-install-audit/);
   } finally {
     fs.rmSync(temporaryRoot, { recursive: true, force: true });
   }
