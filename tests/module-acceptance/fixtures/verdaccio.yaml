@@ -1,0 +1,19 @@
+storage: __STORAGE__
+auth:
+  htpasswd:
+    file: __HTPASSWD__
+    max_users: 1000
+uplinks: {}
+packages:
+  '@johnason/*':
+    access: $all
+    publish: $authenticated
+    unpublish: $anonymous
+  '**':
+    access: $all
+    publish: $authenticated
+    unpublish: $anonymous
+log:
+  type: stdout
+  format: pretty
+  level: warn
