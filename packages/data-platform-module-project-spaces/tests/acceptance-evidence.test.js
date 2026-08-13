@@ -38,11 +38,12 @@ function validateEvidence(value) {
   assert.equal(value.version, "0.1.0");
   assert.equal(value.status, "legacy-accepted");
   assert.equal(value.baseCommit, "8414786");
-  exactKeys(value.sourceTrees, ["legacy", "candidate"], "sourceTrees");
+  exactKeys(value.sourceTrees, ["scope", "legacy", "candidate"], "sourceTrees");
+  assert.equal(value.sourceTrees.scope, "src");
   assert.match(value.sourceTrees.legacy, /^[a-f0-9]{64}$/);
   assert.match(value.sourceTrees.candidate, /^[a-f0-9]{64}$/);
   assert.notEqual(value.sourceTrees.legacy, value.sourceTrees.candidate);
-  assert.equal(value.sourceTrees.legacy, sourceTreeHash(path.resolve(__dirname, "../../../tests/module-acceptance/fixtures/project-spaces-legacy-v0.1.0")));
+  assert.equal(value.sourceTrees.legacy, sourceTreeHash(path.resolve(__dirname, "../../../tests/module-acceptance/fixtures/project-spaces-legacy-v0.1.0/src")));
   assert.equal(value.sourceTrees.candidate, sourceTreeHash(path.resolve(__dirname, "../src")));
   exactKeys(value.golden, ["exitStatus"], "golden");
   assert.equal(value.golden.exitStatus, 0);

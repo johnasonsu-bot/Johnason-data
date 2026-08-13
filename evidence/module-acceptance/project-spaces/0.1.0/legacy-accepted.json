@@ -4,8 +4,9 @@
   "status": "legacy-accepted",
   "baseCommit": "8414786",
   "sourceTrees": {
-    "legacy": "540328e8d1e36e1c247ebcad52c6d5ca2d7a19894fedd52c2394b99d0016c3b6",
-    "candidate": "e0959a00a86c386b6a541c95b89ef00f531a9fcab7f7537999ccc2c8d9984a7d"
+    "scope": "src",
+    "legacy": "6a7756c4f2ff78760e51db13880aa81582e8ca54f137c08a1c6362bb3deee736",
+    "candidate": "be688ee516be889a907259c8a260d51f28ec3b51e78f035faca3213803d002c5"
   },
   "golden": { "exitStatus": 0 },
   "tarball": {

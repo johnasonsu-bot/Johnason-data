@@ -105,6 +105,21 @@ test("project resolution rejects malformed, zero, negative, and absent requested
   assert.equal(fixture.defaults.get(9), 2);
 });
 
+test("invalid and unknown requested IDs are rejected before default membership side effects", async () => {
+  const { createProjectCapabilities } = loadCandidate();
+  const fixture = createFixture();
+  let defaultCalls = 0;
+  let membershipCalls = 0;
+  const capabilities = createProjectCapabilities({ projectRepository: {
+    ...fixture.repository,
+    async ensureDefaultProject() { defaultCalls += 1; return fixture.projects.get(1); },
+    async ensureUserMembership(...args) { membershipCalls += 1; return fixture.repository.ensureUserMembership(...args); },
+  } });
+  for (const requestedProjectId of ["bad", 999]) await assert.rejects(capabilities.project.resolve(actor(10), requestedProjectId));
+  assert.equal(defaultCalls, 0);
+  assert.equal(membershipCalls, 0);
+});
+
 test("project resolution rejects an explicit unknown ID without falling back to the default project", async () => {
   const { createProjectCapabilities } = loadCandidate();
   const fixture = createFixture();
@@ -147,8 +162,8 @@ test("project resolve selects the single eligible project and reports determinis
 
 test("module manifest covers project list/current/resolve/use/access-check and their source API keys", () => {
   const { moduleManifest } = loadCandidate();
-  assert.deepEqual(moduleManifest.capabilities.map((entry) => entry.capabilityId), [
-    "project.list", "project.current", "project.resolve", "project.use", "project.access-check",
+  assert.deepEqual(moduleManifest.capabilities.slice(0, 8).map((entry) => entry.capabilityId), [
+    "project.list-my", "project.list", "project.current", "project.detail", "project.resolve", "project.use", "project.access-check", "project.set-default",
   ]);
   const baseline = require("../../../docs/superpowers/specs/data-platform-cli-coverage-baseline.json");
   const expected = baseline.apiCoverage.filter((entry) => entry.module === "projects").map((entry) => entry.apiKey).sort();
@@ -159,7 +174,7 @@ test("project capability operations invoke their service behavior and preserve s
   const { createProjectCapabilities } = loadCandidate();
   const fixture = createFixture();
   const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
-  assert.deepEqual((await capabilities.project.list(actor(9))).map((entry) => entry.id), [1, 2]);
+  assert.deepEqual((await capabilities.project.list(actor(9))).map((entry) => entry.id), [1, 2, 3]);
   assert.equal(await capabilities.project.current(actor(9)), 2);
   assert.equal((await capabilities.project.resolve(actor(9), undefined)).project.id, 2);
   assert.equal((await capabilities.project.use(actor(9), 1)).project.id, 1);

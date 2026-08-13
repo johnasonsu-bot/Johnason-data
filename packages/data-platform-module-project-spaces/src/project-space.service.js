@@ -30,22 +30,24 @@ function createProjectSpaceService({ projectRepository }) {
   }
 
   async function resolveRequestProject(actor, requestedProjectId) {
-    const defaultProject = await ensureDefaultMembershipForUser(actor);
     const requestIsAbsent = requestedProjectId === undefined || requestedProjectId === null || requestedProjectId === "";
-    let project = null;
     if (!requestIsAbsent) {
       const requestedId = Number(requestedProjectId);
       if (!Number.isInteger(requestedId) || requestedId <= 0) {
         throw projectError("项目空间请求无效", "PROJECT_REQUEST_INVALID", 400);
       }
-      project = await projectRepository.getProjectById(requestedId);
+      const project = await projectRepository.getProjectById(requestedId);
       if (!project) throw projectError("当前项目空间不存在或已停用", "PROJECT_UNAVAILABLE", 403);
+      if (project.status !== "active") throw projectError("当前项目空间不存在或已停用", "PROJECT_UNAVAILABLE", 403);
+      if (isAdmin(actor)) return { project, member: { projectId: project.id, userId: Number(actor.sub), projectRole: "owner", status: "active" } };
+      const membership = await projectRepository.getProjectMember(project.id, actor?.sub);
+      if (!membership || membership.status !== "active") throw projectError("当前账号无权访问该项目空间", "PROJECT_ACCESS_FORBIDDEN", 403);
+      return { project, member: membership };
     }
-    if (requestIsAbsent) {
-      const candidates = isAdmin(actor) ? await projectRepository.listProjects() : await projectRepository.listUserProjects(actor?.sub);
-      const savedDefaultId = await getUserDefaultProjectId(actor);
-      project = candidates.find((candidate) => candidate.id === savedDefaultId) || candidates[0] || defaultProject;
-    }
+    const defaultProject = await ensureDefaultMembershipForUser(actor);
+    const candidates = isAdmin(actor) ? await projectRepository.listProjects() : await projectRepository.listUserProjects(actor?.sub);
+    const savedDefaultId = await getUserDefaultProjectId(actor);
+    const project = candidates.find((candidate) => candidate.id === savedDefaultId) || candidates[0] || defaultProject;
     if (!project || project.status !== "active") throw projectError("当前项目空间不存在或已停用", "PROJECT_UNAVAILABLE", 403);
     if (isAdmin(actor)) return { project, member: { projectId: project.id, userId: Number(actor.sub), projectRole: "owner", status: "active" } };
     const membership = await projectRepository.getProjectMember(project.id, actor?.sub);
@@ -65,7 +67,12 @@ function createProjectSpaceService({ projectRepository }) {
     return { defaultProjectId: project.id, project };
   }
 
-  return Object.freeze({ ensureDefaultMembershipForUser, listMyProjects, getUserDefaultProjectId, resolveRequestProject, resolveProject: (actor, id) => resolveProject(actor, id, { resolveRequestProject }), setDefaultProject });
+  async function listProjects() {
+    await projectRepository.ensureDefaultProject();
+    return projectRepository.listProjects({ includeInactive: true });
+  }
+
+  return Object.freeze({ ensureDefaultMembershipForUser, listMyProjects, listProjects, getUserDefaultProjectId, resolveRequestProject, resolveProject: (actor, id) => resolveProject(actor, id, { resolveRequestProject }), setDefaultProject });
 }
 
 module.exports = { createProjectSpaceService };
