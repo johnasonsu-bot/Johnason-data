@@ -55,7 +55,8 @@ async function claimJobs(candidate, connection) {
   const limit = positiveInteger(candidate?.limit, "limit");
   const leaseMs = positiveInteger(candidate?.leaseMs, "leaseMs");
   const [rows] = await connection.execute(
-    `SELECT job_id, status, attempt_count, max_attempts, lease_owner, lease_until
+    `SELECT job_id, job_type, project_id, input_json, actor_json, status,
+       attempt_count, max_attempts, lease_owner, lease_until
      FROM durable_jobs
      WHERE (status = 'pending' AND attempt_count < max_attempts AND next_run_at <= CURRENT_TIMESTAMP(3))
         OR (status = 'running' AND lease_until < CURRENT_TIMESTAMP(3))
@@ -65,6 +66,7 @@ async function claimJobs(candidate, connection) {
   );
   const claimed = [];
   for (const row of rows || []) {
+    const includesWorkerPayload = Object.hasOwn(row, "job_type");
     const attemptCount = Number(row.attempt_count || 0);
     const maxAttempts = Number(row.max_attempts);
     const expiredLease = row.status === "running" || row.status === "compensating";
@@ -121,9 +123,77 @@ async function claimJobs(candidate, connection) {
        VALUES (?, ?, ?, 'running')`,
       [row.job_id, attemptNo, workerId],
     );
-    claimed.push(Object.freeze({ jobId: row.job_id, status: claimedStatus, leaseOwner: workerId, attemptNo }));
+    claimed.push(Object.freeze({
+      jobId: row.job_id,
+      ...(includesWorkerPayload ? { jobType: row.job_type } : {}),
+      ...(includesWorkerPayload && Object.hasOwn(row, "project_id") ? { projectId: Number(row.project_id || 0) } : {}),
+      ...(includesWorkerPayload && Object.hasOwn(row, "input_json") ? {
+        input: typeof row.input_json === "string" ? JSON.parse(row.input_json) : (row.input_json || {}),
+      } : {}),
+      ...(includesWorkerPayload && Object.hasOwn(row, "actor_json") ? {
+        actor: typeof row.actor_json === "string" ? JSON.parse(row.actor_json) : (row.actor_json || {}),
+      } : {}),
+      status: claimedStatus,
+      leaseOwner: workerId,
+      attemptNo,
+      ...(includesWorkerPayload && Object.hasOwn(row, "max_attempts") ? { maxAttempts: Number(row.max_attempts) } : {}),
+    }));
   }
   return Object.freeze(claimed);
+}
+
+async function scheduleRetry(candidate, connection) {
+  const jobId = requiredString(candidate?.jobId, "jobId");
+  const workerId = requiredString(candidate?.workerId, "workerId");
+  const attemptNo = positiveInteger(candidate?.attemptNo, "attemptNo");
+  const delayMs = positiveInteger(candidate?.delayMs, "delayMs");
+  const error = serializeRedactedContract(candidate?.error || { message: "Job execution failed" });
+  const [write] = await connection.execute(
+    `UPDATE durable_jobs SET status = 'pending', next_run_at = DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL (? * 1000) MICROSECOND),
+     lease_owner = NULL, lease_until = NULL, last_error_json = CAST(? AS JSON), last_error_sha256 = ?
+     WHERE job_id = ? AND status = 'running' AND lease_owner = ?
+       AND lease_until > CURRENT_TIMESTAMP(3) AND attempt_count = ? AND attempt_count < max_attempts`,
+    [delayMs, error.json, error.sha256, jobId, workerId, attemptNo],
+  );
+  if (write?.affectedRows !== 1) {
+    const conflict = new Error(`Durable job retry fencing conflict: ${jobId}`);
+    conflict.code = "JOB_LEASE_CONFLICT";
+    throw conflict;
+  }
+  const [attemptWrite] = await connection.execute(
+    `UPDATE durable_job_attempts SET status = 'failed', error_category = 'retryable',
+     error_json = CAST(? AS JSON), error_sha256 = ?, finished_at = CURRENT_TIMESTAMP(3)
+     WHERE job_id = ? AND attempt_no = ? AND worker_id = ? AND status = 'running'`,
+    [error.json, error.sha256, jobId, attemptNo, workerId],
+  );
+  if (attemptWrite?.affectedRows !== 1) {
+    const conflict = new Error(`Durable job attempt retry conflict: ${jobId}`);
+    conflict.code = "JOB_ATTEMPT_CONFLICT";
+    throw conflict;
+  }
+  return Object.freeze({ jobId, status: "pending", nextRunDelayMs: delayMs });
+}
+
+async function renewLease(candidate, connection) {
+  const jobId = requiredString(candidate?.jobId, "jobId");
+  const workerId = requiredString(candidate?.workerId, "workerId");
+  const attemptNo = positiveInteger(candidate?.attemptNo, "attemptNo");
+  const leaseMs = positiveInteger(candidate?.leaseMs, "leaseMs");
+  const status = requiredString(candidate?.status, "status");
+  if (!["running", "compensating"].includes(status)) throw new TypeError("status is not lease-bearing");
+  const [write] = await connection.execute(
+    `UPDATE durable_jobs SET lease_until = DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL (? * 1000) MICROSECOND),
+     heartbeat_at = CURRENT_TIMESTAMP(3)
+     WHERE job_id = ? AND status = ? AND lease_owner = ? AND attempt_count = ?
+       AND lease_until > CURRENT_TIMESTAMP(3)`,
+    [leaseMs, jobId, status, workerId, attemptNo],
+  );
+  if (write?.affectedRows !== 1) {
+    const conflict = new Error(`Durable job lease renewal conflict: ${jobId}`);
+    conflict.code = "JOB_LEASE_CONFLICT";
+    throw conflict;
+  }
+  return Object.freeze({ jobId, status, attemptNo, leaseMs });
 }
 
 function transitionJob(candidate, connection) {
@@ -191,4 +261,4 @@ async function approveJob(candidate, connection) {
   return Object.freeze({ approvalId, jobId, status: "pending", evidenceSha256: evidence.sha256 });
 }
 
-module.exports = { JOB_STATES, approveJob, claimJobs, enqueueJob, transitionJob };
+module.exports = { JOB_STATES, approveJob, claimJobs, enqueueJob, renewLease, scheduleRetry, transitionJob };

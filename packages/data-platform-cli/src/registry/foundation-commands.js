@@ -4,6 +4,7 @@ const { createConfigCommands } = require("../commands/config");
 const { createPlatformCommands } = require("../commands/platform");
 const { createProjectCommands } = require("../commands/project");
 const { createSystemDoctorCommands } = require("../commands/system-doctor");
+const { createDaemonCommands } = require("../commands/daemon");
 
 const anyObject = z.record(z.unknown()).default({});
 const anyOutput = z.unknown();
@@ -31,6 +32,7 @@ function createFoundationCommands(dependencies) {
   const platform = createPlatformCommands(dependencies);
   const system = createSystemDoctorCommands(dependencies);
   const config = dependencies.profileStore && dependencies.keychain ? createConfigCommands(dependencies) : Object.freeze({});
+  const daemon = dependencies.processManager ? createDaemonCommands(dependencies) : Object.freeze({});
   const definitions = [
     definition("auth login", "auth.login", auth.login, { action: "write", sourceApiKeys: ["POST /api/v1/auth/login"], sourceFrontendKeys: ["/login"] }),
     definition("auth profile", "auth.profile", auth.profile, { sourceApiKeys: ["GET /api/v1/auth/profile"], sourceFrontendKeys: ["/profile"] }),
@@ -45,8 +47,12 @@ function createFoundationCommands(dependencies) {
     definition("system doctor health", "system.doctor.health", system.health, { local: true, sourceApiKeys: ["GET /api/health"] }),
     definition("system doctor database-capabilities", "system.doctor.database-capabilities", platform.databaseCapabilities, { local: true, sourceApiKeys: ["GET /api/v1/platform/database-capabilities"] }),
     ...Object.entries(config).map(([name, handler]) => definition(`config ${name}`, `config.${name}`, handler, { local: true })),
+    ...Object.entries(daemon).map(([name, handler]) => definition(`daemon ${name}`, `daemon.${name}`, handler, {
+      local: true,
+      action: ["status", "logs"].includes(name) ? "read" : "write",
+    })),
   ];
-  Object.assign(definitions, { auth, config, platform, project, system });
+  Object.assign(definitions, { auth, config, daemon, platform, project, system });
   return Object.freeze(definitions);
 }
 

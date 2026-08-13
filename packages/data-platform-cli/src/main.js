@@ -12,6 +12,7 @@ const { createProfileDatabaseRuntime } = require("./runtime/database");
 const { createKeychain } = require("./runtime/keychain");
 const { resolveCliPaths } = require("./runtime/paths");
 const { createProfileStore } = require("./runtime/profile-store");
+const { createProcessManager } = require("./daemon/process-manager");
 const { CliError } = require("./runtime/cli-execution");
 const packageManifest = require("../package.json");
 
@@ -92,16 +93,80 @@ function createAuthRuntimePort(_profile, _keychain, overrides = {}) {
   });
 }
 
+function createProductionDaemonRuntimeFactory(dependencies) {
+  return ({ profileName }) => {
+    const ports = dependencies.daemonPorts;
+    const corePackage = dependencies.corePackage;
+    if (!ports || typeof ports !== "object" || Array.isArray(ports)) throw new TypeError("Production daemon ports are unavailable");
+    if (typeof ports.transaction !== "function") throw new TypeError("Production daemon ports require a MySQL transaction port");
+    if (!ports.producer || ["connect", "send", "disconnect"].some((name) => typeof ports.producer[name] !== "function")) {
+      throw new TypeError("Production daemon ports require a Kafka producer port");
+    }
+    if (!ports.jobHandlers || typeof ports.jobHandlers !== "object" || Array.isArray(ports.jobHandlers)
+      || Object.keys(ports.jobHandlers).length === 0 || typeof ports.authorize !== "function") {
+      throw new TypeError("Production daemon ports require job handlers and authorization");
+    }
+    if (typeof ports.createConsumerSchedulers !== "function") {
+      throw new TypeError("Production daemon ports require Inbox consumer schedulers");
+    }
+    for (const name of ["createOutboxPublisher", "createInboxConsumer", "createJobWorker", "createDaemonRuntime"]) {
+      if (typeof corePackage?.[name] !== "function") throw new TypeError(`Aggregate core daemon port is unavailable: ${name}`);
+    }
+    const publisher = corePackage.createOutboxPublisher({
+      transaction: ports.transaction,
+      producer: ports.producer,
+      topic: ports.topic,
+      destination: ports.destination,
+      workerId: ports.publisherWorkerId,
+      maxAttempts: ports.publisherMaxAttempts,
+      backoffMs: ports.publisherBackoffMs,
+    });
+    const inbox = corePackage.createInboxConsumer({ transaction: ports.transaction });
+    const worker = corePackage.createJobWorker({
+      transaction: ports.transaction,
+      handlers: ports.jobHandlers,
+      authorize: ports.authorize,
+      backoffMs: ports.jobBackoffMs,
+    });
+    const consumerSchedulers = ports.createConsumerSchedulers({ inbox, profileName });
+    if (!Array.isArray(consumerSchedulers)) throw new TypeError("Inbox consumer schedulers must be an array");
+    const publisherInput = Object.freeze({ limit: ports.publisherBatchSize || 10, leaseMs: ports.publisherLeaseMs || 30_000 });
+    const workerInput = Object.freeze({
+      workerId: ports.jobWorkerId,
+      limit: ports.jobBatchSize || 10,
+      leaseMs: ports.jobLeaseMs || 30_000,
+    });
+    return corePackage.createDaemonRuntime({
+      loops: [
+        Object.freeze({ runBatch: () => publisher.publishBatch(publisherInput) }),
+        Object.freeze({ runBatch: () => worker.runBatch(workerInput) }),
+      ],
+      schedulers: [
+        Object.freeze({ start: () => ports.producer.connect(), stop: () => ports.producer.disconnect() }),
+        ...consumerSchedulers,
+      ],
+      checkpoint: ports.checkpoint,
+      resources: ports.resources || [],
+      wait: ports.wait,
+    });
+  };
+}
+
 function createDefaultDependencies(overrides = {}) {
   const paths = overrides.paths || resolveCliPaths({ homeDir: os.homedir() });
   const profileStore = overrides.profileStore || createProfileStore({ configFile: paths.configFile, fsImpl: fs });
   const keychain = overrides.keychain || createKeychain();
   const corePackage = overrides.corePackage || loadCorePackage();
-  return {
+  const processManager = overrides.processManager || createProcessManager({
+    dataDir: paths.dataDir,
+    binPath: path.resolve(__dirname, "../bin/data-platform.js"),
+  });
+  const dependencies = {
     ...overrides,
     corePackage,
     keychain,
     profileStore,
+    processManager,
     doctorPorts: overrides.doctorPorts || createDoctorPorts({ keychain, fsImpl: overrides.fsImpl || fs }),
     createRuntimePorts: overrides.createRuntimePorts || ((profile) => Object.freeze({
       ...(overrides.runtimePorts || {}),
@@ -114,6 +179,8 @@ function createDefaultDependencies(overrides = {}) {
       corePackage,
     )),
   };
+  dependencies.createDaemonRuntime = overrides.createDaemonRuntime || createProductionDaemonRuntimeFactory(dependencies);
+  return dependencies;
 }
 
 function commandFor(program, commandName) {
@@ -153,6 +220,14 @@ const commandOptions = Object.freeze({
     ["option", "--name <name>", "Project name"],
   ],
   "project.access-check": [["requiredOption", "--action <action>", "Access action"]],
+  "daemon.start": [["option", "--readiness-timeout-ms <milliseconds>", "Daemon readiness timeout", "10000"]],
+  "daemon.run": [
+    ["option", "--instance-id <id>", "Internal daemon instance ID"],
+    ["option", "--readiness-id <id>", "Internal daemon readiness ID"],
+  ],
+  "daemon.logs": [["option", "--lines <count>", "Number of log lines", "100"]],
+  "daemon.restart": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
+  "daemon.stop": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
 });
 
 function positiveInteger(value, label) {
@@ -175,6 +250,9 @@ function inputFor(definition, options) {
     delete input.project;
   }
   if (input.userId !== undefined) input.userId = positiveInteger(input.userId, "user-id");
+  if (input.lines !== undefined) input.lines = positiveInteger(input.lines, "lines");
+  if (input.timeoutMs !== undefined) input.timeoutMs = positiveInteger(input.timeoutMs, "timeout-ms");
+  if (input.readinessTimeoutMs !== undefined) input.readinessTimeoutMs = positiveInteger(input.readinessTimeoutMs, "readiness-timeout-ms");
   if (definition.capabilityId === "config.show" && input.name !== undefined) {
     input.profileName = input.name;
     delete input.name;
@@ -241,7 +319,7 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   const stdout = dependencies.stdout || process.stdout;
   const stderr = dependencies.stderr || process.stderr;
   const program = dependencies.program || defaultProgram();
-  const commandRoots = new Set(["auth", "config", "platform", "project", "system"]);
+  const commandRoots = new Set(["auth", "config", "daemon", "platform", "project", "system"]);
   const interactive = argv.length === 0 && stdin.isTTY && stdout.isTTY;
   const needsDefaultRuntime = !dependencies.createCommands
     && (interactive || argv.some((value) => commandRoots.has(value) || value === "--help" || value === "-h"));
@@ -297,4 +375,12 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   return state.exitCode;
 }
 
-module.exports = { createAuthRuntimePort, createCliDataPlatformCore, createCliRuntimeDependencies, createDefaultDependencies, createDoctorPorts, main };
+module.exports = {
+  createAuthRuntimePort,
+  createCliDataPlatformCore,
+  createCliRuntimeDependencies,
+  createDefaultDependencies,
+  createDoctorPorts,
+  createProductionDaemonRuntimeFactory,
+  main,
+};

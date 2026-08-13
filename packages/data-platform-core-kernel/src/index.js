@@ -17,6 +17,10 @@ const { cliRuntimeMigration } = require("./infrastructure/cli-runtime.migration"
 const commandRepository = require("./infrastructure/command.repository");
 const eventRepository = require("./infrastructure/event.repository");
 const jobRepository = require("./infrastructure/job.repository");
+const { createOutboxPublisher } = require("./infrastructure/outbox-publisher");
+const { createInboxConsumer } = require("./infrastructure/inbox-consumer");
+const { createJobWorker } = require("./infrastructure/job-worker");
+const { createDaemonRuntime } = require("./infrastructure/daemon-runtime");
 
 module.exports = {
   moduleManifestSchema,
@@ -37,4 +41,8 @@ module.exports = {
   commandRepository,
   eventRepository,
   jobRepository,
+  createOutboxPublisher,
+  createInboxConsumer,
+  createJobWorker,
+  createDaemonRuntime,
 };
