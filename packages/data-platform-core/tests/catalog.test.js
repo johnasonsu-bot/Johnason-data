@@ -103,6 +103,8 @@ test("aggregate package records exact candidate and rollback versions", () => {
     "@johnason/data-platform-module-model-providers": "0.2.0",
     "@johnason/data-platform-module-dev-ai-configs": "0.2.0",
     "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
+    "@johnason/data-platform-module-data-map": "0.2.0",
+    "@johnason/data-platform-module-data-standards": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
@@ -124,6 +126,8 @@ test("aggregate package records exact candidate and rollback versions", () => {
     { moduleName: "model-providers", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "dev-ai-configs", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "reporting-ai-configs", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-map", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-standards", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);
@@ -457,6 +461,8 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
     "model-providers": { listModelProviders: async () => [{ id: 3 }] },
     "dev-ai-configs": { listConfigs: async () => [{ id: 4 }] },
     "reporting-ai-configs": { listConfigs: async () => [{ id: 5 }] },
+    "data-map": { getOverview: async () => ({ id: 6 }) },
+    "data-standards": { getOverview: async () => ({ id: 7 }) },
   });
 
   assert.deepEqual(await core.execute("platform.health", {}, {}), { status: "ok" });
@@ -468,6 +474,8 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
   assert.deepEqual(await core.execute("modelProviders.list", {}, {}), [{ id: 3 }]);
   assert.deepEqual(await core.execute("devAiConfigs.listConfigs", {}, {}), [{ id: 4 }]);
   assert.deepEqual(await core.execute("reportingAiConfigs.listConfigs", {}, {}), [{ id: 5 }]);
+  assert.deepEqual(await core.execute("dataMap.getOverview", {}, {}), { id: 6 });
+  assert.deepEqual(await core.execute("dataStandards.getOverview", {}, {}), { id: 7 });
 });
 
 test("aggregate packaged capabilities fail closed when their injected port is absent", async () => {
@@ -480,4 +488,6 @@ test("aggregate packaged capabilities fail closed when their injected port is ab
   await assert.rejects(() => core.execute("modelProviders.list", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("devAiConfigs.listConfigs", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("reportingAiConfigs.listConfigs", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("dataMap.getOverview", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("dataStandards.getOverview", {}, {}), /port is not configured/i);
 });

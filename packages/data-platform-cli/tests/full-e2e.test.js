@@ -21,6 +21,8 @@ const packageDirectories = [
   "packages/data-platform-module-model-providers",
   "packages/data-platform-module-dev-ai-configs",
   "packages/data-platform-module-reporting-ai-configs",
+  "packages/data-platform-module-data-map",
+  "packages/data-platform-module-data-standards",
   "packages/data-platform-module-platform",
   "packages/data-platform-module-project-spaces",
   "packages/data-platform-core",

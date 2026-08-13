@@ -25,6 +25,8 @@
     "@johnason/data-platform-module-model-providers": "0.2.0",
     "@johnason/data-platform-module-dev-ai-configs": "0.2.0",
     "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
+    "@johnason/data-platform-module-data-map": "0.2.0",
+    "@johnason/data-platform-module-data-standards": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0"
   }
