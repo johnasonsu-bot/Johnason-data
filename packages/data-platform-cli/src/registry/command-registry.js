@@ -11,7 +11,7 @@ const definitionSchema = z.object({
   capabilityId: z.string().regex(/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/, "capabilityId is invalid"),
   modules: z.array(nonEmptyString),
   action: nonEmptyString,
-  sourceApiKeys: z.array(sourceApiKey).min(1),
+  sourceApiKeys: z.array(sourceApiKey),
   sourceFrontendKeys: z.array(sourceFrontendKey),
   executionTargets: z.array(z.record(z.unknown())),
   inputSchema: parserSchema,

@@ -164,6 +164,16 @@ const optionalProjectIdInputSchema = (label) => exactObjectInputSchema(label, ["
   if (input.projectId === undefined || input.projectId === null || input.projectId === "") return Object.freeze({});
   return Object.freeze({ projectId: positiveId(input.projectId, `${label} input`) });
 });
+const projectAccessCheckInputSchema = exactObjectInputSchema("Project access-check", ["projectId", "action"], (input) => {
+  const action = validOptionalString(input.action, "Project access-check action");
+  if (!["read", "write", "delete", "run", "publish"].includes(action)) throw new TypeError("Project access-check action is invalid");
+  return Object.freeze({
+    action,
+    ...(input.projectId === undefined || input.projectId === null || input.projectId === ""
+      ? {}
+      : { projectId: positiveId(input.projectId, "Project access-check input") }),
+  });
+});
 
 function projectOperationInputSchema(name, label, allowedKeys, argumentsFor) {
   return exactObjectInputSchema(label, allowedKeys, (input, context) => {
@@ -213,6 +223,15 @@ function bind(handler, argumentsFor, schemas = {}) {
 }
 
 function productionBindings(auth, project) {
+  async function projectAccessCheck(input, context) {
+    const actor = actorFrom(context);
+    kernel.authorizeCapability(actor, { modules: ["system_projects"], action: input.action, readOnlyAllowed: input.action === "read" });
+    const result = await project.accessCheck(actor, input.projectId);
+    kernel.authorizeCapability({ ...actor, roleType: result.member?.projectRole }, {
+      modules: ["system_projects"], action: input.action, readOnlyAllowed: input.action === "read",
+    });
+    return result;
+  }
   return Object.freeze({
     "auth.login": bind(auth.login, (input, context) => [input, context], { inputSchema: authLoginInputSchema, outputSchema: authLoginOutputSchema }),
     "auth.profile": bind(auth.profile, (input) => [input], { inputSchema: authProfileInputSchema, outputSchema: authProfileOutputSchema }),
@@ -223,7 +242,7 @@ function productionBindings(auth, project) {
     "project.detail": bind(project.detail, (input, context) => [input.projectId, actorFrom(context)], { inputSchema: projectOperationInputSchema("detail", "Project detail", ["projectId"], (input) => [input.projectId]) }),
     "project.resolve": bind(project.resolve, (input, context) => [actorFrom(context), input.projectId], { inputSchema: optionalProjectIdInputSchema("Project resolve") }),
     "project.use": bind(project.use, (input, context) => [actorFrom(context), input.projectId], { inputSchema: optionalProjectIdInputSchema("Project use") }),
-    "project.access-check": bind(project.accessCheck, (input, context) => [actorFrom(context), input.projectId], { inputSchema: optionalProjectIdInputSchema("Project access-check") }),
+    "project.access-check": bind(projectAccessCheck, (input, context) => [input, context], { inputSchema: projectAccessCheckInputSchema }),
     "project.set-default": bind(project.setDefault, (input, context) => [input.projectId, actorFrom(context)], { inputSchema: projectIdInputSchema("Project set-default") }),
     "project.create": bind(project.create, (input, context) => [input.body, actorFrom(context)], { inputSchema: projectOperationInputSchema("create", "Project create", ["body"], (input, context) => [input.body, actorFrom(context)]) }),
     "project.update": bind(project.update, (input, context) => [input.projectId, input.body, actorFrom(context)], { inputSchema: projectOperationInputSchema("update", "Project update", ["projectId", "body"], (input) => [input.projectId, input.body]) }),

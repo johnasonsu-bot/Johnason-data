@@ -166,7 +166,7 @@ test("JSON renderer refuses to emit a second stdout document", () => {
 
 test("command registry rejects incomplete, unknown, and malformed schema definitions", () => {
   const registry = createCommandRegistry();
-  assert.throws(() => registry.register({ capabilityId: "x", sourceApiKeys: [] }), /sourceApiKeys/i);
+  assert.throws(() => registry.register({ capabilityId: "x", sourceApiKeys: [] }), /command|modules|action/i);
   assert.throws(() => registry.register(definition({ unexpected: true })), /unrecognized|unknown/i);
   assert.throws(() => registry.register(definition({ inputSchema: {}, outputSchema: schema })), /inputSchema/i);
   assert.throws(() => registry.register(definition({ modules: "not-an-array" })), /modules/i);

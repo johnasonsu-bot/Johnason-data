@@ -3,8 +3,10 @@ const test = require("node:test");
 
 const {
   createCliDataPlatformCore,
+  createDefaultDependencies,
   createCliRuntimeDependencies,
 } = require("../src/main");
+const { createFoundationCommands } = require("../src/registry/foundation-commands");
 
 function profile() {
   return Object.freeze({
@@ -180,4 +182,53 @@ test("CLI exposes explicit runtime-port injection for real aggregate auth and pr
     },
   });
   assert.deepEqual(await core.execute("project.list-my", {}, { actor: user }), []);
+});
+
+test("default CLI auth uses an explicit JWT_SECRET and real aggregate session revalidation", async () => {
+  const corePackage = require("@johnason/data-platform-core");
+  const jwtImpl = require("jsonwebtoken");
+  const passwordHasher = require("bcryptjs");
+  const sessions = new Map();
+  const user = {
+    id: 7, username: "operator", displayName: "Operator", roleId: 1, roleCode: "admin",
+    roleType: "admin", roleName: "Administrator", defaultProjectId: null,
+    permissions: { modules: ["system_projects"] }, status: "active", passwordHash: passwordHasher.hashSync("pw", 4),
+  };
+  const keychainValues = new Map();
+  const keychain = {
+    getDatabasePassword() { return "database-passphrase"; },
+    getAuthSigningSecret() { return "keychain-only-signing-secret"; },
+    getSessionToken(name) { return keychainValues.get(name) || null; },
+    setSessionToken(name, token) { keychainValues.set(name, token); },
+    deleteSessionToken(name) { keychainValues.delete(name); },
+  };
+  const runtime = { pool: { async getConnection() { return { async beginTransaction() {}, async commit() {}, async rollback() {}, release() {} }; }, async end() {} }, async testConnection() {}, async close() {} };
+  const dependencies = createDefaultDependencies({
+    profile: profile(), keychain, corePackage, jwtImpl, passwordHasher, env: { JWT_SECRET: " keychain-only-signing-secret " },
+    createDatabaseRuntime: () => runtime,
+    runtimePorts: { auth: {
+      authRepository: { async findByUsername() { return user; }, async findProfileById() { return user; } },
+      sessionRepository: {
+        async createSession(session) { sessions.set(session.id, { ...session, status: "active" }); },
+        async findActiveSession(id) { return sessions.get(id) || null; },
+        async touchSession() {}, async revokeSession(id) { sessions.delete(id); },
+      },
+    } },
+  });
+  const commands = createFoundationCommands(dependencies);
+  assert.equal((await commands.auth.login({ username: "operator", password: "pw" })).user.username, "operator");
+  const issuedToken = keychain.getSessionToken("production");
+  assert.equal(jwtImpl.verify(issuedToken, "keychain-only-signing-secret").sub, 7);
+  assert.equal((await commands.auth.profile()).user.id, 7);
+  assert.deepEqual(await commands.auth.logout(), { success: true });
+  assert.equal(keychain.getSessionToken("production"), null);
+
+  const missing = createDefaultDependencies({
+    profile: profile(), keychain, corePackage, jwtImpl, passwordHasher, env: {},
+    createDatabaseRuntime: () => runtime,
+    runtimePorts: dependencies.runtimePorts,
+  });
+  await assert.rejects(() => createFoundationCommands(missing).auth.login({ username: "operator", password: "pw" }), { code: "SECURITY_DEPENDENCY_MISSING" });
+  keychain.setSessionToken("production", issuedToken);
+  await assert.rejects(() => createFoundationCommands(missing).auth.profile(), { code: "SECURITY_DEPENDENCY_MISSING" });
 });

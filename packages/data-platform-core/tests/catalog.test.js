@@ -380,6 +380,25 @@ test("aggregate rejects malformed project service input before a repository side
   assert.equal(repositoryCalls, 0);
 });
 
+test("aggregate project access-check enforces action against the resolved membership role", async () => {
+  const project = { id: 1, projectName: "One", projectCode: "one", status: "active" };
+  const member = { projectId: 1, userId: 7, projectRole: "viewer", status: "active", permissions: { modules: [] } };
+  const core = createDataPlatformCore({
+    databaseRuntime: { pool: {}, async testConnection() {}, async close() {} },
+    project: { projectRepository: {
+      async getProjectById() { return project; },
+      async getProjectMember() { return member; },
+    } },
+  });
+  const context = { actor: { sub: 7, roleCode: "developer", permissions: { modules: ["system_projects"] } } };
+
+  assert.equal((await core.execute("project.access-check", { projectId: 1, action: "read" }, context)).project.id, 1);
+  await assert.rejects(
+    () => core.execute("project.access-check", { projectId: 1, action: "write" }, context),
+    (error) => error.code === "READ_ONLY_FORBIDDEN" && error.statusCode === 403,
+  );
+});
+
 test("aggregate rejects malformed authentication output", async () => {
   const core = createDataPlatformCore({
     databaseRuntime: {
