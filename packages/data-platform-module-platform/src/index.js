@@ -31,8 +31,11 @@ const moduleManifest = Object.freeze({
   sourceFrontendKeys: SOURCE_FRONTEND_KEYS,
   dependencies: Object.freeze({ "@johnason/data-platform-core-kernel": "0.1.0" }),
   // The exported manifest stays kernel-compatible (string execution target
-  // identifiers); createCapabilities exposes richer target descriptors.
-  capabilities: validatedModuleManifest.capabilities,
+  // identifiers) while retaining schemas and policy metadata for catalogs.
+  capabilities: Object.freeze(CAPABILITY_DEFINITIONS.map(({ port, executionTargets, ...definition }) => Object.freeze({
+    ...definition,
+    executionTargets: Object.freeze(executionTargets.map((target) => target.kind === "database" ? "mysql:platform-authority" : target.kind)),
+  }))),
 });
 
 function resolvePort(dependencies, port) {
