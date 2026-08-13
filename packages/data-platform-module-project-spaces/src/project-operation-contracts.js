@@ -52,9 +52,52 @@ function positiveInputId(value, label = "项目") {
   return id;
 }
 
-function optionalInputObject(value, label, fallback = {}) {
-  if (value === undefined) return fallback;
-  return { ...inputRecord(value, label) };
+function strictNestedRecord(value, allowedKeys, failure) {
+  if (!isRecord(value)) throw failure();
+  const allowed = new Set(allowedKeys);
+  if (Object.keys(value).some((key) => !allowed.has(key))) throw failure();
+  return value;
+}
+
+function nestedCount(value, failure) {
+  if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) throw failure();
+  return value;
+}
+
+function nestedBoolean(value, failure) {
+  if (typeof value !== "boolean") throw failure();
+  return value;
+}
+
+function nestedString(value, failure, { allowEmpty = false } = {}) {
+  if (typeof value !== "string" || (!allowEmpty && value.length === 0)) throw failure();
+  return value;
+}
+
+function resourceConfigSchema(value, failure) {
+  const config = strictNestedRecord(value, ["maxDataSources", "maxConcurrentTasks", "schedulerEnabled"], failure);
+  const dto = {};
+  if (config.maxDataSources !== undefined) dto.maxDataSources = nestedCount(config.maxDataSources, failure);
+  if (config.maxConcurrentTasks !== undefined) dto.maxConcurrentTasks = nestedCount(config.maxConcurrentTasks, failure);
+  if (config.schedulerEnabled !== undefined) dto.schedulerEnabled = nestedBoolean(config.schedulerEnabled, failure);
+  return dto;
+}
+
+function projectSettingsSchema(value, failure) {
+  const settings = strictNestedRecord(value, ["defaultStoragePath"], failure);
+  const dto = {};
+  if (settings.defaultStoragePath !== undefined) dto.defaultStoragePath = nestedString(settings.defaultStoragePath, failure, { allowEmpty: true });
+  return dto;
+}
+
+function permissionsSchema(value, failure) {
+  const permissions = strictNestedRecord(value, ["modules"], failure);
+  if (!Array.isArray(permissions.modules)) throw failure();
+  return { modules: permissions.modules.map((name) => {
+    const normalized = nestedString(name, failure).trim();
+    if (normalized.length === 0) throw failure();
+    return normalized;
+  }) };
 }
 
 function projectBody(value) {
@@ -67,8 +110,8 @@ function projectBody(value) {
     projectCode,
     projectType: inputEnum(body.projectType, PROJECT_TYPES, "项目类型", "standard"),
     status: inputEnum(body.status, PROJECT_STATUSES, "项目状态", "active"),
-    resourceConfig: optionalInputObject(body.resourceConfig, "资源配置"),
-    settings: optionalInputObject(body.settings, "项目设置"),
+    resourceConfig: resourceConfigSchema(body.resourceConfig === undefined ? {} : body.resourceConfig, () => requestError("资源配置无效")),
+    settings: projectSettingsSchema(body.settings === undefined ? {} : body.settings, () => requestError("项目设置无效")),
   };
   if (body.description !== undefined) normalized.description = inputString(body.description, "项目描述", { max: 1024, allowEmpty: true });
   if (body.ownerUserId !== undefined) normalized.ownerUserId = body.ownerUserId === null ? null : positiveInputId(body.ownerUserId, "项目所有者");
@@ -78,13 +121,15 @@ function projectBody(value) {
 
 function memberBody(value) {
   const body = inputRecord(value, "项目成员");
-  const permissions = optionalInputObject(body.permissions, "成员权限", { modules: [] });
-  const modules = permissions.modules === undefined ? [] : permissions.modules;
-  if (!Array.isArray(modules)) throw requestError("成员权限无效");
+  const rawPermissions = body.permissions === undefined ? { modules: [] } : body.permissions;
+  const permissions = isRecord(rawPermissions) && rawPermissions.modules === undefined
+    ? { ...rawPermissions, modules: [] }
+    : rawPermissions;
+  const normalizedPermissions = permissionsSchema(permissions, () => requestError("成员权限无效"));
   return Object.freeze({
     userId: positiveInputId(body.userId, "成员"),
     projectRole: inputEnum(body.projectRole, PROJECT_MEMBER_ROLES, "成员角色", "developer"),
-    permissions: Object.freeze({ modules: Object.freeze(modules.map((name) => inputString(name, "成员权限模块", { min: 1 }))) }),
+    permissions: Object.freeze({ modules: Object.freeze(normalizedPermissions.modules) }),
     status: inputEnum(body.status, MEMBER_STATUSES, "成员状态", "active"),
   });
 }
@@ -187,19 +232,11 @@ function resultStringArray(value) {
 }
 
 function exactResourceConfig(value) {
-  const config = strictResultRecord(value, ["maxDataSources", "maxConcurrentTasks", "schedulerEnabled"]);
-  const dto = {};
-  if (config.maxDataSources !== undefined) dto.maxDataSources = resultCount(config.maxDataSources);
-  if (config.maxConcurrentTasks !== undefined) dto.maxConcurrentTasks = resultCount(config.maxConcurrentTasks);
-  if (config.schedulerEnabled !== undefined) dto.schedulerEnabled = resultBoolean(config.schedulerEnabled);
-  return dto;
+  return resourceConfigSchema(value, invalidResult);
 }
 
 function exactProjectSettings(value) {
-  const settings = strictResultRecord(value, ["defaultStoragePath"]);
-  const dto = {};
-  if (settings.defaultStoragePath !== undefined) dto.defaultStoragePath = resultString(settings.defaultStoragePath, { allowEmpty: true });
-  return dto;
+  return projectSettingsSchema(value, invalidResult);
 }
 
 function projectDto(value) {
@@ -227,8 +264,7 @@ function projectDto(value) {
 }
 
 function permissionsDto(value) {
-  const permissions = strictResultRecord(value, ["modules"]);
-  return { modules: resultStringArray(permissions.modules) };
+  return permissionsSchema(value, invalidResult);
 }
 
 function memberDto(value) {
@@ -414,6 +450,31 @@ function jsonValue(value, ancestors = new WeakSet()) {
   }
 }
 
+function canonicalJsonValue(value, ancestors = new WeakSet()) {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw invalidResult();
+    return value;
+  }
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) throw invalidResult();
+    return value.toISOString();
+  }
+  if (Buffer.isBuffer(value) || typeof value !== "object") throw invalidResult();
+  if (ancestors.has(value)) throw invalidResult();
+  ancestors.add(value);
+  try {
+    if (Array.isArray(value)) return value.map((item) => canonicalJsonValue(item, ancestors));
+    if (!isRecord(value)) throw invalidResult();
+    return Object.keys(value).sort().reduce((result, key) => {
+      result[key] = canonicalJsonValue(value[key], ancestors);
+      return result;
+    }, {});
+  } finally {
+    ancestors.delete(value);
+  }
+}
+
 function base64(value) {
   resultString(value);
   if (!/^[A-Za-z0-9+/]*={0,2}$/.test(value) || value.length % 4 !== 0) throw invalidResult();
@@ -464,6 +525,8 @@ function protectedJsonValue(value, sensitiveMode, key = "", ancestors = new Weak
 }
 
 function stableValue(value) {
+  if (value instanceof Date) return value.toISOString();
+  if (Buffer.isBuffer(value)) return value.toString("base64");
   if (Array.isArray(value)) return value.map(stableValue);
   if (value && typeof value === "object") return Object.keys(value).sort().reduce((result, key) => { result[key] = stableValue(value[key]); return result; }, {});
   return value;
@@ -596,7 +659,7 @@ function validateArtifactIntegrity(artifact, version) {
 }
 
 function artifactDto(value) {
-  const artifact = strictResultRecord(value, ["manifest", "project", "schema", "references", "tables", "files"]);
+  const artifact = strictResultRecord(canonicalJsonValue(value), ["manifest", "project", "schema", "references", "tables", "files"]);
   const { version, sensitiveMode } = artifactManifest(artifact.manifest);
   artifactProject(artifact.project, sensitiveMode);
   artifactSchema(artifact.schema);

@@ -250,6 +250,96 @@ test("project input schemas reject missing fields and illegal codes, statuses, r
   assert.equal(invoked, 0);
 });
 
+test("nested mutation DTO schemas round-trip valid fields and reject unknown fields before IO", async () => {
+  const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["system_projects"] } };
+  const nestedProjectBody = validProjectBody({
+    resourceConfig: { maxDataSources: 4, maxConcurrentTasks: 2, schedulerEnabled: false },
+    settings: { defaultStoragePath: "/runtime/projects/one" },
+  });
+  const nestedMemberBody = {
+    userId: 9,
+    projectRole: "developer",
+    permissions: { modules: ["data_map", "system_projects"] },
+    status: "active",
+  };
+  const project = createProjectCapabilities({ projectOperations: {
+    create: async (body) => projectRecord({ resourceConfig: body.resourceConfig, settings: body.settings }),
+    update: async (_id, body) => projectRecord({ resourceConfig: body.resourceConfig, settings: body.settings }),
+    upsertMember: async (_id, body) => memberRecord({ permissions: body.permissions }),
+  } }).project;
+
+  assert.deepEqual((await project.create(nestedProjectBody, actor)).data.resourceConfig, nestedProjectBody.resourceConfig);
+  assert.deepEqual((await project.update(1, nestedProjectBody, actor)).data.settings, nestedProjectBody.settings);
+  assert.deepEqual((await project.upsertMember(1, nestedMemberBody, actor)).data.permissions, nestedMemberBody.permissions);
+
+  const invalidCases = [
+    ["create", (candidate) => candidate.create(validProjectBody({ resourceConfig: { privateEndpoint: "private.example.invalid" } }), actor)],
+    ["update", (candidate) => candidate.update(1, validProjectBody({ settings: { privateEndpoint: "private.example.invalid" } }), actor)],
+    ["upsertMember", (candidate) => candidate.upsertMember(1, { userId: 9, permissions: { modules: [], privateEndpoint: "private.example.invalid" } }, actor)],
+  ];
+  const outcomes = [];
+  for (const [name, call] of invalidCases) {
+    let portCalls = 0;
+    const candidate = createProjectCapabilities({ projectOperations: {
+      [name]: async () => { portCalls += 1; return {}; },
+    } }).project;
+    try {
+      await call(candidate);
+      outcomes.push({ name, code: null, statusCode: null, portCalls });
+    } catch (error) {
+      outcomes.push({ name, code: error?.code, statusCode: error?.statusCode, portCalls });
+    }
+  }
+  assert.deepEqual(outcomes, [
+    { name: "create", code: "PROJECT_REQUEST_INVALID", statusCode: 400, portCalls: 0 },
+    { name: "update", code: "PROJECT_REQUEST_INVALID", statusCode: 400, portCalls: 0 },
+    { name: "upsertMember", code: "PROJECT_REQUEST_INVALID", statusCode: 400, portCalls: 0 },
+  ]);
+});
+
+test("shared permission schema normalizes module names and rejects blank modules before IO", async () => {
+  const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["system_projects"] } };
+  let normalizedPortBody;
+  const project = createProjectCapabilities({ projectOperations: {
+    upsertMember: async (_id, body) => {
+      normalizedPortBody = body;
+      return memberRecord({ permissions: body.permissions });
+    },
+  } }).project;
+  const normalizedResult = await project.upsertMember(1, {
+    userId: 9,
+    permissions: { modules: [" data_map ", "system_projects"] },
+  }, actor);
+
+  let blankPortCalls = 0;
+  const blankCandidate = createProjectCapabilities({ projectOperations: {
+    upsertMember: async (_id, body) => {
+      blankPortCalls += 1;
+      return memberRecord({ permissions: body.permissions });
+    },
+  } }).project;
+  let blankError;
+  try {
+    await blankCandidate.upsertMember(1, { userId: 9, permissions: { modules: ["   "] } }, actor);
+  } catch (error) {
+    blankError = error;
+  }
+
+  assert.deepEqual({
+    portModules: normalizedPortBody.permissions.modules,
+    resultModules: normalizedResult.data.permissions.modules,
+    blankCode: blankError?.code || null,
+    blankStatusCode: blankError?.statusCode || null,
+    blankPortCalls,
+  }, {
+    portModules: ["data_map", "system_projects"],
+    resultModules: ["data_map", "system_projects"],
+    blankCode: "PROJECT_REQUEST_INVALID",
+    blankStatusCode: 400,
+    blankPortCalls: 0,
+  });
+});
+
 test("each project operation applies its own result schema instead of accepting empty records or malformed lists", async () => {
   const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["system_projects"] } };
   const malformedByOperation = {

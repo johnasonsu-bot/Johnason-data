@@ -95,6 +95,8 @@ function transferLog(overrides = {}) {
 }
 
 function stableValue(value) {
+  if (value instanceof Date) return value.toISOString();
+  if (Buffer.isBuffer(value)) return value.toString("base64");
   if (Array.isArray(value)) return value.map(stableValue);
   if (value && typeof value === "object") {
     return Object.keys(value).sort().reduce((result, key) => {
@@ -177,6 +179,43 @@ function encryptedArtifact(extraTopLevel = {}) {
   return payload;
 }
 
+function dateArtifact() {
+  const nestedTimestamp = "2026-08-13T01:02:03.456Z";
+  const payload = encryptedArtifact();
+  payload.manifest.exportedAt = new Date(timestamp);
+  payload.manifest.sensitiveMode = "desensitized";
+  payload.manifest.coverage.sensitiveConfiguration = "desensitized";
+  delete payload.manifest.sensitiveEncryption;
+  payload.project.resourceConfig = { maxDataSources: 2 };
+  payload.project.settings = { synchronization: { lastCompletedAt: new Date(nestedTimestamp) } };
+  payload.tables[0].columns = ["id", "observedAt", "metadata"];
+  payload.tables[0].rows = [{
+    id: 1,
+    observedAt: new Date(timestamp),
+    metadata: { lastSeenAt: new Date(nestedTimestamp) },
+  }];
+  payload.manifest.integrity = {
+    algorithm: "sha256",
+    payloadSha256: "222606908516217bfdb2b9fd49e2f17c6531153982f0c415a461bd46b6b08b75",
+    tables: [{
+      tableName: "data_sources",
+      rowCount: 1,
+      sha256: "97f0e5b3f787aedf9aa7abc6fb83355e9630e35001a62014cbf6cd4136978fdd",
+    }],
+  };
+  return payload;
+}
+
+function canonicalDateArtifact() {
+  const nestedTimestamp = "2026-08-13T01:02:03.456Z";
+  const payload = dateArtifact();
+  payload.manifest.exportedAt = timestamp;
+  payload.project.settings.synchronization.lastCompletedAt = nestedTimestamp;
+  payload.tables[0].rows[0].observedAt = timestamp;
+  payload.tables[0].rows[0].metadata.lastSeenAt = nestedTimestamp;
+  return payload;
+}
+
 function expectInvalidResult(call) {
   return assert.rejects(call, (error) => error?.code === "PROJECT_PORT_INVALID_RESULT" && error.statusCode === 502 && error.retryable === false);
 }
@@ -240,6 +279,35 @@ test("export and download preserve an encrypted artifact byte-for-byte and retai
     assert.deepEqual(integrityFor(result.data), result.data.manifest.integrity);
     assert.equal(result.data.tables[0].rows[0].password.__medataEncrypted, true);
     assert.equal(result.data.tables[0].rows[0].config_json.apiKey.__medataEncrypted, true);
+  }
+});
+
+test("export and download canonicalize Date artifacts before backend-compatible integrity verification", async () => {
+  for (const operation of ["exportAssets", "downloadBackup"]) {
+    const project = createProjectCapabilities({ projectOperations: {
+      [operation]: async () => dateArtifact(),
+    } }).project;
+    const result = operation === "exportAssets"
+      ? await project.exportAssets(1, { sensitiveMode: "desensitized" }, actor)
+      : await project.downloadBackup(1, 2, actor);
+    assert.deepEqual(result.data, canonicalDateArtifact());
+    assert.deepEqual(integrityFor(result.data), result.data.manifest.integrity);
+  }
+});
+
+test("Date artifact canonicalization retains Buffer and cycle rejection", async () => {
+  const withBuffer = encryptedArtifact();
+  withBuffer.tables[0].rows[0].config_json = Buffer.from("unsafe");
+  withBuffer.manifest.integrity = integrityFor(withBuffer);
+
+  const withCycle = encryptedArtifact();
+  withCycle.manifest.exportFormatVersion = "1.0.0";
+  delete withCycle.manifest.integrity;
+  withCycle.project.settings.self = withCycle.project.settings;
+
+  for (const artifact of [withBuffer, withCycle]) {
+    const project = createProjectCapabilities({ projectOperations: { exportAssets: async () => artifact } }).project;
+    await expectInvalidResult(() => project.exportAssets(1, { sensitiveMode: "encrypted" }, actor));
   }
 });
 
