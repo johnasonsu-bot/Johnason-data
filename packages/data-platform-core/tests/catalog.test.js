@@ -99,6 +99,8 @@ test("aggregate package records exact candidate and rollback versions", () => {
     "@johnason/data-platform-module-data-lab-sources": "0.2.0",
     "@johnason/data-platform-module-ingestion-ai-configs": "0.2.0",
     "@johnason/data-platform-module-ingestion-tasks": "0.2.0",
+    "@johnason/data-platform-module-file-imports": "0.2.0",
+    "@johnason/data-platform-module-model-providers": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
@@ -116,6 +118,8 @@ test("aggregate package records exact candidate and rollback versions", () => {
     { moduleName: "data-lab-sources", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "ingestion-ai-configs", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "ingestion-tasks", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "file-imports", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "model-providers", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);
@@ -445,6 +449,8 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
     "data-sources": { listDataSources: async () => [{ id: 1 }] },
     "data-source-research": { getResearchTask: async (id) => ({ id }) },
     "ingestion-tasks": { listTasks: async (input) => [{ id: input.projectId || 1 }] },
+    "file-imports": { listTasks: async () => [{ id: 2 }] },
+    "model-providers": { listModelProviders: async () => [{ id: 3 }] },
   });
 
   assert.deepEqual(await core.execute("platform.health", {}, {}), { status: "ok" });
@@ -452,6 +458,8 @@ test("aggregate executes packaged platform, asset-search, data-sources, and inge
   assert.deepEqual(await core.execute("data-sources.list", {}, {}), [{ id: 1 }]);
   assert.deepEqual(await core.execute("dataSourceResearch.getResearchTask", { taskId: 11 }, {}), { id: 11 });
   assert.deepEqual(await core.execute("ingestionTasks.list", { projectId: 12 }, {}), [{ id: 12 }]);
+  assert.deepEqual(await core.execute("fileImports.list", {}, {}), [{ id: 2 }]);
+  assert.deepEqual(await core.execute("modelProviders.list", {}, {}), [{ id: 3 }]);
 });
 
 test("aggregate packaged capabilities fail closed when their injected port is absent", async () => {
@@ -460,4 +468,6 @@ test("aggregate packaged capabilities fail closed when their injected port is ab
   await assert.rejects(() => core.execute("assetSearch.search", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("data-sources.list", {}, {}), /port is not configured/i);
   await assert.rejects(() => core.execute("ingestionTasks.list", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("fileImports.list", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("modelProviders.list", {}, {}), /port is not configured/i);
 });

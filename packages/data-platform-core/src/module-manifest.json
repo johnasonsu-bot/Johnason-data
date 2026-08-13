@@ -63,6 +63,22 @@
       "factoryExport": "createCapabilities"
     },
     {
+      "packageName": "@johnason/data-platform-module-file-imports",
+      "moduleName": "file-imports",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
+      "packageName": "@johnason/data-platform-module-model-providers",
+      "moduleName": "model-providers",
+      "candidateVersion": "0.2.0",
+      "rollbackVersion": "0.1.0",
+      "capabilitySchemaVersion": "1.0.0",
+      "factoryExport": "createCapabilities"
+    },
+    {
       "packageName": "@johnason/data-platform-module-platform",
       "moduleName": "platform",
       "candidateVersion": "0.2.0",
