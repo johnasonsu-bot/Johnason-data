@@ -11,7 +11,19 @@ const {
   isReadOnlyUser,
 } = require("../utils/user-permissions");
 
-async function authMiddleware(req, res, next) {
+function createAuthMiddleware(dependencies = {}) {
+  const jwtCodec = dependencies.jwtCodec || jwt;
+  const jwtSecret = dependencies.jwtSecret || env.jwtSecret;
+  const activeSessionRepository = dependencies.sessionRepository || sessionRepository;
+  const profileRepository = dependencies.authRepository || authRepository;
+  const projects = dependencies.projectSpaceService || projectSpaceService;
+  const withProjectContext = dependencies.runWithProjectContext || runWithProjectContext;
+  const requiredModulesForPath = dependencies.getRequiredModulesForApiPath || getRequiredModulesForApiPath;
+  const modulePermission = dependencies.hasAnyModulePermission || hasAnyModulePermission;
+  const readOnlyUser = dependencies.isReadOnlyUser || isReadOnlyUser;
+  const readOnlyAllowedRequest = dependencies.isReadOnlyAllowedRequest || isReadOnlyAllowedRequest;
+
+  return async function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
 
@@ -20,18 +32,18 @@ async function authMiddleware(req, res, next) {
   }
 
   try {
-    req.user = jwt.verify(token, env.jwtSecret);
+    req.user = jwtCodec.verify(token, jwtSecret);
   } catch (error) {
     return res.status(401).json({ success: false, message: "Token 无效" });
   }
 
-  const session = await sessionRepository.findActiveSession(req.user.sessionId);
+  const session = await activeSessionRepository.findActiveSession(req.user.sessionId);
   if (!session || Number(session.userId) !== Number(req.user.sub)) {
     return res.status(401).json({ success: false, message: "登录会话已失效，请重新登录" });
   }
-  await sessionRepository.touchSession(req.user.sessionId);
+  await activeSessionRepository.touchSession(req.user.sessionId);
 
-  const profile = await authRepository.findProfileById(req.user.sub);
+  const profile = await profileRepository.findProfileById(req.user.sub);
   if (!profile || profile.status !== "active") {
     return res.status(401).json({ success: false, message: "用户不存在或已停用" });
   }
@@ -49,8 +61,8 @@ async function authMiddleware(req, res, next) {
     permissions: profile.permissions || { modules: [] },
   };
 
-  const requiredModules = getRequiredModulesForApiPath(req.originalUrl || req.path);
-  if (!hasAnyModulePermission(req.user, requiredModules)) {
+  const requiredModules = requiredModulesForPath(req.originalUrl || req.path);
+  if (!modulePermission(req.user, requiredModules)) {
     return res.status(403).json({
       success: false,
       message: "当前角色无权访问该功能模块",
@@ -59,7 +71,7 @@ async function authMiddleware(req, res, next) {
     });
   }
 
-  if (isReadOnlyUser(req.user) && !isReadOnlyAllowedRequest(req.method, req.originalUrl || req.path)) {
+  if (readOnlyUser(req.user) && !readOnlyAllowedRequest(req.method, req.originalUrl || req.path)) {
     return res.status(403).json({
       success: false,
       message: "只读用户仅允许查看，不能执行新建、修改、删除、运行或发布操作",
@@ -70,11 +82,11 @@ async function authMiddleware(req, res, next) {
   try {
     const shouldIgnoreRequestedProject = String(req.originalUrl || "").startsWith("/api/v1/projects/my");
     const requestedProjectId = shouldIgnoreRequestedProject ? null : (req.headers["x-project-id"] || req.query?.projectId);
-    const { project, member } = await projectSpaceService.resolveRequestProject(req.user, requestedProjectId);
+    const { project, member } = await projects.resolveRequestProject(req.user, requestedProjectId);
     req.project = project;
     req.projectId = project.id;
     req.projectMember = member;
-    return runWithProjectContext({ projectId: project.id, project, member }, () => next());
+    return withProjectContext({ projectId: project.id, project, member }, () => next());
   } catch (error) {
     return res.status(error.statusCode || 403).json({
       success: false,
@@ -82,6 +94,9 @@ async function authMiddleware(req, res, next) {
       details: error.details,
     });
   }
+  };
 }
 
+const authMiddleware = createAuthMiddleware();
 module.exports = authMiddleware;
+module.exports.createAuthMiddleware = createAuthMiddleware;
