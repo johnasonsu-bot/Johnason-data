@@ -27,7 +27,7 @@ test("data-sources candidate exposes the exact nine Web API keys", () => {
 
   assert.equal(definition.moduleManifest.moduleId, "data-sources");
   assert.equal(definition.moduleManifest.moduleVersion, "0.2.0");
-  assert.equal(definition.moduleManifest.capabilitySchemaVersion, "0.1.0");
+  assert.equal(definition.moduleManifest.capabilitySchemaVersion, "1.0.0");
   assert.deepEqual(definition.moduleManifest.sourceApiKeys, SOURCE_API_KEYS);
   assert.deepEqual(definition.moduleManifest.sourceFrontendKeys, SOURCE_FRONTEND_KEYS);
   assert.equal(typeof definition.createCapabilities, "function");

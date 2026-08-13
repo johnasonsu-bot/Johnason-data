@@ -7,7 +7,7 @@ const {
 
 const MODULE_ID = "data-sources";
 const MODULE_VERSION = "0.2.0";
-const CAPABILITY_SCHEMA_VERSION = "0.1.0";
+const CAPABILITY_SCHEMA_VERSION = "1.0.0";
 const KERNEL_VERSION = "0.1.0";
 
 const dependencies = Object.freeze({
