@@ -38,3 +38,7 @@ Shared-core Task 6: standalone locks retained with secret-free explicit `JOHNASO
 Shared-core Task 6: Foundation Task 7 owns real CLI command/profile/session binding; Task 6 exposes and verifies the complete runtime-port injection seam without fabricating JWT/keychain secrets.
 Shared-core Task 6: verification — core 150 total (146 passed, 4 optional DB skips), shared install 21/21, boundary scan clean.
 Shared-core Task 6: deferred risk — existing backend production dependency audit reports 8 high and 4 moderate findings; no new aggregate dependency finding.
+Foundation Task 6: RED — registry/output test failed with missing output modules before implementation; review regressions separately failed for undefined failure exit status and nested execution-target immutability.
+Foundation Task 6: fix round 1/5 (undefined/unclassified failures now exit 1; execution-target metadata recursively frozen; focused 12/12).
+Foundation Task 6: complete candidate (stable envelopes, recursive redaction, JSON stdout discipline, deterministic exit codes, strict command registry; reviewer Ready with 0 Critical and 0 Important).
+Foundation Task 6: deferred minor — recursive execution-target freezing also freezes caller-shared nested metadata because the intentionally broad Task 6 schema uses z.unknown(); Task 10 strict execution-target schema should remove shared references.
