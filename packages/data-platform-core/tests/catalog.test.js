@@ -93,6 +93,9 @@ test("aggregate package records exact candidate and rollback versions", () => {
   assert.deepEqual(pkg.dependencies, {
     "@johnason/data-platform-core-kernel": "0.1.0",
     "@johnason/data-platform-module-auth": "0.2.0",
+    "@johnason/data-platform-module-asset-search": "0.2.0",
+    "@johnason/data-platform-module-data-sources": "0.2.0",
+    "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0",
   });
   assert.equal(workspaceLock.packages["packages/data-platform-core"].version, manifest.aggregateVersion);
@@ -103,6 +106,9 @@ test("aggregate package records exact candidate and rollback versions", () => {
     rollbackVersion,
   })), [
     { moduleName: "auth", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "asset-search", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "data-sources", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
+    { moduleName: "platform", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
     { moduleName: "project-spaces", candidateVersion: "0.2.0", rollbackVersion: "0.1.0" },
   ]);
   assert.equal(Object.isFrozen(exportedAggregateManifest), true);
@@ -422,4 +428,23 @@ test("aggregate rejects malformed authentication output", async () => {
   });
 
   await assert.rejects(() => core.execute("auth.profile", { userId: 7 }, {}), /auth profile output/i);
+});
+
+test("aggregate executes packaged platform, asset-search, and data-sources capabilities through injected ports", async () => {
+  const core = createDataPlatformCore({
+    platform: { health: async () => ({ status: "ok" }) },
+    "asset-search": { search: async (input) => ({ keyword: input.keyword, items: [] }) },
+    "data-sources": { listDataSources: async () => [{ id: 1 }] },
+  });
+
+  assert.deepEqual(await core.execute("platform.health", {}, {}), { status: "ok" });
+  assert.deepEqual(await core.execute("assetSearch.search", { keyword: "flight" }, {}), { keyword: "flight", items: [] });
+  assert.deepEqual(await core.execute("data-sources.list", {}, {}), [{ id: 1 }]);
+});
+
+test("aggregate packaged capabilities fail closed when their injected port is absent", async () => {
+  const core = createDataPlatformCore({});
+  await assert.rejects(() => core.execute("platform.health", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("assetSearch.search", {}, {}), /port is not configured/i);
+  await assert.rejects(() => core.execute("data-sources.list", {}, {}), /port is not configured/i);
 });

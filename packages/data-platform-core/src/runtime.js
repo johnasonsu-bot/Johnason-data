@@ -1,5 +1,8 @@
 const kernel = require("@johnason/data-platform-core-kernel");
 const authModule = require("@johnason/data-platform-module-auth");
+const assetSearchModule = require("@johnason/data-platform-module-asset-search");
+const dataSourcesModule = require("@johnason/data-platform-module-data-sources");
+const platformModule = require("@johnason/data-platform-module-platform");
 const projectModule = require("@johnason/data-platform-module-project-spaces");
 const kernelPackage = require("@johnason/data-platform-core-kernel/package.json");
 const packageManifest = require("../package.json");
@@ -16,6 +19,9 @@ const aggregateManifest = deepFreeze(rawAggregateManifest);
 
 const moduleExports = Object.freeze({
   "@johnason/data-platform-module-auth": authModule,
+  "@johnason/data-platform-module-asset-search": assetSearchModule,
+  "@johnason/data-platform-module-data-sources": dataSourcesModule,
+  "@johnason/data-platform-module-platform": platformModule,
   "@johnason/data-platform-module-project-spaces": projectModule,
 });
 
@@ -222,7 +228,7 @@ function bind(handler, argumentsFor, schemas = {}) {
   });
 }
 
-function productionBindings(auth, project) {
+function productionBindings(auth, project, moduleBindings = {}) {
   async function projectAccessCheck(input, context) {
     const actor = actorFrom(context);
     kernel.authorizeCapability(actor, { modules: ["system_projects"], action: input.action, readOnlyAllowed: input.action === "read" });
@@ -257,6 +263,45 @@ function productionBindings(auth, project) {
     "project.create-backup": bind(project.createBackup, (input, context) => [input.projectId, actorFrom(context)], { inputSchema: projectOperationInputSchema("createBackup", "Project create-backup", ["projectId"], (input, context) => [input.projectId, actorFrom(context)]) }),
     "project.download-backup": bind(project.downloadBackup, (input, context) => [input.projectId, input.backupId, actorFrom(context)], { inputSchema: projectOperationInputSchema("downloadBackup", "Project download-backup", ["projectId", "backupId"], (input) => [input.projectId, input.backupId]) }),
     "project.export-assets": bind(project.exportAssets, (input, context) => [input.projectId, input.options || {}, actorFrom(context)], { inputSchema: projectOperationInputSchema("exportAssets", "Project export-assets", ["projectId", "options"], (input, context) => [input.projectId, input.options || {}, actorFrom(context)]) }),
+    ...moduleBindings,
+  });
+}
+
+function moduleInputSchema(definition) {
+  return Object.freeze({
+    parse(value) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new TypeError(`${definition.capabilityId} input must be an object`);
+      }
+      for (const key of definition.inputSchema?.required || []) {
+        if (value[key] === undefined || value[key] === null) {
+          throw new TypeError(`${definition.capabilityId} input is missing ${key}`);
+        }
+      }
+      return value;
+    },
+  });
+}
+
+function moduleCapabilityBindings(capabilities) {
+  return Object.fromEntries(capabilities.map((capability) => [capability.capabilityId, Object.freeze({
+    inputSchema: moduleInputSchema(capability),
+    outputSchema: identitySchema,
+    invoke(input, context) {
+      return capability.execute(input, context);
+    },
+  })]));
+}
+
+function moduleNamespace(capabilities, prefix) {
+  const byId = new Map(capabilities.map((capability) => [capability.capabilityId, capability.execute]));
+  return new Proxy(Object.create(null), {
+    get(_target, property) {
+      const capabilityId = `${prefix}.${String(property)}`;
+      const execute = byId.get(capabilityId);
+      if (typeof execute !== "function") throw new TypeError(`Missing ${capabilityId} capability handler`);
+      return execute;
+    },
   });
 }
 
@@ -292,7 +337,21 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   });
   const auth = lazyCapabilityNamespace(authModule.createAuthCapabilities, moduleDependencies(runtimeDependencies, "auth"), "auth");
   const project = lazyCapabilityNamespace(projectModule.createProjectCapabilities, moduleDependencies(runtimeDependencies, "project"), "project");
-  return createCoreRuntime({ catalog, bindings: productionBindings(auth, project) });
+  const platformCapabilities = platformModule.createCapabilities(moduleDependencies(runtimeDependencies, "platform"));
+  const assetSearchCapabilities = assetSearchModule.createCapabilities(moduleDependencies(runtimeDependencies, "asset-search"));
+  const dataSourcesCapabilities = dataSourcesModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-sources"));
+  const moduleBindings = {
+    ...moduleCapabilityBindings(platformCapabilities),
+    ...moduleCapabilityBindings(assetSearchCapabilities),
+    ...moduleCapabilityBindings(dataSourcesCapabilities),
+  };
+  const coreRuntime = createCoreRuntime({ catalog, bindings: productionBindings(auth, project, moduleBindings) });
+  return Object.freeze({
+    ...coreRuntime,
+    platform: moduleNamespace(platformCapabilities, "platform"),
+    assetSearch: moduleNamespace(assetSearchCapabilities, "assetSearch"),
+    dataSources: moduleNamespace(dataSourcesCapabilities, "data-sources"),
+  });
 }
 
 module.exports = Object.freeze({

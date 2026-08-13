@@ -10,7 +10,10 @@ const { createFakeRuntime } = require("./fixtures/fake-runtime");
 const workspaceRoot = path.resolve(__dirname, "../../..");
 const packageDirectories = [
   "packages/data-platform-core-kernel",
+  "packages/data-platform-module-asset-search",
   "packages/data-platform-module-auth",
+  "packages/data-platform-module-data-sources",
+  "packages/data-platform-module-platform",
   "packages/data-platform-module-project-spaces",
   "packages/data-platform-core",
   "packages/data-platform-cli",
