@@ -1,0 +1,36 @@
+{
+  "package": "@johnason/data-platform-module-project-spaces",
+  "version": "0.1.0",
+  "status": "legacy-accepted",
+  "tarball": {
+    "filename": "johnason-data-platform-module-project-spaces-0.1.0.tgz",
+    "bytes": 3646,
+    "sha512": "fa9cdfa041cd2660739a9b89df379c5c377cfe93cb83afee464a1c3635b63db10d23c96292dc76e99101e6f56941f95e9ab8f8d75b96870d1a16099f640dfa00"
+  },
+  "packManifest": {
+    "fileCount": 5,
+    "files": [
+      "package.json",
+      "src/index.js",
+      "src/project-policy.js",
+      "src/project-space.repository.js",
+      "src/project-space.service.js"
+    ],
+    "unpackedBytes": 13118
+  },
+  "registry": {
+    "url": "http://127.0.0.1:63826"
+  },
+  "commands": {
+    "pack": { "exitStatus": 0 },
+    "publish": { "exitStatus": 0 },
+    "tag": { "exitStatus": 0 },
+    "readback": { "exitStatus": 0 }
+  },
+  "readback": {
+    "version": "0.1.0",
+    "tag": "legacy-accepted",
+    "integrity": "sha512-+pzfoEHNJmBzmpuJ3zecXDd8/pPLg6/uRkocNjW2PbENI8liktx26ZEB5vVpQflemrj411uWhw0aFgmfZA36AA=="
+  },
+  "generatedAt": "2026-08-13T04:13:21Z"
+}

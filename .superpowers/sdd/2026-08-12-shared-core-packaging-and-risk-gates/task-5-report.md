@@ -14,7 +14,9 @@ Contract fixtures cover admin access, viewer write rejection, module-permission 
 
 ## Legacy baseline
 
-The transport-neutral 0.1.0 baseline passed the project and Web golden contracts and was packed as `johnason-data-platform-module-project-spaces-0.1.0.tgz` (3,646 bytes; SHA-512 `fa9cdfa041cd2660739a9b89df379c5c377cfe93cb83afee464a1c3635b63db10d23c96292dc76e99101e6f56941f95e9ab8f8d75596870d1a160999f640dfa0`). Its package manifest contained only `package.json` and the four transport-neutral source files.
+The transport-neutral 0.1.0 baseline passed the project and Web golden contracts and was packed as `johnason-data-platform-module-project-spaces-0.1.0.tgz` (3,646 bytes; SHA-512 `fa9cdfa041cd2660739a9b89df379c5c377cfe93cb83afee464a1c3635b63db10d23c96292dc76e99101e6f56941f95e9ab8f8d75b96870d1a16099f640dfa00`). Its package manifest contained only `package.json` and the four transport-neutral source files.
+
+A fresh disposable Verdaccio 6.9.2 loopback registry accepted the tarball at 0.1.0, then accepted the `legacy-accepted` dist-tag update. Registry readback returned `version = '0.1.0'`, `tag = 'legacy-accepted'`, and `dist.integrity = 'sha512-+pzfoEHNJmBzmpuJ3zecXDd8/pPLg6/uRkocNjW2PbENI8liktx26ZEB5vVpQflemrj411uWhw0aFgmfZA36AA=='`. The committed acceptance evidence contains only package, tarball, package-manifest summary, loopback host-and-port, exit statuses, readback, and timestamp. It validates exact field shape, rejects secret-shaped fields, and confirms the tarball SHA-512/SRI conversion.
 
 ## Candidate verification
 
@@ -40,6 +42,5 @@ cd backend && npm test
 
 ## Concerns / handoff
 
-1. Publishing the 0.1.0 tarball and applying the `legacy-accepted` tag could not be completed: the available loopback registries require npm authentication and no credential was supplied. No authentication material was read, created, or recorded. The tarball is available for a credentialed owner to publish and tag; do not treat it as accepted until registry readback succeeds.
-2. The strict graph intentionally keeps backend from importing module or kernel packages. Task 6 must bind Web/CLI through the aggregate while retaining the compatibility factories.
-3. Loopback-registry data and the rollback tarball are intentionally unstaged. Cleanup or deletion requires explicit approval.
+1. The strict graph intentionally keeps backend from importing module or kernel packages. Task 6 must bind Web/CLI through the aggregate while retaining the compatibility factories.
+2. The disposable registry process was stopped after readback. Its local data and the rollback tarball remain unstaged; cleanup or deletion requires explicit approval.
