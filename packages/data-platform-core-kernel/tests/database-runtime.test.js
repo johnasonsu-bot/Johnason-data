@@ -23,13 +23,24 @@ function pool(id) {
     id,
     endCount: 0,
     releaseCount: 0,
+    queryCount: 0,
     async end() {
       this.endCount += 1;
     },
     async getConnection() {
       return { release: () => { this.releaseCount += 1; } };
     },
+    async query() {
+      if (this.endCount > 0) throw new Error("pool closed before query");
+      this.queryCount += 1;
+    },
   };
+}
+
+function deferred() {
+  let resolve;
+  const promise = new Promise((resolvePromise) => { resolve = resolvePromise; });
+  return { promise, resolve };
 }
 
 test.afterEach(() => setDefaultDatabaseRuntime(null));
@@ -82,6 +93,61 @@ test("database runtime closes exactly once when a scoped callback fails", async 
   );
   await runtime.close();
 
+  assert.equal(databasePool.endCount, 1);
+});
+
+test("a shared runtime stays open until concurrent scopes have both exited", async () => {
+  const databasePool = pool("concurrent-lease");
+  const runtime = createDatabaseRuntime({ host: "concurrent-lease" }, mysqlWithPool(databasePool));
+  const secondScopeEntered = deferred();
+  const allowSecondScopeToExit = deferred();
+
+  const secondScope = runWithDatabaseRuntime(runtime, async () => {
+    secondScopeEntered.resolve();
+    await allowSecondScopeToExit.promise;
+    await runtime.pool.query("SELECT 1");
+  });
+  await secondScopeEntered.promise;
+  await runWithDatabaseRuntime(runtime, async () => {});
+
+  assert.equal(databasePool.endCount, 0);
+  allowSecondScopeToExit.resolve();
+  await secondScope;
+  assert.equal(databasePool.queryCount, 1);
+  assert.equal(databasePool.endCount, 1);
+});
+
+test("an inner scope of the same runtime cannot close its outer scope pool", async () => {
+  const databasePool = pool("nested-lease");
+  const runtime = createDatabaseRuntime({ host: "nested-lease" }, mysqlWithPool(databasePool));
+
+  await runWithDatabaseRuntime(runtime, async () => {
+    await runWithDatabaseRuntime(runtime, async () => {});
+    assert.equal(databasePool.endCount, 0);
+    await runtime.pool.query("SELECT 1");
+  });
+
+  assert.equal(databasePool.queryCount, 1);
+  assert.equal(databasePool.endCount, 1);
+});
+
+test("a failing shared scope waits for successful sibling scopes before closing", async () => {
+  const databasePool = pool("mixed-lease");
+  const runtime = createDatabaseRuntime({ host: "mixed-lease" }, mysqlWithPool(databasePool));
+  const failingScopeEntered = deferred();
+  const allowFailingScopeToExit = deferred();
+
+  const failingScope = runWithDatabaseRuntime(runtime, async () => {
+    failingScopeEntered.resolve();
+    await allowFailingScopeToExit.promise;
+    throw new Error("second scope failed");
+  });
+  await failingScopeEntered.promise;
+  await runWithDatabaseRuntime(runtime, async () => {});
+
+  assert.equal(databasePool.endCount, 0);
+  allowFailingScopeToExit.resolve();
+  await assert.rejects(failingScope, /second scope failed/);
   assert.equal(databasePool.endCount, 1);
 });
 

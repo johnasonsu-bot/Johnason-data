@@ -2,12 +2,53 @@ const { DatabaseRuntimeMissingError } = require("../contracts/errors");
 const { getExecutionContext, runWithExecutionContext } = require("./execution-context");
 
 let defaultDatabaseRuntime = null;
+const runtimeLifecycles = new WeakMap();
 
 function assertRuntime(runtime) {
   if (!runtime || typeof runtime !== "object" || !runtime.pool || typeof runtime.testConnection !== "function" || typeof runtime.close !== "function") {
     throw new TypeError("Database runtime must expose pool, testConnection, and close");
   }
   return runtime;
+}
+
+function createLifecycle(closeOperation) {
+  let resolveClose;
+  let rejectClose;
+  const lifecycle = {
+    activeScopes: 0,
+    closeStarted: false,
+    closePromise: new Promise((resolve, reject) => {
+      resolveClose = resolve;
+      rejectClose = reject;
+    }),
+    closeOperation,
+    resolveClose,
+    rejectClose,
+  };
+  return lifecycle;
+}
+
+function beginClose(lifecycle) {
+  if (!lifecycle.closeStarted) {
+    lifecycle.closeStarted = true;
+    Promise.resolve()
+      .then(lifecycle.closeOperation)
+      .then(lifecycle.resolveClose, lifecycle.rejectClose);
+  }
+  return lifecycle.closePromise;
+}
+
+function requestClose(lifecycle) {
+  return lifecycle.activeScopes === 0 ? beginClose(lifecycle) : lifecycle.closePromise;
+}
+
+function lifecycleFor(runtime) {
+  let lifecycle = runtimeLifecycles.get(runtime);
+  if (!lifecycle) {
+    lifecycle = createLifecycle(runtime.close.bind(runtime));
+    runtimeLifecycles.set(runtime, lifecycle);
+  }
+  return lifecycle;
 }
 
 function createDatabaseRuntime(config, mysqlImpl) {
@@ -19,18 +60,19 @@ function createDatabaseRuntime(config, mysqlImpl) {
     throw new TypeError("Database pool must expose getConnection and end");
   }
 
-  let closePromise = null;
-  return Object.freeze({
+  const lifecycle = createLifecycle(() => pool.end());
+  const runtime = Object.freeze({
     pool,
     async testConnection() {
       const connection = await pool.getConnection();
       connection.release();
     },
     close() {
-      if (!closePromise) closePromise = Promise.resolve().then(() => pool.end());
-      return closePromise;
+      return requestClose(lifecycle);
     },
   });
+  runtimeLifecycles.set(runtime, lifecycle);
+  return runtime;
 }
 
 function setDefaultDatabaseRuntime(runtime) {
@@ -47,11 +89,14 @@ function getDatabaseRuntime() {
 async function runWithDatabaseRuntime(runtime, callback) {
   assertRuntime(runtime);
   if (typeof callback !== "function") throw new TypeError("Database runtime callback must be a function");
+  const lifecycle = lifecycleFor(runtime);
+  lifecycle.activeScopes += 1;
   const context = getExecutionContext() || {};
   try {
     return await runWithExecutionContext({ ...context, databaseRuntime: runtime }, callback);
   } finally {
-    await runtime.close();
+    lifecycle.activeScopes -= 1;
+    if (lifecycle.activeScopes === 0) await beginClose(lifecycle);
   }
 }
 
