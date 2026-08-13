@@ -169,3 +169,90 @@ git diff --check
 
 1. `npm ci` reports 12 existing audit findings (4 moderate and 8 high); dependency remediation is outside Task 5 and no dependency changed in this round.
 2. Task 6 still owns the Web/CLI aggregate binding. The new file artifact input deliberately uses neutral `name`, `size`, `mediaType`, and optional `path` fields, so the later Web adapter must translate Multer metadata rather than passing `req`, `res`, or the raw Multer object into this package.
+
+## Review round 5 — strict DTO boundaries, integrity-preserving artifacts, and exact error details
+
+### RED
+
+The breaker contracts were added before their implementations:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/project-result-security.contract.test.js
+# exit 1; tests 5; pass 0; fail 5
+# ordinary and service-backed results accepted unknown rawConnectionString/ssn/privateEndpoint fields
+# encrypted artifact password/apiKey fields were removed instead of preserved
+# extra top-level artifact secret/connection fields were accepted
+# error details retained actual and unsafe supported values
+
+node --test --test-name-pattern='inspect JSON text' packages/data-platform-module-project-spaces/tests/project-result-security.contract.test.js
+# exit 1; Missing expected rejection for a JSON text value containing plaintext apiKey
+
+node --test --test-name-pattern='malformed version metadata' packages/data-platform-module-project-spaces/tests/project-result-security.contract.test.js
+# exit 1; TypeError: Cannot read properties of undefined (reading 'forEach')
+
+node --test --test-name-pattern='backend-valid empty sensitive' packages/data-platform-module-project-spaces/tests/project-result-security.contract.test.js
+# exit 1; PROJECT_PORT_INVALID_RESULT rejected an empty backend-valid sensitive column
+
+node --test --test-name-pattern='legacy user-reference shape' packages/data-platform-module-project-spaces/tests/project-result-security.contract.test.js
+# exit 1; PROJECT_PORT_INVALID_RESULT attempted to require a field absent from the retained V3 fixture shape
+```
+
+The first full project-package regression after implementation failed only the two evidence assertions because the recorded candidate source-tree hash still described round 4:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/*.test.js
+# exit 1; tests 32; pass 30; fail 2
+# actual candidate hash bac4331a... did not match new source hash 3a433a04...
+```
+
+### GREEN
+
+Every ordinary operation and service-backed operation now parses its result into a newly constructed, operation-specific DTO. Exact top-level and nested key sets reject adapter drift, including `rawConnectionString`, `ssn`, and `privateEndpoint`; project/member/status/timestamp/list/detail/preview/import/backup/transfer fields retain their business enums and shapes. Dates become ISO strings and unsupported buffers, cyclic values, secret-shaped fields, and unknown fields fail with the fixed `PROJECT_PORT_INVALID_RESULT` response.
+
+Export and backup download use a dedicated artifact validator instead of the ordinary DTO serializer. It validates the supported artifact versions, manifest/encryption metadata, strict nested structures, encrypted envelopes, runtime-file hashes, table hashes, and the complete payload SHA-256 before returning the original artifact reference unchanged. Encrypted `password`/`apiKey` envelopes, backend-valid empty sensitive values, JSON-encoded nested fields, field order, and integrity therefore remain untouched. Extra top-level secret/connection fields and plaintext nested secrets are rejected. The repository's retained 3.0.0 seed artifact also validates as the original object without any rewrite. Candidate evidence now records source hash `4a4f71775467f489358dc508176389d103316071b7fb3b8ba974c0f05c8a2eda`.
+
+Port failures are reconstructed from four package-owned codes with fixed message/status/retryability. Details are exact per code: `actual` is never emitted; `field` and `resource` are allowlisted identifiers; IDs are positive integers; and `supported` is a deduplicated restricted-enum array. URI userinfo, bearer text, token/key-shaped values, arbitrary nested details, and every `PROJECT_DRIVER_FAILURE` field are discarded.
+
+Fresh final verification:
+
+```text
+node --test packages/data-platform-module-project-spaces/tests/*.test.js packages/data-platform-core-kernel/tests/*.test.js backend/src/common/middleware/auth.project-context.test.js backend/src/common/middleware/access-policy.factory.test.js
+# exit 0; tests 57; pass 57; fail 0
+
+npm ci --ignore-scripts
+# exit 0; added 542 packages; existing audit output: 12 vulnerabilities (4 moderate, 8 high)
+
+npm ci --dry-run --ignore-scripts
+# exit 0; up to date
+
+npm run test:core
+# exit 0; CLI 19/19; kernel 19/19; auth 14/14; project-spaces 34/34
+# backend 32 pass, 0 fail, 4 optional integration skips
+
+npm run test:shared-core-install
+# exit 0; tests 18; pass 18; fail 0
+
+node scripts/check-core-package-boundaries.js
+# exit 0
+
+cd backend && npm test
+# exit 0; 32 pass, 0 fail, 4 optional integration skips
+
+npm --workspace @johnason/data-platform-module-project-spaces pack --dry-run
+# exit 0; @johnason/data-platform-module-project-spaces@0.2.0; six publishable files
+
+node --check packages/data-platform-module-project-spaces/src/project-operation-contracts.js
+node --check packages/data-platform-module-project-spaces/src/index.js
+# both exit 0
+
+rg -q <high-confidence credential-value patterns> packages/data-platform-module-project-spaces evidence/module-acceptance/project-spaces task-5-report.md
+# guarded scan exit 0; no match
+
+git diff --check
+# exit 0
+```
+
+### Round 5 concerns
+
+1. `npm ci` continues to report the 12 pre-existing audit findings (4 moderate and 8 high); this round changed no dependencies.
+2. Task 6 still owns the Multer-to-neutral-file-artifact adapter. Task 5 continues to accept only `name`, optional `size`, `mediaType`, and `path`, and does not import HTTP request/response or Multer types.

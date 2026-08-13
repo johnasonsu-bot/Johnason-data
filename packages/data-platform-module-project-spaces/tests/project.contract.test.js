@@ -16,7 +16,7 @@ function createFixture() {
   const projects = new Map([
     [1, project(1, { projectCode: "default" })],
     [2, project(2)],
-    [3, project(3, { status: "disabled" })],
+    [3, project(3, { status: "inactive" })],
   ]);
   const memberships = new Map([
     ["9:1", member(1, 9)],

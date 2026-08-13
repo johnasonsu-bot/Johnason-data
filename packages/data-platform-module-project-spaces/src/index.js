@@ -2,7 +2,7 @@ const { getDatabaseRuntime: kernelGetDatabaseRuntime, validateModuleManifest, au
 const { createProjectSpaceRepository } = require("./project-space.repository");
 const { createProjectSpaceService } = require("./project-space.service");
 const { getProjectContext, resolveProject, runWithProjectContext } = require("./project-policy");
-const { mappedPortError, projectOperationSchemas, publicDtoValue } = require("./project-operation-contracts");
+const { mappedPortError, projectOperationSchemas, projectServiceSchemas } = require("./project-operation-contracts");
 
 const moduleManifest = validateModuleManifest({
   moduleName: "project-spaces", moduleVersion: "0.2.0", capabilitySchemaVersion: "1.0.0",
@@ -52,25 +52,26 @@ function createProjectCapabilities(dependencies = {}) {
       } catch (error) {
         throw mappedPortError(error);
       }
-      schema.parseResult(result);
-      return Object.freeze({ data: publicDtoValue(result) });
+      return Object.freeze({ data: schema.parseResult(result) });
     };
   }
-  function systemOperation(serviceOperation, action = "read") {
+  function serviceOperation(name) {
+    const schema = projectServiceSchemas[name];
     return async (...args) => {
-      authorizeCapability(args.at(-1), { modules: ["system_projects"], action, readOnlyAllowed: action === "read" });
-      return serviceOperation(...args);
+      if (schema.action) authorizeCapability(args.at(-1), { modules: ["system_projects"], action: schema.action, readOnlyAllowed: schema.action === "read" });
+      const result = await service[schema.method](...args);
+      return schema.parseResult(result);
     };
   }
   return Object.freeze({ project: Object.freeze({
-    listMy: service.listMyProjects,
-    list: systemOperation(service.listProjects),
-    current: service.getUserDefaultProjectId,
+    listMy: serviceOperation("listMy"),
+    list: serviceOperation("list"),
+    current: serviceOperation("current"),
     detail: operation("detail"),
-    resolve: service.resolveRequestProject,
-    use: service.resolveRequestProject,
-    accessCheck: service.resolveRequestProject,
-    setDefault: systemOperation(service.setDefaultProject, "write"),
+    resolve: serviceOperation("resolve"),
+    use: serviceOperation("use"),
+    accessCheck: serviceOperation("accessCheck"),
+    setDefault: serviceOperation("setDefault"),
     create: operation("create"),
     update: operation("update"),
     remove: operation("remove"),
@@ -87,4 +88,4 @@ function createProjectCapabilities(dependencies = {}) {
   }) });
 }
 
-module.exports = { moduleManifest, projectOperationSchemas, createProjectCapabilities, createProjectSpaceRepository, createProjectSpaceService, createRuntimeAdapters, authorizeCapability, getProjectContext, resolveProject, runWithProjectContext };
+module.exports = { moduleManifest, projectOperationSchemas, projectServiceSchemas, createProjectCapabilities, createProjectSpaceRepository, createProjectSpaceService, createRuntimeAdapters, authorizeCapability, getProjectContext, resolveProject, runWithProjectContext };

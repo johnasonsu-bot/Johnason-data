@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
 const test = require("node:test");
 const { createProjectCapabilities, moduleManifest } = require("../src");
 
@@ -40,15 +41,40 @@ function memberRecord(overrides = {}) {
 }
 
 function packageArtifact() {
-  return {
+  const artifact = {
     manifest: {
+      appVersion: "2.0.0",
       packageType: "medata-project-assets",
       exportFormatVersion: "3.0.0",
+      exportedAt: timestamp,
+      exportedBy: "admin",
+      sensitiveMode: "desensitized",
       sourceProject: { id: 1, code: "project_one", name: "Project One", type: "standard" },
+      modules: [],
+      compatibility: { minimumImportVersion: "2.0.0", supportedLegacyVersions: ["1.0.0", "2.0.0"] },
+      coverage: { configurationAssets: true, projectRuntimeFiles: true, externalPhysicalData: false, sensitiveConfiguration: "desensitized" },
     },
+    project: {
+      projectName: "Project One", projectCode: "project_one", projectType: "standard", description: "Project description",
+      ownerName: "Admin", status: "active", resourceConfig: {}, settings: {},
+    },
+    schema: { importOrder: [], foreignKeys: [] },
+    references: { users: [], modelProviders: [] },
     tables: [],
     files: [],
   };
+  const withoutIntegrity = { ...artifact, manifest: { ...artifact.manifest } };
+  artifact.manifest.integrity = { algorithm: "sha256", payloadSha256: sha256(withoutIntegrity), tables: [] };
+  return artifact;
+}
+
+function sha256(value) {
+  function stable(item) {
+    if (Array.isArray(item)) return item.map(stable);
+    if (item && typeof item === "object") return Object.keys(item).sort().reduce((result, key) => { result[key] = stable(item[key]); return result; }, {});
+    return item;
+  }
+  return crypto.createHash("sha256").update(JSON.stringify(stable(value))).digest("hex");
 }
 
 function previewResult() {
@@ -119,9 +145,9 @@ test("each project source API maps to its own semantic transport capability", as
   };
   const projectOperations = Object.fromEntries(Object.values(apiToCapability).filter((name) => !["listMy", "list", "setDefault"].includes(name)).map((name) => [name, async (...args) => { calls.push({ name, args }); return resultFor[name]; }]));
   const repository = {
-    async ensureDefaultProject() { return { id: 1, status: "active" }; }, async getProjectMember() { return { status: "active" }; }, async ensureUserMembership() {},
-    async listUserProjects() { return [{ id: 1, status: "active" }]; }, async listProjects() { return [{ id: 1, status: "active" }]; },
-    async getUserDefaultProjectId() { return 1; }, async getProjectById(id) { return { id: Number(id), status: "active" }; }, async setUserDefaultProject() { return true; },
+    async ensureDefaultProject() { return projectRecord(); }, async getProjectMember() { return memberRecord({ userId: 7 }); }, async ensureUserMembership() {},
+    async listUserProjects() { return [projectRecord()]; }, async listProjects() { return [projectRecord()]; },
+    async getUserDefaultProjectId() { return 1; }, async getProjectById(id) { return projectRecord({ id: Number(id) }); }, async setUserDefaultProject() { return true; },
   };
   const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["data_map", "system_projects"] } };
   const project = createProjectCapabilities({ projectRepository: repository, projectOperations }).project;
@@ -159,9 +185,9 @@ test("project mutation operations reject viewers before invoking the injected IO
 test("source project operations require system_projects while /my remains self-service", async () => {
   const calls = [];
   const repository = {
-    async ensureDefaultProject() { return { id: 1, status: "active" }; }, async getProjectMember() { return { status: "active" }; }, async ensureUserMembership() {},
-    async listUserProjects() { return [{ id: 1, status: "active" }]; }, async listProjects() { return [{ id: 1, status: "active" }]; },
-    async getUserDefaultProjectId() { return 1; }, async getProjectById(id) { return { id: Number(id), status: "active" }; }, async setUserDefaultProject() { return true; },
+    async ensureDefaultProject() { return projectRecord(); }, async getProjectMember() { return memberRecord({ userId: 8 }); }, async ensureUserMembership() {},
+    async listUserProjects() { return [projectRecord()]; }, async listProjects() { return [projectRecord()]; },
+    async getUserDefaultProjectId() { return 1; }, async getProjectById(id) { return projectRecord({ id: Number(id) }); }, async setUserDefaultProject() { return true; },
   };
   const port = { detail: async () => ({ ...projectRecord(), members: [] }), previewImport: async () => { calls.push("previewImport"); return previewResult(); } };
   const project = createProjectCapabilities({ projectRepository: repository, projectOperations: port }).project;
@@ -169,7 +195,7 @@ test("source project operations require system_projects while /my remains self-s
   const dataMapOnly = { sub: 8, roleCode: "admin", permissions: { modules: ["data_map"] } };
   const viewer = { sub: 9, roleCode: "viewer", permissions: { modules: ["system_projects"] } };
 
-  assert.deepEqual(await project.listMy(dataMapOnly), [{ id: 1, status: "active" }]);
+  assert.deepEqual(await project.listMy(dataMapOnly), [projectRecord()]);
   assert.deepEqual(await project.detail(1, systemOnly), { data: { ...projectRecord(), members: [] } });
   await assert.rejects(() => project.detail(1, dataMapOnly), (error) => error?.code === "MODULE_PERMISSION_FORBIDDEN" && error.statusCode === 403);
   await assert.rejects(() => project.list(dataMapOnly), (error) => error?.code === "MODULE_PERMISSION_FORBIDDEN" && error.statusCode === 403);
@@ -182,7 +208,7 @@ test("project port operations validate transport inputs, business errors, and pu
   const calls = [];
   const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["system_projects"] } };
   const port = {
-    detail: async (...args) => { calls.push(["detail", args]); return { ...projectRecord(), members: [], internal: "removed" }; },
+    detail: async (...args) => { calls.push(["detail", args]); return { ...projectRecord(), members: [] }; },
     create: async () => { const error = new Error("duplicate"); error.code = "CONFLICT"; throw error; },
     previewImport: async (...args) => { calls.push(["previewImport", args]); return previewResult(); },
     exportAssets: async () => packageArtifact(),
@@ -282,14 +308,14 @@ test("port errors are reconstructed from a public whitelist and recursively reda
   });
 });
 
-test("public DTO serialization converts dates, redacts recursive secret keys, and rejects buffers and cycles", async () => {
+test("strict public DTO serialization converts dates and rejects secret keys, buffers, and cycles", async () => {
   const actor = { sub: 7, roleCode: "admin", permissions: { modules: ["system_projects"] } };
   const date = new Date(timestamp);
   const serializedProject = projectRecord({
     createdAt: date,
     updatedAt: date,
-    resourceConfig: { refreshedAt: date, password: "hidden", nested: { apiToken: "hidden", visible: true } },
   });
+  const withSecret = projectRecord({ resourceConfig: { password: "hidden" } });
   const withBuffer = projectRecord({ resourceConfig: { bytes: Buffer.from("unsafe") } });
   const cyclicConfig = {};
   cyclicConfig.self = cyclicConfig;
@@ -299,9 +325,8 @@ test("public DTO serialization converts dates, redacts recursive secret keys, an
   assert.deepEqual(await success.create(validProjectBody(), actor), { data: projectRecord({
     createdAt: timestamp,
     updatedAt: timestamp,
-    resourceConfig: { refreshedAt: timestamp, nested: { visible: true } },
   }) });
-  for (const value of [withBuffer, withCycle]) {
+  for (const value of [withSecret, withBuffer, withCycle]) {
     const project = createProjectCapabilities({ projectOperations: { create: async () => value } }).project;
     await assert.rejects(() => project.create(validProjectBody(), actor), (error) => {
       assert.equal(error.code, "PROJECT_PORT_INVALID_RESULT");
