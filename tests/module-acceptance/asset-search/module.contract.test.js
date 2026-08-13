@@ -43,7 +43,8 @@ test("asset-search candidate exports transport-neutral module contract", () => {
   assert.ok(candidate.moduleManifest);
   assert.equal(candidate.moduleManifest.moduleName, "asset-search");
   assert.equal(candidate.moduleManifest.moduleVersion, "0.2.0");
-  assert.equal(candidate.moduleManifest.capabilitySchemaVersion, "0.1.0");
+  assert.equal(candidate.moduleManifest.capabilitySchemaVersion, "1.0.0");
+  assert.equal(typeof candidate.createAssetSearchCapabilities, "function");
   assert.deepEqual(candidate.moduleManifest.sourceApiKeys, expectedApiKeys);
   assert.deepEqual(candidate.moduleManifest.sourceFrontendKeys, expectedFrontendKeys);
 });

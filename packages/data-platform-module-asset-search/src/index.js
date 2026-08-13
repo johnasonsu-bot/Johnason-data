@@ -5,13 +5,27 @@ const {
   SOURCE_FRONTEND_KEYS,
   SOURCE_MODULES,
 } = require("../contracts");
+const { validateModuleManifest } = require("@johnason/data-platform-core-kernel");
 const { createRuntimeAdapters } = require("./adapters");
 
 const MODULE_ID = "asset-search";
 const MODULE_VERSION = "0.2.0";
-const CAPABILITY_SCHEMA_VERSION = "0.1.0";
+const CAPABILITY_SCHEMA_VERSION = "1.0.0";
+
+const validatedManifest = validateModuleManifest({
+  moduleName: MODULE_ID,
+  moduleVersion: MODULE_VERSION,
+  capabilitySchemaVersion: CAPABILITY_SCHEMA_VERSION,
+  capabilities: CAPABILITY_DEFINITIONS.map(({ id, capabilityId, sourceApiKeys, sourceFrontendKeys, executionTargets }) => ({
+    capabilityId: capabilityId || id,
+    sourceApiKeys,
+    sourceFrontendKeys,
+    executionTargets,
+  })),
+});
 
 const moduleManifest = Object.freeze({
+  ...validatedManifest,
   moduleId: MODULE_ID,
   moduleName: MODULE_ID,
   moduleVersion: MODULE_VERSION,
@@ -41,10 +55,21 @@ function createCapabilities(dependencies = {}) {
   }));
 }
 
+function createAssetSearchCapabilities(dependencies = {}) {
+  const capabilities = createCapabilities(dependencies);
+  return Object.freeze({
+    assetSearch: Object.freeze(Object.fromEntries(capabilities.map((capability) => [
+      capability.capabilityId.slice("assetSearch.".length),
+      capability.execute,
+    ]))),
+  });
+}
+
 module.exports = {
   ASSET_TYPES,
   SOURCE_MODULES,
   moduleManifest,
   createCapabilities,
+  createAssetSearchCapabilities,
   createRuntimeAdapters,
 };
