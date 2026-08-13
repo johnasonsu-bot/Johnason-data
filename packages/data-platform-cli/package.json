@@ -20,6 +20,7 @@
     "pack:check": "npm pack --dry-run"
   },
   "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.1.0",
     "@napi-rs/keyring": "1.3.0",
     "cli-table3": "0.6.5",
     "commander": "15.0.0",

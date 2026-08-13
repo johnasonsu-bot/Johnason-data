@@ -26,6 +26,7 @@
         "start:secure": "node dist-secure/server.js"
     },
     "dependencies": {
+        "@johnason/data-platform-core-kernel": "0.1.0",
         "basic-ftp": "^5.3.1",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",

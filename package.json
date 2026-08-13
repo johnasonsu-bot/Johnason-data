@@ -1,0 +1,13 @@
+{
+  "name": "johnason-data-platform-workspace",
+  "private": true,
+  "workspaces": ["packages/*", "backend"],
+  "engines": { "node": ">=22.20.0" },
+  "scripts": {
+    "test:core": "npm test --workspaces --if-present",
+    "check:boundaries": "node scripts/check-core-package-boundaries.js"
+  },
+  "devDependencies": {
+    "verdaccio": "6.9.2"
+  }
+}
