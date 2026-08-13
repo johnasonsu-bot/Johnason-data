@@ -1,0 +1,11 @@
+{
+  "name": "@johnason/data-platform-module-data-source-research",
+  "version": "0.2.0",
+  "private": false,
+  "description": "Transport-neutral data-source research capabilities",
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js", "./contracts": "./contracts/index.js" },
+  "files": ["src", "contracts"],
+  "engines": { "node": ">=22.20.0" },
+  "dependencies": { "@johnason/data-platform-core-kernel": "0.1.0" }
+}
