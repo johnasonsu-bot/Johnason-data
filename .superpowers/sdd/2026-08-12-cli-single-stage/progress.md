@@ -48,3 +48,6 @@ Foundation Task 7: review round 1/5 fixes — default auth now uses exact bcrypt
 Foundation Task 7: review round 2/5 fix — logout clears expired, revoked, and missing active-session tokens in `finally` while preserving the remote fail-closed error; focused auth/project tests 18/18.
 Foundation Task 7: verification — CLI 55/55; complete workspace `test:core` passed; backend 40 passed and 4 optional live-database tests skipped; boundary and syntax checks clean; CLI pack dry-run passed.
 Foundation Task 7: scope note — the default REPL remains an injected hook; shared REPL implementation belongs to Foundation Task 8. The pre-existing untracked `artifacts/` directory remains untouched.
+Foundation Task 8: RED — `repl.test.js` failed with `MODULE_NOT_FOUND` for `src/repl/repl` before implementation.
+Foundation Task 8: complete candidate (registry-derived help, profile/project prompt, context/exit/quit built-ins, deterministic local quoted tokenizer, shared argv execution, per-line safe errors, secret-safe no-history input, EOF cleanup, and real TTY main hook; independent reviewer Ready with no findings).
+Foundation Task 8: verification — focused 7/7; CLI 62/62; backend 40 passed and 4 optional live-database tests skipped; boundary 7/7; syntax/diff checks and CLI pack dry-run passed.

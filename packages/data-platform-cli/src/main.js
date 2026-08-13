@@ -4,6 +4,7 @@ const path = require("node:path");
 const crypto = require("node:crypto");
 const { Command } = require("commander");
 const { createRenderer } = require("./output/renderer");
+const { runRepl } = require("./repl/repl");
 const { createCommandRegistry } = require("./registry/command-registry");
 const { createFoundationCommands } = require("./registry/foundation-commands");
 const { createProfileDatabaseRuntime } = require("./runtime/database");
@@ -236,7 +237,8 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   const stderr = dependencies.stderr || process.stderr;
   const program = dependencies.program || defaultProgram();
   const commandRoots = new Set(["auth", "config", "platform", "project", "system"]);
-  const needsDefaultRuntime = !dependencies.createCommands && argv.some((value) => commandRoots.has(value));
+  const interactive = argv.length === 0 && stdin.isTTY && stdout.isTTY;
+  const needsDefaultRuntime = !dependencies.createCommands && (interactive || argv.some((value) => commandRoots.has(value)));
   let runtimeDependencies;
   let candidates;
   try {
@@ -263,8 +265,17 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   }
 
   if (!state.executed) {
-    if (argv.length === 0 && stdin.isTTY && stdout.isTTY && typeof dependencies.runRepl === "function") {
-      await dependencies.runRepl({ program, registry, definitions, stdin, stdout, stderr });
+    if (interactive) {
+      const replDependencies = { ...runtimeDependencies, stdin, stdout, stderr };
+      delete replDependencies.program;
+      delete replDependencies.renderer;
+      delete replDependencies.runRepl;
+      const executeArgv = dependencies.executeArgv || ((tokens) => main(tokens, replDependencies));
+      const getContext = dependencies.getContext || (() => {
+        const profile = runtimeDependencies.profile || runtimeDependencies.profileStore?.current?.();
+        return { profile: profile?.name || null, projectId: profile?.currentProjectId ?? null };
+      });
+      await (dependencies.runRepl || runRepl)({ registry, executeArgv, input: stdin, output: stdout, getContext });
       return 0;
     }
     if (typeof program.configureOutput === "function") {
