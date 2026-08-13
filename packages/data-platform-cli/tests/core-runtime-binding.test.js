@@ -132,6 +132,7 @@ test("CLI can construct the real aggregate without Web-only authentication ports
     "data-source-research": "0.2.0",
     "data-lab-sources": "0.2.0",
     "ingestion-ai-configs": "0.2.0",
+    "ingestion-tasks": "0.2.0",
     platform: "0.2.0",
     "project-spaces": "0.2.0",
   });
