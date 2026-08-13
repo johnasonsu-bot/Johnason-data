@@ -19,6 +19,7 @@
     "@johnason/data-platform-module-data-sources": "0.2.0",
     "@johnason/data-platform-module-data-source-research": "0.2.0",
     "@johnason/data-platform-module-data-lab-sources": "0.2.0",
+    "@johnason/data-platform-module-ingestion-ai-configs": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0"
   }
