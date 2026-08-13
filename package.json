@@ -5,6 +5,7 @@
   "engines": { "node": ">=22.20.0" },
   "scripts": {
     "test:core": "npm test --workspaces --if-present",
+    "test:shared-core-install": "node --test tests/shared-core-install/*.test.js",
     "check:boundaries": "node scripts/check-core-package-boundaries.js"
   },
   "devDependencies": {
