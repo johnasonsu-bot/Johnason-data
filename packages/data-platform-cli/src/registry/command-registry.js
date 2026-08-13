@@ -9,7 +9,7 @@ const functionSchema = z.custom((value) => typeof value === "function", "handler
 
 const definitionSchema = z.object({
   command: nonEmptyString,
-  capabilityId: z.string().regex(/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/, "capabilityId is invalid"),
+  capabilityId: z.string().regex(/^[a-z][A-Za-z0-9]*(?:[.-][A-Za-z0-9]+)*$/, "capabilityId is invalid"),
   modules: z.array(nonEmptyString),
   action: nonEmptyString,
   sourceApiKeys: z.array(sourceApiKey),
@@ -18,6 +18,7 @@ const definitionSchema = z.object({
   inputSchema: parserSchema,
   outputSchema: parserSchema,
   handler: functionSchema,
+  inputMode: z.enum(["json"]).optional(),
   sharedCommandAlias: z.boolean().optional(),
   aliasApiKeys: z.array(sourceApiKey).optional(),
 }).strict();
@@ -56,6 +57,7 @@ function validateCommandDefinition(candidate) {
     sourceApiKeys: uniqueStrings(definition.sourceApiKeys, "sourceApiKeys"),
     sourceFrontendKeys: uniqueStrings(definition.sourceFrontendKeys, "sourceFrontendKeys"),
     executionTargets: validateExecutionTargets(definition.executionTargets),
+    ...(definition.inputMode === undefined ? {} : { inputMode: definition.inputMode }),
     ...(definition.aliasApiKeys === undefined
       ? {}
       : { aliasApiKeys: uniqueStrings(definition.aliasApiKeys, "aliasApiKeys") }),

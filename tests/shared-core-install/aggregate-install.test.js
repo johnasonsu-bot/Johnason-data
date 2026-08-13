@@ -9,13 +9,17 @@ const path = require("node:path");
 const test = require("node:test");
 
 const workspaceRoot = path.resolve(__dirname, "../..");
+const aggregateManifest = require(path.join(workspaceRoot, "packages/data-platform-core/src/module-manifest.json"));
+const expectedModuleVersions = Object.fromEntries(
+  aggregateManifest.modules.map((selection) => [selection.moduleName, selection.candidateVersion]),
+);
 const packageDirectories = [
   "packages/data-platform-core-kernel",
-  "packages/data-platform-module-auth",
-  "packages/data-platform-module-project-spaces",
+  ...aggregateManifest.modules.map((selection) => `packages/${selection.packageName.replace(/^@[^/]+\//, "")}`),
   "packages/data-platform-core",
   "packages/data-platform-cli",
-].map((directory) => path.join(workspaceRoot, directory));
+].filter((directory, index, directories) => directories.indexOf(directory) === index)
+  .map((directory) => path.join(workspaceRoot, directory));
 const standaloneConsumerDirectories = ["backend", "packages/data-platform-cli"]
   .map((directory) => path.join(workspaceRoot, directory));
 
@@ -295,7 +299,7 @@ test("real registry packages install globally and execute aggregate capabilities
       },
     },
     projects: [],
-    versions: { auth: "0.2.0", "project-spaces": "0.2.0" },
+    versions: expectedModuleVersions,
   });
 
   const cliWithoutCommand = run(path.join(prefix, "bin/data-platform"), [], { cwd: consumer, env: auditEnvironment });

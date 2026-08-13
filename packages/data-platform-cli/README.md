@@ -49,6 +49,20 @@ data-platform system doctor database-capabilities
 
 `project use` persists the selected project ID in the active profile. `system doctor` checks the keychain, database connection/schema, DataX, and Kafka; unavailable dependencies exit with status 7.
 
+## Business capabilities
+
+The installed CLI registers every aggregate capability that is not already represented by a foundation facade under the stable command form `capability <capabilityId>`. This keeps the aggregate capability ID, source API keys, frontend metadata, execution targets, and handler in one registry; it does not call the Web HTTP server.
+
+```bash
+data-platform --json capability dataMap.getOverview --input '{"projectId":12}'
+data-platform --json capability dataSources.listTables --file request.json
+data-platform --help
+```
+
+Business capability commands revalidate the keychain session through `auth.profile`, execute through the aggregate core, and resolve declared API/database targets in the JSON envelope. Capability IDs containing a generated duplicate suffix use `-duplicate-<n>` in the CLI command while retaining the aggregate ID internally.
+
+The Skill-facing local facades are also registered: `ontology contract|lineage|graph|simulation`, `acceptance aviation-ontology`, `standard field-mapping apply`, `knowledge-base wait|search`, and `reconcile project`. Contract and lineage validation can run offline; platform mutations, long-running acceptance jobs, and reconciliation require explicit injected ports and fail closed when unavailable.
+
 ## Output and exit status
 
 Add `--json` for automation. stdout contains exactly one JSON envelope per command; diagnostics go to stderr. Envelopes are recursively redacted.
@@ -67,6 +81,6 @@ Add `--json` for automation. stdout contains exactly one JSON envelope per comma
 
 Running with no command opens the local REPL only when both stdin and stdout are TTYs. Its `help`, `context`, `exit`, and `quit` built-ins reuse the same command registry and handlers; input is neither sent to a shell nor persisted. `--json` with no subcommand does not enter the REPL.
 
-## Foundation scope
+## Scope and live gates
 
-This foundation release covers `config`, `auth`, `project`, `platform`, and `system doctor`. Business task groups such as durable jobs and data-source operations are added later in the same implementation stage. Use `data-platform --help` as the authoritative installed command inventory.
+The package now includes foundation facades plus dynamic commands for the aggregate's full business capability catalog (596 API source keys and 84 frontend entry points). Unit, installed-tarball, boundary, and Web regression gates are local and reproducible. Real four-database and Kafka gates remain environment-dependent; unavailable engines must be reported as blocked rather than passed. Use `data-platform --help` as the authoritative installed command inventory.

@@ -8,6 +8,8 @@ const { runRepl } = require("./repl/repl");
 const { createCommandRegistry } = require("./registry/command-registry");
 const { resolveRuntimeTargets } = require("./registry/execution-targets");
 const { createFoundationCommands } = require("./registry/foundation-commands");
+const { createBusinessCommands } = require("./registry/business-commands");
+const { createOntologyAcceptanceCommands } = require("./commands/ontology-acceptance");
 const { createProfileDatabaseRuntime } = require("./runtime/database");
 const { createKeychain } = require("./runtime/keychain");
 const { resolveCliPaths } = require("./runtime/paths");
@@ -220,6 +222,8 @@ const commandOptions = Object.freeze({
     ["option", "--name <name>", "Project name"],
   ],
   "project.access-check": [["requiredOption", "--action <action>", "Access action"]],
+  "project.access-check-alias": [["requiredOption", "--action <action>", "Access action"]],
+  "system.doctor": [["option", "--all", "Run every dependency check"]],
   "daemon.start": [["option", "--readiness-timeout-ms <milliseconds>", "Daemon readiness timeout", "10000"]],
   "daemon.run": [
     ["option", "--instance-id <id>", "Internal daemon instance ID"],
@@ -228,6 +232,19 @@ const commandOptions = Object.freeze({
   "daemon.logs": [["option", "--lines <count>", "Number of log lines", "100"]],
   "daemon.restart": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
   "daemon.stop": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
+  "ontology.contract.validate": [["option", "--contract <path>", "Ontology contract JSON file"]],
+  "ontology.contract.import": [["option", "--contract <path>", "Ontology contract JSON file"]],
+  "ontology.contract.show": [["option", "--project <id>", "Project ID"]],
+  "ontology.contract.diff": [["option", "--contract <path>", "Ontology contract JSON file"]],
+  "ontology.lineage.show": [["option", "--project <id>", "Project ID"]],
+  "ontology.graph.export": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--output <path>", "Output HTML path"]],
+  "ontology.graph.verify": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--html <path>", "Graph HTML path"]],
+  "ontology.simulation.export": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--output <path>", "Output HTML path"]],
+  "ontology.simulation.verify": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--html <path>", "Simulation HTML path"]],
+  "acceptance.aviation-ontology.preflight": [["option", "--contract <path>", "Ontology contract JSON file"]],
+  "acceptance.aviation-ontology.run": [["option", "--contract <path>", "Ontology contract JSON file"]],
+  "acceptance.aviation-ontology.verify": [["requiredOption", "--run <id>", "Acceptance run ID"]],
+  "acceptance.aviation-ontology.report": [["requiredOption", "--run <id>", "Acceptance run ID"], ["requiredOption", "--output <path>", "Report output path"]],
 });
 
 function positiveInteger(value, label) {
@@ -272,12 +289,44 @@ function inputFor(definition, options) {
       input.kafkaBootstrapServers = input.kafkaBootstrapServers.split(",").map((value) => value.trim()).filter(Boolean);
     }
   }
+  if (definition.inputMode === "json") {
+    const raw = input.input;
+    const file = input.file;
+    delete input.input;
+    delete input.file;
+    if (raw !== undefined && file !== undefined) throw new TypeError("Use either --input or --file, not both");
+    let payload = {};
+    if (raw !== undefined || file !== undefined) {
+      const text = file === undefined ? raw : fs.readFileSync(path.resolve(String(file)), "utf8");
+      try {
+        payload = JSON.parse(text);
+      } catch (error) {
+        throw new TypeError(`Capability JSON input is invalid: ${error.message}`);
+      }
+      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        throw new TypeError("Capability JSON input must be an object");
+      }
+    }
+    if (["ontology.", "acceptance."].some((prefix) => definition.capabilityId.startsWith(prefix))
+      && typeof input.contract === "string") {
+      try {
+        input.contract = JSON.parse(fs.readFileSync(path.resolve(input.contract), "utf8"));
+      } catch (error) {
+        throw new TypeError(`Contract input is invalid: ${error.message}`);
+      }
+    }
+    return { ...payload, ...input };
+  }
   return input;
 }
 
 function configureCommand(command, definition) {
   for (const [method, flags, description, defaultValue] of commandOptions[definition.capabilityId] || []) {
     command[method](flags, description, defaultValue);
+  }
+  if (definition.inputMode === "json") {
+    command.option("--input <json>", "Capability JSON input");
+    command.option("--file <path>", "Read capability JSON input from a file");
   }
 }
 
@@ -319,7 +368,7 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   const stdout = dependencies.stdout || process.stdout;
   const stderr = dependencies.stderr || process.stderr;
   const program = dependencies.program || defaultProgram();
-  const commandRoots = new Set(["auth", "config", "daemon", "platform", "project", "system"]);
+  const commandRoots = new Set(["acceptance", "auth", "capability", "config", "daemon", "knowledge-base", "ontology", "platform", "project", "reconcile", "standard", "system"]);
   const interactive = argv.length === 0 && stdin.isTTY && stdout.isTTY;
   const needsDefaultRuntime = !dependencies.createCommands
     && (interactive || argv.some((value) => commandRoots.has(value) || value === "--help" || value === "-h"));
@@ -329,7 +378,13 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
     runtimeDependencies = needsDefaultRuntime ? createDefaultDependencies(dependencies) : dependencies;
     candidates = dependencies.createCommands
       ? dependencies.createCommands(runtimeDependencies)
-      : (needsDefaultRuntime ? createFoundationCommands(runtimeDependencies) : []);
+      : (needsDefaultRuntime
+        ? [
+          ...createFoundationCommands(runtimeDependencies),
+          ...createBusinessCommands(runtimeDependencies),
+          ...createOntologyAcceptanceCommands(runtimeDependencies),
+        ]
+        : []);
   } catch (error) {
     const renderer = dependencies.renderer || createRenderer({ json: argv.includes("--json"), stdout, stderr });
     return renderer.error(error);

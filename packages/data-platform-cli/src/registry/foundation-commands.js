@@ -42,6 +42,7 @@ function createFoundationCommands(dependencies) {
     definition("project resolve", "project.resolve", project.resolve, { modules: ["system_projects"] }),
     definition("project use", "project.use", project.use, { modules: ["system_projects"], action: "write" }),
     definition("project access-check", "project.access-check", project.accessCheck, { modules: ["system_projects"] }),
+    definition("project access check", "project.access-check-alias", project.accessCheck, { modules: ["system_projects"] }),
     definition("platform overview", "platform.overview", platform.overview, { sourceApiKeys: ["GET /api/v1/platform/overview"] }),
     definition("system doctor", "system.doctor", system.doctor),
     definition("system doctor health", "system.doctor.health", system.health, { local: true, sourceApiKeys: ["GET /api/health"] }),

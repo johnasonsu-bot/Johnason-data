@@ -445,10 +445,22 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   });
 }
 
+function listCapabilityDefinitions() {
+  const catalog = createCapabilityCatalog({
+    manifest: aggregateManifest,
+    aggregatePackageVersion: packageManifest.version,
+    kernelVersion: kernelPackage.version,
+    dependencyVersions: packageManifest.dependencies,
+    modules: moduleExports,
+  });
+  return catalog.values();
+}
+
 module.exports = Object.freeze({
   ...kernel,
   aggregateManifest,
   createCapabilityCatalog,
   createCoreRuntime,
   createDataPlatformCore,
+  listCapabilityDefinitions,
 });

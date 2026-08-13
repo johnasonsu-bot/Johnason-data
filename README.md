@@ -6,7 +6,7 @@
 
 本仓库正在将 Johnason Data Platform 改造为可全局安装、可供人员、脚本与 Agent 直接使用的 CLI。当前交付范围包括 CLI 基础运行时，以及覆盖 596 个 API、84 个前端功能入口、共享核心拆分、API/数据库双阶段测试和航空本体端到端验收的设计与实施方案。
 
-> 当前状态：CLI 基础能力已进入实现；全量业务模块迁移、共享核心打包和完整验收仍按下列方案推进。本文档不代表全部 CLI 改造已经完成。
+> 当前状态：共享核心、全部业务能力包和动态 CLI capability registry 已落到 `codex/data-platform-cli`。API/数据库双阶段的真实外部环境门禁，以及航空本体 Skill 的两次真实运行，仍需在具备 MySQL、PostgreSQL、Oracle、达梦和 Kafka 的验收环境中完成。
 
 ### 核心交付件
 
@@ -27,7 +27,7 @@
 
 This repository is evolving Johnason Data Platform into a globally installable CLI for people, scripts, and Agents. The current delivery scope includes the CLI foundation plus the architecture and implementation plans covering 596 APIs, 84 frontend entry points, shared-core packaging, two-stage API/database testing, and end-to-end aviation ontology acceptance.
 
-> Current status: the CLI foundation is under implementation. Full business-module migration, shared-core packaging, and complete acceptance remain governed by the plans below. This README does not claim that the entire CLI transformation is complete.
+> Current status: the shared core, all business capability packages, and the dynamic CLI capability registry are implemented on `codex/data-platform-cli`. Live API/database gates and the two-run aviation-ontology acceptance still require an environment with MySQL, PostgreSQL, Oracle, Dameng, and Kafka.
 
 ### Core Deliverables
 
