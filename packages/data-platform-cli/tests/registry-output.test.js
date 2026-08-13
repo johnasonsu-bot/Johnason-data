@@ -16,7 +16,7 @@ function definition(overrides = {}) {
     action: "read",
     sourceApiKeys: ["GET /api/v1/projects"],
     sourceFrontendKeys: ["/projects"],
-    executionTargets: [{ kind: "database", engine: "mysql", options: { readOnly: true } }],
+    executionTargets: [{ kind: "database", engine: "mysql", role: "platform-authority" }],
     inputSchema: schema,
     outputSchema: schema,
     async handler() { return []; },
@@ -185,7 +185,6 @@ test("command registry indexes one immutable validated definition by command, ca
   assert.equal(Object.isFrozen(registered.modules), true);
   assert.equal(Object.isFrozen(registered.executionTargets), true);
   assert.equal(Object.isFrozen(registered.executionTargets[0]), true);
-  assert.equal(Object.isFrozen(registered.executionTargets[0].options), true);
   assert.equal(Object.isFrozen(registry.values()), true);
 });
 

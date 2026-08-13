@@ -7,7 +7,7 @@ const { createSystemDoctorCommands } = require("../commands/system-doctor");
 
 const anyObject = z.record(z.unknown()).default({});
 const anyOutput = z.unknown();
-const databaseTarget = Object.freeze([{ kind: "database", engine: "mysql" }]);
+const databaseTarget = Object.freeze([{ kind: "database", engine: "mysql", role: "platform-authority" }]);
 const localTarget = Object.freeze([{ kind: "local" }]);
 
 function definition(command, capabilityId, handler, metadata = {}) {
@@ -43,7 +43,7 @@ function createFoundationCommands(dependencies) {
     definition("platform overview", "platform.overview", platform.overview, { sourceApiKeys: ["GET /api/v1/platform/overview"] }),
     definition("system doctor", "system.doctor", system.doctor),
     definition("system doctor health", "system.doctor.health", system.health, { local: true, sourceApiKeys: ["GET /api/health"] }),
-    definition("system doctor database-capabilities", "system.doctor.database-capabilities", platform.databaseCapabilities, { sourceApiKeys: ["GET /api/v1/platform/database-capabilities"] }),
+    definition("system doctor database-capabilities", "system.doctor.database-capabilities", platform.databaseCapabilities, { local: true, sourceApiKeys: ["GET /api/v1/platform/database-capabilities"] }),
     ...Object.entries(config).map(([name, handler]) => definition(`config ${name}`, `config.${name}`, handler, { local: true })),
   ];
   Object.assign(definitions, { auth, config, platform, project, system });

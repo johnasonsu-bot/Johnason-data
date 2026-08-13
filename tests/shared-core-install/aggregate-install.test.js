@@ -298,9 +298,12 @@ test("real registry packages install globally and execute aggregate capabilities
     versions: { auth: "0.2.0", "project-spaces": "0.2.0" },
   });
 
-  const cli = run(path.join(prefix, "bin/data-platform"), [], { cwd: consumer, env: auditEnvironment });
+  const cliWithoutCommand = run(path.join(prefix, "bin/data-platform"), [], { cwd: consumer, env: auditEnvironment });
+  assert.equal(cliWithoutCommand.status, 2, cliWithoutCommand.stderr);
+
+  const cli = run(path.join(prefix, "bin/data-platform"), ["--help"], { cwd: consumer, env: auditEnvironment });
   assert.equal(cli.status, 0, cli.stderr);
-  assert.doesNotMatch(`${execute.stderr}\n${cli.stderr}`, /listener started|prefix escape/);
+  assert.doesNotMatch(`${execute.stderr}\n${cliWithoutCommand.stderr}\n${cli.stderr}`, /listener started|prefix escape/);
 
   const repositoryEscape = run(process.execPath, ["-e", 'require("node:fs").readFileSync(process.env.REPOSITORY_PACKAGE);'], {
     cwd: consumer,

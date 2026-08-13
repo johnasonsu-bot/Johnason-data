@@ -6,6 +6,7 @@ const { Command } = require("commander");
 const { createRenderer } = require("./output/renderer");
 const { runRepl } = require("./repl/repl");
 const { createCommandRegistry } = require("./registry/command-registry");
+const { resolveRuntimeTargets } = require("./registry/execution-targets");
 const { createFoundationCommands } = require("./registry/foundation-commands");
 const { createProfileDatabaseRuntime } = require("./runtime/database");
 const { createKeychain } = require("./runtime/keychain");
@@ -213,8 +214,9 @@ function bindDefinitions(program, definitions, renderer, state) {
       const options = typeof commanderCommand?.optsWithGlobals === "function" ? commanderCommand.optsWithGlobals() : {};
       try {
         const parsedInput = definition.inputSchema.parse(inputFor(definition, options));
-        const result = await definition.handler(parsedInput);
-        state.exitCode = renderer.success(definition.outputSchema.parse(result));
+        const result = definition.outputSchema.parse(await definition.handler(parsedInput));
+        const executionTargets = resolveRuntimeTargets(definition, parsedInput, result);
+        state.exitCode = renderer.success(result, { meta: { executionTargets } });
       } catch (error) {
         state.exitCode = renderer.error(error);
       }

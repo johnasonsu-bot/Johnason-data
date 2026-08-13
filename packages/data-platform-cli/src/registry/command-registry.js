@@ -1,4 +1,5 @@
 const { z } = require("zod");
+const { validateExecutionTargets } = require("./execution-targets");
 
 const nonEmptyString = z.string().trim().min(1);
 const sourceApiKey = z.string().regex(/^[A-Z]+ \/\S*$/, "sourceApiKeys must contain METHOD /path values");
@@ -13,7 +14,7 @@ const definitionSchema = z.object({
   action: nonEmptyString,
   sourceApiKeys: z.array(sourceApiKey),
   sourceFrontendKeys: z.array(sourceFrontendKey),
-  executionTargets: z.array(z.record(z.unknown())),
+  executionTargets: z.array(z.unknown()),
   inputSchema: parserSchema,
   outputSchema: parserSchema,
   handler: functionSchema,
@@ -24,13 +25,6 @@ const definitionSchema = z.object({
 function uniqueStrings(values, label) {
   if (new Set(values).size !== values.length) throw new TypeError(`${label} must contain unique values`);
   return Object.freeze([...values]);
-}
-
-function deepFreeze(value, seen = new WeakSet()) {
-  if (value === null || typeof value !== "object" || seen.has(value)) return value;
-  seen.add(value);
-  for (const key of Reflect.ownKeys(value)) deepFreeze(value[key], seen);
-  return Object.freeze(value);
 }
 
 function validateAliasRules(definition) {
@@ -61,7 +55,7 @@ function validateCommandDefinition(candidate) {
     modules: uniqueStrings(definition.modules, "modules"),
     sourceApiKeys: uniqueStrings(definition.sourceApiKeys, "sourceApiKeys"),
     sourceFrontendKeys: uniqueStrings(definition.sourceFrontendKeys, "sourceFrontendKeys"),
-    executionTargets: deepFreeze([...definition.executionTargets]),
+    executionTargets: validateExecutionTargets(definition.executionTargets),
     ...(definition.aliasApiKeys === undefined
       ? {}
       : { aliasApiKeys: uniqueStrings(definition.aliasApiKeys, "aliasApiKeys") }),
