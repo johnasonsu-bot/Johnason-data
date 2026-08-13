@@ -8,6 +8,8 @@ const ingestionAiConfigsModule = require("@johnason/data-platform-module-ingesti
 const ingestionTasksModule = require("@johnason/data-platform-module-ingestion-tasks");
 const fileImportsModule = require("@johnason/data-platform-module-file-imports");
 const modelProvidersModule = require("@johnason/data-platform-module-model-providers");
+const devAiConfigsModule = require("@johnason/data-platform-module-dev-ai-configs");
+const reportingAiConfigsModule = require("@johnason/data-platform-module-reporting-ai-configs");
 const platformModule = require("@johnason/data-platform-module-platform");
 const projectModule = require("@johnason/data-platform-module-project-spaces");
 const kernelPackage = require("@johnason/data-platform-core-kernel/package.json");
@@ -33,6 +35,8 @@ const moduleExports = Object.freeze({
   "@johnason/data-platform-module-ingestion-tasks": ingestionTasksModule,
   "@johnason/data-platform-module-file-imports": fileImportsModule,
   "@johnason/data-platform-module-model-providers": modelProvidersModule,
+  "@johnason/data-platform-module-dev-ai-configs": devAiConfigsModule,
+  "@johnason/data-platform-module-reporting-ai-configs": reportingAiConfigsModule,
   "@johnason/data-platform-module-platform": platformModule,
   "@johnason/data-platform-module-project-spaces": projectModule,
 });
@@ -358,6 +362,8 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   const ingestionTasksCapabilities = ingestionTasksModule.createCapabilities(moduleDependencies(runtimeDependencies, "ingestion-tasks"));
   const fileImportsCapabilities = fileImportsModule.createCapabilities(moduleDependencies(runtimeDependencies, "file-imports"));
   const modelProvidersCapabilities = modelProvidersModule.createCapabilities(moduleDependencies(runtimeDependencies, "model-providers"));
+  const devAiConfigsCapabilities = devAiConfigsModule.createCapabilities(moduleDependencies(runtimeDependencies, "dev-ai-configs"));
+  const reportingAiConfigsCapabilities = reportingAiConfigsModule.createCapabilities(moduleDependencies(runtimeDependencies, "reporting-ai-configs"));
   const moduleBindings = {
     ...moduleCapabilityBindings(platformCapabilities),
     ...moduleCapabilityBindings(assetSearchCapabilities),
@@ -368,6 +374,8 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     ...moduleCapabilityBindings(ingestionTasksCapabilities),
     ...moduleCapabilityBindings(fileImportsCapabilities),
     ...moduleCapabilityBindings(modelProvidersCapabilities),
+    ...moduleCapabilityBindings(devAiConfigsCapabilities),
+    ...moduleCapabilityBindings(reportingAiConfigsCapabilities),
   };
   const coreRuntime = createCoreRuntime({ catalog, bindings: productionBindings(auth, project, moduleBindings) });
   return Object.freeze({
@@ -381,6 +389,8 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     ingestionTasks: moduleNamespace(ingestionTasksCapabilities, "ingestionTasks"),
     fileImports: moduleNamespace(fileImportsCapabilities, "fileImports"),
     modelProviders: moduleNamespace(modelProvidersCapabilities, "modelProviders"),
+    devAiConfigs: moduleNamespace(devAiConfigsCapabilities, "devAiConfigs"),
+    reportingAiConfigs: moduleNamespace(reportingAiConfigsCapabilities, "reportingAiConfigs"),
   });
 }
 

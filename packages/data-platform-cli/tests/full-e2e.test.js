@@ -19,6 +19,8 @@ const packageDirectories = [
   "packages/data-platform-module-ingestion-tasks",
   "packages/data-platform-module-file-imports",
   "packages/data-platform-module-model-providers",
+  "packages/data-platform-module-dev-ai-configs",
+  "packages/data-platform-module-reporting-ai-configs",
   "packages/data-platform-module-platform",
   "packages/data-platform-module-project-spaces",
   "packages/data-platform-core",

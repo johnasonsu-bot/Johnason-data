@@ -23,6 +23,8 @@
     "@johnason/data-platform-module-ingestion-tasks": "0.2.0",
     "@johnason/data-platform-module-file-imports": "0.2.0",
     "@johnason/data-platform-module-model-providers": "0.2.0",
+    "@johnason/data-platform-module-dev-ai-configs": "0.2.0",
+    "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0"
   }
