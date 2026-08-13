@@ -4,6 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const { validateModuleManifest } = require("../src/contracts/module-manifest");
+const EXACT_SEMVER = /^\d+\.\d+\.\d+$/;
 
 function readPackage(packagePath) {
   return JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../..", packagePath), "utf8"));
@@ -78,8 +79,6 @@ test("backend and CLI do not directly depend on the kernel", () => {
 });
 
 test("Task 1 workspace manifests use exact direct dependency versions", () => {
-  const forbiddenSpecifier = /^(?:[~^]|latest$|git\+|git:|https?:|github:|workspace:|file:)/i;
-
   for (const packagePath of [
     "package.json",
     "backend/package.json",
@@ -89,8 +88,32 @@ test("Task 1 workspace manifests use exact direct dependency versions", () => {
     const pkg = readPackage(packagePath);
     for (const dependencyType of ["dependencies", "devDependencies"]) {
       for (const [name, version] of Object.entries(pkg[dependencyType] ?? {})) {
-        assert.doesNotMatch(version, forbiddenSpecifier, `${packagePath} ${dependencyType}.${name}`);
+        assert.match(version, EXACT_SEMVER, `${packagePath} ${dependencyType}.${name}`);
       }
     }
   }
+
+  for (const nonExactSpecifier of [
+    ">=1.0.0",
+    "1.x",
+    "*",
+    "1.0.0 || 2.0.0",
+    "next",
+    "npm:replacement@1.0.0",
+    "git+https://example.com/package.git",
+    "git@github.com:owner/package.git",
+    "workspace:*",
+    "file:../package",
+  ]) {
+    assert.doesNotMatch(nonExactSpecifier, EXACT_SEMVER, nonExactSpecifier);
+  }
+});
+
+test("backend standalone lock matches its exact manifest and root workspace lock", () => {
+  const backendPackage = readPackage("backend/package.json");
+  const backendLock = readPackage("backend/package-lock.json");
+  const rootLock = readPackage("package-lock.json");
+
+  assert.deepEqual(backendLock.packages[""].dependencies, backendPackage.dependencies);
+  assert.deepEqual(rootLock.packages.backend.dependencies, backendPackage.dependencies);
 });
