@@ -19,6 +19,7 @@ const qualityControlModule = require("@johnason/data-platform-module-quality-con
 const dataServicesModule = require("@johnason/data-platform-module-data-services");
 const reportingModule = require("@johnason/data-platform-module-reporting");
 const dataModelingModule = require("@johnason/data-platform-module-data-modeling");
+const serviceRuntimeModule = require("@johnason/data-platform-module-service-runtime");
 const platformModule = require("@johnason/data-platform-module-platform");
 const projectModule = require("@johnason/data-platform-module-project-spaces");
 const kernelPackage = require("@johnason/data-platform-core-kernel/package.json");
@@ -55,6 +56,7 @@ const moduleExports = Object.freeze({
   "@johnason/data-platform-module-data-services": dataServicesModule,
   "@johnason/data-platform-module-reporting": reportingModule,
   "@johnason/data-platform-module-data-modeling": dataModelingModule,
+  "@johnason/data-platform-module-service-runtime": serviceRuntimeModule,
   "@johnason/data-platform-module-platform": platformModule,
   "@johnason/data-platform-module-project-spaces": projectModule,
 });
@@ -276,6 +278,7 @@ function productionBindings(auth, project, moduleBindings = {}) {
     "auth.login": bind(auth.login, (input, context) => [input, context], { inputSchema: authLoginInputSchema, outputSchema: authLoginOutputSchema }),
     "auth.profile": bind(auth.profile, (input) => [input], { inputSchema: authProfileInputSchema, outputSchema: authProfileOutputSchema }),
     "auth.logout": bind(auth.logout, (input) => [input], { inputSchema: authLogoutInputSchema, outputSchema: authLogoutOutputSchema }),
+    "auth.logout-beacon": bind(auth.logout, (input) => [input], { inputSchema: authLogoutInputSchema, outputSchema: authLogoutOutputSchema }),
     "project.list-my": bind(project.listMy, (_input, context) => [actorFrom(context)], { inputSchema: emptyInputSchema("Project list-my") }),
     "project.list": bind(project.list, (_input, context) => [actorFrom(context)], { inputSchema: emptyInputSchema("Project list") }),
     "project.current": bind(project.current, (_input, context) => [actorFrom(context)], { inputSchema: emptyInputSchema("Project current") }),
@@ -391,6 +394,7 @@ function createDataPlatformCore(runtimeDependencies = {}) {
   const dataServicesCapabilities = dataServicesModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-services"));
   const reportingCapabilities = reportingModule.createCapabilities(moduleDependencies(runtimeDependencies, "reporting"));
   const dataModelingCapabilities = dataModelingModule.createCapabilities(moduleDependencies(runtimeDependencies, "data-modeling"));
+  const serviceRuntimeCapabilities = serviceRuntimeModule.createCapabilities(moduleDependencies(runtimeDependencies, "service-runtime"));
   const moduleBindings = {
     ...moduleCapabilityBindings(platformCapabilities),
     ...moduleCapabilityBindings(assetSearchCapabilities),
@@ -412,6 +416,7 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     ...moduleCapabilityBindings(dataServicesCapabilities),
     ...moduleCapabilityBindings(reportingCapabilities),
     ...moduleCapabilityBindings(dataModelingCapabilities),
+    ...moduleCapabilityBindings(serviceRuntimeCapabilities),
   };
   const coreRuntime = createCoreRuntime({ catalog, bindings: productionBindings(auth, project, moduleBindings) });
   return Object.freeze({
@@ -436,6 +441,7 @@ function createDataPlatformCore(runtimeDependencies = {}) {
     dataServices: moduleNamespace(dataServicesCapabilities, "dataServices"),
     reporting: moduleNamespace(reportingCapabilities, "reporting"),
     dataModeling: moduleNamespace(dataModelingCapabilities, "dataModeling"),
+    serviceRuntime: moduleNamespace(serviceRuntimeCapabilities, "serviceRuntime"),
   });
 }
 

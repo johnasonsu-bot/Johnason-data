@@ -34,6 +34,7 @@
     "@johnason/data-platform-module-data-services": "0.2.0",
     "@johnason/data-platform-module-reporting": "0.2.0",
     "@johnason/data-platform-module-data-modeling": "0.2.0",
+    "@johnason/data-platform-module-service-runtime": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
     "@johnason/data-platform-module-project-spaces": "0.2.0"
   }

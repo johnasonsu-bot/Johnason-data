@@ -12,6 +12,7 @@ const moduleManifest = validateModuleManifest({
     { capabilityId: "auth.login", sourceApiKeys: ["POST /api/v1/auth/login"], sourceFrontendKeys: ["/login"], executionTargets: ["web", "cli"] },
     { capabilityId: "auth.profile", sourceApiKeys: ["GET /api/v1/auth/profile"], sourceFrontendKeys: ["/profile"], executionTargets: ["web", "cli"] },
     { capabilityId: "auth.logout", sourceApiKeys: ["POST /api/v1/auth/logout"], sourceFrontendKeys: ["/logout"], executionTargets: ["web", "cli"] },
+    { capabilityId: "auth.logout-beacon", sourceApiKeys: ["POST /api/v1/auth/logout-beacon"], sourceFrontendKeys: ["/logout"], executionTargets: ["web", "cli"] },
   ],
 });
 
@@ -27,7 +28,7 @@ function createRuntimeAdapters(dependencies) {
 
 function createAuthCapabilities(dependencies) {
   const { service } = createRuntimeAdapters(dependencies);
-  return Object.freeze({ auth: Object.freeze({ login: service.login, profile: service.profile, logout: service.logout }) });
+  return Object.freeze({ auth: Object.freeze({ login: service.login, profile: service.profile, logout: service.logout, logoutBeacon: service.logout }) });
 }
 
 module.exports = {

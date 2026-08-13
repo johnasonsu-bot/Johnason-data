@@ -30,6 +30,7 @@ const packageDirectories = [
   "packages/data-platform-module-data-services",
   "packages/data-platform-module-reporting",
   "packages/data-platform-module-data-modeling",
+  "packages/data-platform-module-service-runtime",
   "packages/data-platform-module-platform",
   "packages/data-platform-module-project-spaces",
   "packages/data-platform-core",

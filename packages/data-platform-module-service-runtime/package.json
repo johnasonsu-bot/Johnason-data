@@ -1,0 +1,10 @@
+{
+  "name": "@johnason/data-platform-module-service-runtime",
+  "version": "0.2.0",
+  "private": false,
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js", "./contracts": "./contracts/index.js" },
+  "files": ["src", "contracts"],
+  "engines": { "node": ">=22.20.0" },
+  "dependencies": { "@johnason/data-platform-core-kernel": "0.1.0" }
+}
