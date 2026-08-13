@@ -13,6 +13,10 @@ const { getExecutionContext, runWithExecutionContext } = require("./runtime/exec
 const { authorizeCapability, normalizePermissions, policyError } = require("./runtime/authorization-policy");
 const { createLicensePolicy } = require("./runtime/license-policy");
 const { createActivationPolicy } = require("./runtime/activation-policy");
+const { cliRuntimeMigration } = require("./infrastructure/cli-runtime.migration");
+const commandRepository = require("./infrastructure/command.repository");
+const eventRepository = require("./infrastructure/event.repository");
+const jobRepository = require("./infrastructure/job.repository");
 
 module.exports = {
   moduleManifestSchema,
@@ -29,4 +33,8 @@ module.exports = {
   policyError,
   createLicensePolicy,
   createActivationPolicy,
+  cliRuntimeMigration,
+  commandRepository,
+  eventRepository,
+  jobRepository,
 };
