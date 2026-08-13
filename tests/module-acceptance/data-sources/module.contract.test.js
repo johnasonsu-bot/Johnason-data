@@ -153,3 +153,10 @@ test("data-sources module manifest keeps kernel execution targets transport-neut
     assert.ok(capability.executionTargets.every((target) => typeof target === "string"));
   }
 });
+
+test("data-sources module validates its manifest through the shared kernel contract", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const source = fs.readFileSync(path.join(__dirname, "../../../packages/data-platform-module-data-sources/src/index.js"), "utf8");
+  assert.match(source, /validateModuleManifest/);
+});

@@ -4,6 +4,7 @@ const {
   SOURCE_DEFINITIONS,
   SOURCE_FRONTEND_KEYS,
 } = require("../contracts");
+const { validateModuleManifest } = require("@johnason/data-platform-core-kernel");
 
 const MODULE_ID = "data-sources";
 const MODULE_VERSION = "0.2.0";
@@ -22,18 +23,22 @@ function kernelExecutionTargets(executionTargets) {
   });
 }
 
-const moduleManifest = Object.freeze({
-  moduleId: MODULE_ID,
+const validatedModuleManifest = validateModuleManifest({
   moduleName: MODULE_ID,
   moduleVersion: MODULE_VERSION,
   capabilitySchemaVersion: CAPABILITY_SCHEMA_VERSION,
+  capabilities: SOURCE_DEFINITIONS.map(({ port, inputSchema, outputSchema, permission, mutation, executionTargets, ...definition }) => ({
+    ...definition,
+    executionTargets: kernelExecutionTargets(executionTargets),
+  })),
+});
+
+const moduleManifest = Object.freeze({
+  ...validatedModuleManifest,
+  moduleId: MODULE_ID,
   sourceApiKeys: SOURCE_API_KEYS,
   sourceFrontendKeys: SOURCE_FRONTEND_KEYS,
   dependencies,
-  capabilities: Object.freeze(SOURCE_DEFINITIONS.map(({ port, executionTargets, ...definition }) => Object.freeze({
-    ...definition,
-    executionTargets: Object.freeze(kernelExecutionTargets(executionTargets)),
-  }))),
 });
 
 function resolvePort(dependenciesInput, port) {
