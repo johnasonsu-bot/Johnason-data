@@ -8,6 +8,8 @@ Review round 1 also recorded `npm ci --dry-run --ignore-scripts` failing with `E
 
 Review round 2 first failed the new source-API mapping contract because the candidate exposed no semantic per-operation capability handlers, and failed the side-effect contract because invalid and unknown explicit IDs invoked default-membership creation. The viewer-mutation contract then failed before the injected I/O port was gated. These RED results preceded the matching implementation.
 
+Review round 3 first failed the system-projects-only route contract because source operations were still gated by `data_map`; it also failed the port DTO contract because arbitrary port results were passed through unvalidated. The tests for data-map-only rejection, `list`/`setDefault` protection, and viewer preview-with-zero-I/O then drove the authorization change.
+
 ## GREEN
 
 `@johnason/data-platform-module-project-spaces@0.2.0` provides a transport-neutral repository, service, project-context policy, immutable manifest, and capability factory. It covers project list/current/resolve/use/access-check and uses only the core-kernel package.
@@ -28,7 +30,9 @@ The new unique review artifact was published to a new disposable Verdaccio 6.9.2
 
 Review round 2 replaces the prior artificial five-handler API allocation with 21 semantic capabilities: the 17 baseline project API keys each map to their matching list, mutation, asset-transfer, import, backup, export, or detail capability; `current`, `resolve`, `use`, and `access-check` remain explicitly internal with no claimed source API. Non-repository operations use an injected `projectOperations` port and never import backend code. The authoritative legacy tarball is 1,279 bytes with SHA-512 `69683444be5da474dec167af83548768b7af253829f2c4724ef0bfb035c885d5e6e420c4c6525838ae06221cdc7cbdb18db50fc4e9be5d833a304242f66e4d31`; source-tree hashes use the same `src` publishing scope on both sides.
 
-The mapping contract invokes every one of the 17 source API capabilities with its real transport shape and asserts that the matching handler (not an arbitrary shared handler) receives unchanged inputs. Mutation operations apply the kernel module/read-only policy before they invoke the injected I/O port; a viewer is rejected with no I/O call.
+The mapping contract invokes every one of the 17 source API capabilities with its real transport shape and asserts that the matching handler (not an arbitrary shared handler) is selected. A descriptor normalizes positive IDs, project/member bodies, import options, and file metadata before a port receives only its I/O arguments; it validates record/list/delete result shapes, maps not-found/conflict failures to stable public project errors, and returns a redacted `{ data }` DTO envelope. Malformed port “success” results are rejected with `PROJECT_PORT_INVALID_RESULT` rather than accepted from an arbitrary stub.
+
+Review round 3 applies `modules: ["system_projects"]` to every source capability except self-service `GET /projects/my` (`listMy`). The root list and default-selection operations are now gated too. Preview import is a write action, so a viewer is denied before the I/O port is invoked. Tests prove system-projects-only success, data-map-only rejection, missing-list permission rejection, zero-I/O viewer preview rejection, and retained self-service `/my` access.
 
 ## Candidate verification
 
@@ -67,6 +71,10 @@ git diff --check
 Review round 1 follow-up is committed with the lockfile, strict evidence, baseline fixture, and policy fixes.
 
 Review round 2 follows with the semantic source API mapping, pre-side-effect explicit ID validation, same-scope evidence hashes, and viewer-before-I/O policy contract.
+
+Review round 3 follows with system-projects source authorization and descriptor-backed, validated public port contracts.
+
+Round 3 final verification reran `node --test packages/data-platform-module-project-spaces/tests/*.test.js packages/data-platform-core-kernel/tests/*.test.js` (41 pass, 0 fail), the core boundary scanner (exit 0), root `npm ci --ignore-scripts` and `npm ci --dry-run --ignore-scripts` (both exit 0), module pack dry-run (five publishable files), backend tests (32 pass, 4 optional skips), the credential-value scan (only intentional negative-schema fixtures), and `git diff --check` (exit 0).
 
 ## Concerns / handoff
 

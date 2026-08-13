@@ -142,7 +142,7 @@ test("project default selection uses a valid saved default and rejects inaccessi
   const fixture = createFixture();
   const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
   assert.equal(await capabilities.project.current(actor(9)), 2);
-  await assert.rejects(capabilities.project.setDefault(3, actor(9)), (error) => error.code === "PROJECT_DEFAULT_INVALID" && error.statusCode === 400);
+  await assert.rejects(capabilities.project.setDefault(3, actor(9, { permissions: { modules: ["system_projects"] } })), (error) => error.code === "PROJECT_DEFAULT_INVALID" && error.statusCode === 400);
   assert.equal(fixture.defaults.get(9), 2);
 });
 
@@ -174,12 +174,13 @@ test("project capability operations invoke their service behavior and preserve s
   const { createProjectCapabilities } = loadCandidate();
   const fixture = createFixture();
   const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
-  assert.deepEqual((await capabilities.project.list(actor(9))).map((entry) => entry.id), [1, 2, 3]);
+  const systemActor = actor(9, { permissions: { modules: ["system_projects"] } });
+  assert.deepEqual((await capabilities.project.list(systemActor)).map((entry) => entry.id), [1, 2, 3]);
   assert.equal(await capabilities.project.current(actor(9)), 2);
   assert.equal((await capabilities.project.resolve(actor(9), undefined)).project.id, 2);
   assert.equal((await capabilities.project.use(actor(9), 1)).project.id, 1);
   assert.equal((await capabilities.project.accessCheck(actor(9), 2)).member.userId, 9);
-  assert.equal((await capabilities.project.setDefault(1, actor(9))).defaultProjectId, 1);
+  assert.equal((await capabilities.project.setDefault(1, systemActor)).defaultProjectId, 1);
   assert.equal(await capabilities.project.current(actor(9)), 1);
   await assert.rejects(capabilities.project.resolve(actor(10), 2), (error) => error.code === "PROJECT_ACCESS_FORBIDDEN");
   await assert.rejects(capabilities.project.use(actor(10), 2), (error) => error.code === "PROJECT_ACCESS_FORBIDDEN");

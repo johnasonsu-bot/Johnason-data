@@ -19,10 +19,10 @@ function fixture() {
 test("candidate retains baseline 8414786 Web golden project DTOs for list/current/resolve/default", async () => {
   const legacyFixture = fixture();
   const candidateFixture = fixture();
-  const actor = { sub: 5, roleCode: "developer" };
+  const actor = { sub: 5, roleCode: "developer", permissions: { modules: ["system_projects"] } };
   const legacy = createLegacyProjectAdapter(legacyFixture.repository);
   const candidate = createProjectCapabilities({ projectRepository: candidateFixture.repository }).project;
-  assert.deepEqual(await candidate.list(actor), await legacy.listMyProjects(actor));
+  assert.deepEqual(await candidate.listMy(actor), await legacy.listMyProjects(actor));
   assert.equal(await candidate.current(actor), await legacy.getUserDefaultProjectId(actor));
   assert.deepEqual(await candidate.resolve(actor, 2), await legacy.resolveRequestProject(actor, 2));
   assert.deepEqual(await candidate.setDefault(1, actor), await legacy.setDefaultProject(1, actor));
