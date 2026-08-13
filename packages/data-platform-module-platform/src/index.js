@@ -16,7 +16,10 @@ const validatedModuleManifest = validateModuleManifest({
   moduleName: "platform",
   moduleVersion: "0.2.0",
   capabilitySchemaVersion: CAPABILITY_SCHEMA_VERSION,
-  capabilities: CAPABILITY_DEFINITIONS.map(({ inputSchema, outputSchema, permission, mutation, port, ...definition }) => definition),
+  capabilities: CAPABILITY_DEFINITIONS.map(({ inputSchema, outputSchema, permission, mutation, port, executionTargets, ...definition }) => ({
+    ...definition,
+    executionTargets: executionTargets.map((target) => target.kind === "database" ? "mysql:platform-authority" : target.kind),
+  })),
 });
 
 // Keep the transport-neutral kernel manifest as the source of validation while
@@ -115,7 +118,7 @@ function createCapabilities(dependencies = {}) {
     outputSchema,
     permission,
     mutation,
-    executionTargetDetails: definition.executionTargets.includes("mysql:platform-authority")
+    executionTargetDetails: definition.executionTargets.some((target) => target.kind === "database")
       ? Object.freeze([{ kind: "database", engine: "mysql", role: "platform-authority" }])
       : Object.freeze([]),
     execute: async (input = {}, executionContext = {}) => {

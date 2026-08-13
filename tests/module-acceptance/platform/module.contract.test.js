@@ -43,6 +43,9 @@ test("platform capabilities declare schema, permission, mutation and execution t
     assert.ok(capability.permission);
     assert.ok(capability.mutation);
     assert.ok(capability.executionTargets.length > 0);
+    if (capability.capabilityId === "platform.overview") {
+      assert.deepEqual(capability.executionTargets, [{ kind: "database", engine: "mysql", role: "platform-authority" }]);
+    }
     assert.equal(typeof capability.execute, "function");
   }
 });

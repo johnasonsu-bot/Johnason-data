@@ -14,6 +14,13 @@ const SOURCE_FRONTEND_KEYS = Object.freeze([
   "frontend/src/pages/dashboard/OverviewPage.tsx",
 ]);
 
+const PLATFORM_DATABASE_TARGET = Object.freeze({
+  kind: "database",
+  engine: "mysql",
+  role: "platform-authority",
+});
+const LOCAL_TARGET = Object.freeze({ kind: "local" });
+
 const CAPABILITY_DEFINITIONS = Object.freeze([
   {
     capabilityId: "platform.overview",
@@ -23,7 +30,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze(["overview"]), action: "read" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["mysql:platform-authority"]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "overview",
   },
   {
@@ -34,7 +41,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze([]), action: "anonymous" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["local"]),
+    executionTargets: Object.freeze([LOCAL_TARGET]),
     port: "health",
   },
   {
@@ -45,7 +52,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "array" }),
     permission: Object.freeze({ modules: Object.freeze([]), action: "anonymous" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["local"]),
+    executionTargets: Object.freeze([LOCAL_TARGET]),
     port: "databaseCapabilities",
   },
   {
@@ -56,7 +63,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze([]), action: "anonymous" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["mysql:platform-authority"]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "jobShow",
   },
   {
@@ -67,7 +74,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze([]), action: "anonymous" }),
     mutation: Object.freeze({ kind: "write", idempotent: false, audited: true }),
-    executionTargets: Object.freeze(["mysql:platform-authority"]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "authLogin",
   },
   {
@@ -78,7 +85,7 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze([]), action: "read" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["mysql:platform-authority"]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "authProfile",
   },
   {
@@ -89,9 +96,9 @@ const CAPABILITY_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "object" }),
     permission: Object.freeze({ modules: Object.freeze(["reporting"]), action: "read" }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze(["mysql:platform-authority"]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "reportingRuntimeDashboard",
   },
 ]);
 
-module.exports = { SOURCE_API_KEYS, SOURCE_FRONTEND_KEYS, CAPABILITY_DEFINITIONS };
+module.exports = { SOURCE_API_KEYS, SOURCE_FRONTEND_KEYS, PLATFORM_DATABASE_TARGET, LOCAL_TARGET, CAPABILITY_DEFINITIONS };
