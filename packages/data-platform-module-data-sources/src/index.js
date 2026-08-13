@@ -14,6 +14,14 @@ const dependencies = Object.freeze({
   "@johnason/data-platform-core-kernel": KERNEL_VERSION,
 });
 
+function kernelExecutionTargets(executionTargets) {
+  return executionTargets.map((target) => {
+    if (target.kind === "database") return `${target.engine}:${target.role || "source"}`;
+    if (target.kind === "api") return `api:${target.provider || "external-api"}${target.conditional ? ":conditional" : ""}`;
+    return target.kind;
+  });
+}
+
 const moduleManifest = Object.freeze({
   moduleId: MODULE_ID,
   moduleName: MODULE_ID,
@@ -22,7 +30,10 @@ const moduleManifest = Object.freeze({
   sourceApiKeys: SOURCE_API_KEYS,
   sourceFrontendKeys: SOURCE_FRONTEND_KEYS,
   dependencies,
-  capabilities: Object.freeze(SOURCE_DEFINITIONS.map(({ port, ...definition }) => Object.freeze(definition))),
+  capabilities: Object.freeze(SOURCE_DEFINITIONS.map(({ port, executionTargets, ...definition }) => Object.freeze({
+    ...definition,
+    executionTargets: Object.freeze(kernelExecutionTargets(executionTargets)),
+  }))),
 });
 
 function resolvePort(dependenciesInput, port) {

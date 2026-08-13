@@ -59,3 +59,10 @@ test("platform runtime adapters expose Web and CLI compatibility ports", () => {
     assert.equal(typeof adapters[key], "function");
   }
 });
+
+test("platform module manifest keeps kernel execution targets transport-neutral", () => {
+  const { moduleManifest } = require(packageDir);
+  for (const capability of moduleManifest.capabilities) {
+    assert.ok(capability.executionTargets.every((target) => typeof target === "string"));
+  }
+});

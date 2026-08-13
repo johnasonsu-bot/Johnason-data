@@ -146,3 +146,10 @@ test("package metadata remains transport neutral and uses the exact kernel versi
   assert.equal(packageJson.dependencies.express, undefined);
   assert.equal(packageJson.dependencies.commander, undefined);
 });
+
+test("data-sources module manifest keeps kernel execution targets transport-neutral", () => {
+  const { moduleManifest } = require(PACKAGE_ROOT);
+  for (const capability of moduleManifest.capabilities) {
+    assert.ok(capability.executionTargets.every((target) => typeof target === "string"));
+  }
+});
