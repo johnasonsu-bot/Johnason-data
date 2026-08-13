@@ -90,6 +90,29 @@ test("project resolution rejects disabled requested projects", async () => {
   );
 });
 
+test("project resolution rejects malformed, zero, negative, and absent requested IDs without selecting another project", async () => {
+  const { createProjectCapabilities } = loadCandidate();
+  const fixture = createFixture();
+  const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
+  for (const requestedProjectId of ["missing", "0", 0, "-2", -2]) {
+    await assert.rejects(
+      capabilities.project.resolve(actor(9), requestedProjectId),
+      (error) => error.code === "PROJECT_REQUEST_INVALID" && error.statusCode === 400 && error.retryable === false,
+      `requestedProjectId=${requestedProjectId}`,
+    );
+  }
+  assert.equal((await capabilities.project.resolve(actor(9), undefined)).project.id, 2);
+  assert.equal(fixture.defaults.get(9), 2);
+});
+
+test("project resolution rejects an explicit unknown ID without falling back to the default project", async () => {
+  const { createProjectCapabilities } = loadCandidate();
+  const fixture = createFixture();
+  const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
+  await assert.rejects(capabilities.project.resolve(actor(9), 999), (error) => error.code === "PROJECT_UNAVAILABLE" && error.statusCode === 403);
+  assert.equal(fixture.defaults.get(9), 2);
+});
+
 test("project contexts remain isolated across concurrent operations", async () => {
   const { runWithProjectContext, getProjectContext } = loadCandidate();
   const seen = await Promise.all([
@@ -127,6 +150,23 @@ test("module manifest covers project list/current/resolve/use/access-check and t
   assert.deepEqual(moduleManifest.capabilities.map((entry) => entry.capabilityId), [
     "project.list", "project.current", "project.resolve", "project.use", "project.access-check",
   ]);
-  assert.equal(moduleManifest.capabilities.flatMap((entry) => entry.sourceApiKeys).includes("GET /api/v1/projects/my"), true);
-  assert.equal(moduleManifest.capabilities.flatMap((entry) => entry.sourceApiKeys).includes("POST /api/v1/projects/:id/default"), true);
+  const baseline = require("../../../docs/superpowers/specs/data-platform-cli-coverage-baseline.json");
+  const expected = baseline.apiCoverage.filter((entry) => entry.module === "projects").map((entry) => entry.apiKey).sort();
+  assert.deepEqual(moduleManifest.capabilities.flatMap((entry) => entry.sourceApiKeys).sort(), expected);
+});
+
+test("project capability operations invoke their service behavior and preserve selection persistence", async () => {
+  const { createProjectCapabilities } = loadCandidate();
+  const fixture = createFixture();
+  const capabilities = createProjectCapabilities({ projectRepository: fixture.repository });
+  assert.deepEqual((await capabilities.project.list(actor(9))).map((entry) => entry.id), [1, 2]);
+  assert.equal(await capabilities.project.current(actor(9)), 2);
+  assert.equal((await capabilities.project.resolve(actor(9), undefined)).project.id, 2);
+  assert.equal((await capabilities.project.use(actor(9), 1)).project.id, 1);
+  assert.equal((await capabilities.project.accessCheck(actor(9), 2)).member.userId, 9);
+  assert.equal((await capabilities.project.setDefault(1, actor(9))).defaultProjectId, 1);
+  assert.equal(await capabilities.project.current(actor(9)), 1);
+  await assert.rejects(capabilities.project.resolve(actor(10), 2), (error) => error.code === "PROJECT_ACCESS_FORBIDDEN");
+  await assert.rejects(capabilities.project.use(actor(10), 2), (error) => error.code === "PROJECT_ACCESS_FORBIDDEN");
+  await assert.rejects(capabilities.project.accessCheck(actor(10), 2), (error) => error.code === "PROJECT_ACCESS_FORBIDDEN");
 });

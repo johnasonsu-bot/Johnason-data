@@ -41,7 +41,9 @@ function createProjectSpaceRepository({ getDatabaseRuntime }) {
   async function ensureDefaultProject() {
     const existing = await getProjectByCode(DEFAULT_PROJECT_CODE);
     if (existing) return existing;
-    await pool().query("INSERT INTO project_spaces (project_name, project_code, project_type, description, status, resource_config_json, settings_json, created_by) VALUES ('默认项目', ?, 'standard', '历史数据和未指定项目的默认工作空间', 'active', JSON_OBJECT(), JSON_OBJECT(), 'system')", [DEFAULT_PROJECT_CODE]);
+    const [adminRows] = await pool().query("SELECT id, display_name AS displayName FROM users WHERE role_code = 'admin' ORDER BY id ASC LIMIT 1");
+    const owner = adminRows[0] || null;
+    await pool().query("INSERT INTO project_spaces (project_name, project_code, project_type, description, owner_user_id, owner_name, status, resource_config_json, settings_json, created_by) VALUES ('默认项目', ?, 'standard', '历史数据和未指定项目的默认工作空间', ?, ?, 'active', JSON_OBJECT(), JSON_OBJECT(), 'system')", [DEFAULT_PROJECT_CODE, owner?.id || null, owner?.displayName || "system"]);
     return getProjectByCode(DEFAULT_PROJECT_CODE);
   }
   async function ensureUserMembership(projectId, userId, projectRole = "developer") {

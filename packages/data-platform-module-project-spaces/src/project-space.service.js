@@ -31,9 +31,17 @@ function createProjectSpaceService({ projectRepository }) {
 
   async function resolveRequestProject(actor, requestedProjectId) {
     const defaultProject = await ensureDefaultMembershipForUser(actor);
-    const requestedId = Number(requestedProjectId || 0) || null;
-    let project = requestedId ? await projectRepository.getProjectById(requestedId) : null;
-    if (!project) {
+    const requestIsAbsent = requestedProjectId === undefined || requestedProjectId === null || requestedProjectId === "";
+    let project = null;
+    if (!requestIsAbsent) {
+      const requestedId = Number(requestedProjectId);
+      if (!Number.isInteger(requestedId) || requestedId <= 0) {
+        throw projectError("项目空间请求无效", "PROJECT_REQUEST_INVALID", 400);
+      }
+      project = await projectRepository.getProjectById(requestedId);
+      if (!project) throw projectError("当前项目空间不存在或已停用", "PROJECT_UNAVAILABLE", 403);
+    }
+    if (requestIsAbsent) {
       const candidates = isAdmin(actor) ? await projectRepository.listProjects() : await projectRepository.listUserProjects(actor?.sub);
       const savedDefaultId = await getUserDefaultProjectId(actor);
       project = candidates.find((candidate) => candidate.id === savedDefaultId) || candidates[0] || defaultProject;
