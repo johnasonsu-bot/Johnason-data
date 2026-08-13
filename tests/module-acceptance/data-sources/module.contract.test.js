@@ -70,6 +70,25 @@ test("dynamic data-source targets only resolve to API or the four supported data
   assert.deepEqual(adapters.resolveExecutionTargets({ sourceType: "ftp" }), []);
 });
 
+test("platform registry operations do not claim source-engine execution", () => {
+  const { createCapabilities } = require(PACKAGE_ROOT);
+  const capabilities = createCapabilities({});
+  const target = (capabilityId) => capabilities.find((capability) => capability.capabilityId === capabilityId).executionTargets;
+
+  assert.deepEqual(target("data-sources.list"), [{ kind: "database", engine: "mysql", role: "platform-authority" }]);
+  assert.deepEqual(target("data-sources.listReferencedTasks"), [{ kind: "database", engine: "mysql", role: "platform-authority" }]);
+  assert.deepEqual(target("data-sources.create"), [{ kind: "database", engine: "mysql", role: "platform-authority" }]);
+  assert.deepEqual(target("data-sources.delete"), [{ kind: "database", engine: "mysql", role: "platform-authority" }]);
+  assert.deepEqual(target("data-sources.listTables"), [
+    { kind: "database", engine: "mysql", role: "platform-authority" },
+    { kind: "api", provider: "external-api", conditional: true },
+    { kind: "database", engine: "mysql", conditional: true },
+    { kind: "database", engine: "postgresql", conditional: true },
+    { kind: "database", engine: "oracle", conditional: true },
+    { kind: "database", engine: "dm", conditional: true },
+  ]);
+});
+
 test("capability execution delegates through injected runtime ports", async () => {
   const calls = [];
   const { createCapabilities } = require(PACKAGE_ROOT);

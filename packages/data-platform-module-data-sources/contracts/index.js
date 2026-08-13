@@ -62,7 +62,7 @@ const SOURCE_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "array" }),
     permission: Object.freeze({ allOf: Object.freeze(["ingestion"]) }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET, ...CONDITIONAL_SOURCE_TARGETS]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "listDataSources",
   },
   {
@@ -73,7 +73,7 @@ const SOURCE_DEFINITIONS = Object.freeze([
     outputSchema: Object.freeze({ type: "array" }),
     permission: Object.freeze({ allOf: Object.freeze(["ingestion"]) }),
     mutation: Object.freeze({ kind: "read", idempotent: true }),
-    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET, ...CONDITIONAL_SOURCE_TARGETS]),
+    executionTargets: Object.freeze([PLATFORM_DATABASE_TARGET]),
     port: "listReferencedTasks",
   },
   {
