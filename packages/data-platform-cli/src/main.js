@@ -12,6 +12,7 @@ const { createKeychain } = require("./runtime/keychain");
 const { resolveCliPaths } = require("./runtime/paths");
 const { createProfileStore } = require("./runtime/profile-store");
 const { CliError } = require("./runtime/cli-execution");
+const packageManifest = require("../package.json");
 
 function loadCorePackage() {
   return require("@johnason/data-platform-core");
@@ -224,6 +225,8 @@ function bindDefinitions(program, definitions, renderer, state) {
 function defaultProgram() {
   return new Command()
     .name("data-platform")
+    .version(packageManifest.version)
+    .exitOverride()
     .description("Direct-runtime CLI for the Data Platform")
     .option("--profile <name>")
     .option("--project <id>")
@@ -238,7 +241,8 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   const program = dependencies.program || defaultProgram();
   const commandRoots = new Set(["auth", "config", "platform", "project", "system"]);
   const interactive = argv.length === 0 && stdin.isTTY && stdout.isTTY;
-  const needsDefaultRuntime = !dependencies.createCommands && (interactive || argv.some((value) => commandRoots.has(value)));
+  const needsDefaultRuntime = !dependencies.createCommands
+    && (interactive || argv.some((value) => commandRoots.has(value) || value === "--help" || value === "-h"));
   let runtimeDependencies;
   let candidates;
   try {
@@ -261,6 +265,10 @@ async function main(argv = process.argv.slice(2), dependencies = {}) {
   try {
     await program.parseAsync(argv, { from: "user" });
   } catch (error) {
+    if (["commander.helpDisplayed", "commander.version"].includes(error?.code)) return 0;
+    if (typeof error?.code === "string" && error.code.startsWith("commander.")) {
+      return renderer.error(new CliError(error.message, { code: "INPUT_INVALID", statusCode: 400 }));
+    }
     return renderer.error(error);
   }
 
