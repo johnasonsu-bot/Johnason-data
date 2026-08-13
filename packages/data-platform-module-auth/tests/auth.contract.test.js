@@ -30,6 +30,7 @@ function createFixture() {
   ]);
   const sessions = new Map();
   const calls = [];
+  let now = new Date("2023-11-14T22:13:20.000Z");
   const connection = {
     began: 0,
     committed: 0,
@@ -50,8 +51,26 @@ function createFixture() {
       }
       if (sql.includes("INSERT INTO auth_sessions")) {
         if (this.failCreate) throw new Error("write failed");
-        sessions.set(params[0], { id: params[0], userId: params[1], username: params[2], status: params[3] });
+        sessions.set(params[0], {
+          id: params[0],
+          userId: params[1],
+          username: params[2],
+          status: params[3],
+          issuedAt: params[4],
+          expiresAt: params[5],
+          lastSeenAt: params[6],
+          touchCount: 0,
+        });
         return [{ affectedRows: 1 }];
+      }
+      if (sql.includes("FROM auth_sessions WHERE id = ? AND status = ?")) {
+        const session = sessions.get(params[0]);
+        return [[session].filter((entry) => entry?.status === params[1])];
+      }
+      if (sql.includes("SET last_seen_at = NOW()")) {
+        const session = sessions.get(params[0]);
+        if (session && session.status === params[1]) session.touchCount += 1;
+        return [{ affectedRows: session ? 1 : 0 }];
       }
       if (sql.includes("SET status = 'revoked'") && sql.includes("id = ?")) {
         const session = sessions.get(params[0]);
@@ -81,11 +100,12 @@ function createFixture() {
     connection,
     calls,
     sessions,
+    setNow(value) { now = new Date(value); },
     dependencies: {
       databaseRuntime: { pool, testConnection: async () => {}, close: async () => {} },
       jwtCodec,
       passwordHasher: { async compare(password, hash) { return hash === `hash:${password}`; } },
-      clock: { now: () => new Date("2023-11-14T22:13:20.000Z") },
+      clock: { now: () => now },
       idGenerator: () => "session-1",
     },
   };
@@ -195,4 +215,69 @@ test("auth.profile returns the response DTO and rejects a disabled profile", asy
     },
   });
   await assert.rejects(auth.profile({ userId: 8 }), (error) => error.message === "用户不存在或已停用" && error.statusCode === 401);
+});
+
+test("auth.profile accepts an active token session and touches it", async () => {
+  const fixture = createFixture();
+  const { createAuthCapabilities } = loadCandidate();
+  const auth = createAuthCapabilities(fixture.dependencies).auth;
+  const { token } = await auth.login({ username: "active", password: "correct" });
+
+  const result = await auth.profile({ userId: 7, token });
+
+  assert.equal(result.user.id, 7);
+  assert.equal(fixture.sessions.get("session-1").touchCount, 1);
+});
+
+test("auth.profile uses the default validity policy when an injected session policy only enforces limits", async () => {
+  const fixture = createFixture();
+  fixture.dependencies.sessionPolicy = { enforceConcurrentLimit: async () => {} };
+  const { createAuthCapabilities } = loadCandidate();
+  const auth = createAuthCapabilities(fixture.dependencies).auth;
+  const { token } = await auth.login({ username: "active", password: "correct" });
+
+  assert.equal((await auth.profile({ userId: 7, token })).user.id, 7);
+});
+
+test("auth.profile rejects a token after its session is logged out", async () => {
+  const fixture = createFixture();
+  const { createAuthCapabilities } = loadCandidate();
+  const auth = createAuthCapabilities(fixture.dependencies).auth;
+  const { token } = await auth.login({ username: "active", password: "correct" });
+  await auth.logout({ sessionId: "session-1", userId: 7 });
+
+  await assert.rejects(
+    auth.profile({ userId: 7, token }),
+    (error) => error.message === "认证会话无效" && error.statusCode === 401,
+  );
+});
+
+test("auth.profile rejects revoked, expired, and missing active token sessions", async () => {
+  for (const state of ["revoked", "expired", "missing"]) {
+    const fixture = createFixture();
+    const { createAuthCapabilities } = loadCandidate();
+    const auth = createAuthCapabilities(fixture.dependencies).auth;
+    const { token } = await auth.login({ username: "active", password: "correct" });
+    if (state === "missing") fixture.sessions.delete("session-1");
+    if (state === "revoked") fixture.sessions.get("session-1").status = "revoked";
+    if (state === "expired") fixture.sessions.get("session-1").expiresAt = new Date("2023-11-14T22:13:19.000Z");
+
+    await assert.rejects(
+      auth.profile({ userId: 7, token: state === "missing" ? "token:7:missing" : token }),
+      (error) => error.message === "认证会话无效" && error.statusCode === 401,
+      state,
+    );
+  }
+});
+
+test("auth.profile rejects a token whose subject does not match the requested user", async () => {
+  const fixture = createFixture();
+  const { createAuthCapabilities } = loadCandidate();
+  const auth = createAuthCapabilities(fixture.dependencies).auth;
+  await auth.login({ username: "active", password: "correct" });
+
+  await assert.rejects(
+    auth.profile({ userId: 99, token: "token:7:session-1" }),
+    (error) => error.message === "令牌用户不匹配" && error.statusCode === 401,
+  );
 });

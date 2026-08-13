@@ -30,7 +30,26 @@ function createAuthService({ databaseRuntime, authRepository, sessionRepository,
   if (!passwordHasher || typeof passwordHasher.compare !== "function") throw new TypeError("Auth service requires passwordHasher");
   if (!clock || typeof clock.now !== "function") throw new TypeError("Auth service requires clock");
   if (typeof idGenerator !== "function") throw new TypeError("Auth service requires idGenerator");
-  const policy = sessionPolicy || createSessionPolicy();
+  const policy = Object.freeze({ ...createSessionPolicy(), ...(sessionPolicy || {}) });
+
+  function verifyToken(token) {
+    try {
+      return jwtCodec.verify(token);
+    } catch {
+      throw authError("认证会话无效", 401, errorFactory);
+    }
+  }
+
+  async function requireActiveTokenSession(token, expectedUserId) {
+    const tokenUser = verifyToken(token);
+    if (Number(tokenUser?.sub) !== Number(expectedUserId)) throw authError("令牌用户不匹配", 401, errorFactory);
+    const session = await sessionRepository.findActiveSession(tokenUser?.sessionId);
+    if (!policy.isActiveSession(session, clock.now()) || Number(session.userId) !== Number(tokenUser.sub)) {
+      throw authError("认证会话无效", 401, errorFactory);
+    }
+    await sessionRepository.touchSession(session.id);
+    return tokenUser;
+  }
 
   async function login(payload, context = {}) {
     const user = await authRepository.findByUsername(payload?.username);
@@ -80,8 +99,7 @@ function createAuthService({ databaseRuntime, authRepository, sessionRepository,
   async function profile(input) {
     const userId = typeof input === "object" ? input.userId : input;
     if (typeof input === "object" && input.token) {
-      const tokenUser = jwtCodec.verify(input.token);
-      if (Number(tokenUser?.sub) !== Number(userId)) throw authError("令牌用户不匹配", 401, errorFactory);
+      await requireActiveTokenSession(input.token, userId);
     }
     const user = await authRepository.findProfileById(userId);
     if (!user || user.status !== "active") throw authError("用户不存在或已停用", 401, errorFactory);
@@ -92,7 +110,7 @@ function createAuthService({ databaseRuntime, authRepository, sessionRepository,
     const caller = typeof input === "object" ? input : { sessionId: input };
     let sessionId = caller.sessionId;
     if (caller.token) {
-      const tokenUser = jwtCodec.verify(caller.token);
+      const tokenUser = verifyToken(caller.token);
       const callerUserId = caller.userId ?? caller.user?.sub;
       if (callerUserId != null && Number(tokenUser?.sub) !== Number(callerUserId)) throw authError("令牌用户不匹配", 401, errorFactory);
       sessionId = tokenUser?.sessionId;
