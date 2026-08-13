@@ -10,14 +10,14 @@ const capabilityDefinition = z.object({
   sourceApiKeys: immutableStringArray,
   sourceFrontendKeys: immutableStringArray,
   executionTargets: immutableStringArray,
-}).transform((capability) => Object.freeze(capability));
+}).strict().transform((capability) => Object.freeze(capability));
 
 const moduleManifestSchema = z.object({
   moduleName: z.string().min(1),
   moduleVersion: exactVersion,
   capabilitySchemaVersion: exactVersion,
   capabilities: z.array(capabilityDefinition),
-}).superRefine((manifest, context) => {
+}).strict().superRefine((manifest, context) => {
   const capabilityIds = new Set();
 
   for (const [index, capability] of manifest.capabilities.entries()) {
