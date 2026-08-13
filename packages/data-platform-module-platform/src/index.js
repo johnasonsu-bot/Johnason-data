@@ -30,7 +30,9 @@ const moduleManifest = Object.freeze({
   sourceApiKeys: SOURCE_API_KEYS,
   sourceFrontendKeys: SOURCE_FRONTEND_KEYS,
   dependencies: Object.freeze({ "@johnason/data-platform-core-kernel": "0.1.0" }),
-  capabilities: Object.freeze(CAPABILITY_DEFINITIONS.map(({ port, ...definition }) => Object.freeze(definition))),
+  // The exported manifest stays kernel-compatible (string execution target
+  // identifiers); createCapabilities exposes richer target descriptors.
+  capabilities: validatedModuleManifest.capabilities,
 });
 
 function resolvePort(dependencies, port) {
