@@ -110,6 +110,34 @@ test("capability execution delegates through injected runtime ports", async () =
   assert.deepEqual(calls, [["listDataSources", { sourceDomain: "integration" }]]);
 });
 
+test("capabilities preserve legacy service argument boundaries", async () => {
+  const calls = [];
+  const { createCapabilities } = require(PACKAGE_ROOT);
+  const capabilities = createCapabilities({
+    service: {
+      listColumns: async (...args) => {
+        calls.push(args);
+        return [];
+      },
+      updateDataSource: async (...args) => {
+        calls.push(args);
+        return { id: args[0] };
+      },
+    },
+  });
+  const context = { projectId: "p1" };
+
+  await capabilities.find((capability) => capability.capabilityId === "data-sources.listColumns")
+    .execute({ id: 7, tableName: "orders" }, context);
+  await capabilities.find((capability) => capability.capabilityId === "data-sources.update")
+    .execute({ id: 7, sourceName: "Orders", sourceCode: "orders", sourceType: "mysql" }, context);
+
+  assert.deepEqual(calls, [
+    [7, "orders", context],
+    [7, { sourceName: "Orders", sourceCode: "orders", sourceType: "mysql" }, context],
+  ]);
+});
+
 test("package metadata remains transport neutral and uses the exact kernel version", () => {
   const packageJson = require(`${PACKAGE_ROOT}/package.json`);
   assert.equal(packageJson.name, PACKAGE_NAME);

@@ -38,12 +38,35 @@ function resolvePort(dependenciesInput, port) {
   };
 }
 
+function capabilityArgs(capabilityId, input, executionContext) {
+  switch (capabilityId) {
+    case "data-sources.listReferencedTasks":
+      return [input?.id, executionContext];
+    case "data-sources.listTables":
+      return [input?.id, { includeDirectories: Boolean(input?.includeDirectories) }, executionContext];
+    case "data-sources.listColumns":
+      return [input?.id, input?.tableName, executionContext];
+    case "data-sources.sampleRows":
+      return [input?.id, input?.tableName, input?.limit, executionContext];
+    case "data-sources.update": {
+      const { id, ...payload } = input || {};
+      return [id, payload, executionContext];
+    }
+    case "data-sources.delete":
+      return [input?.id, executionContext];
+    default:
+      return [input, executionContext];
+  }
+}
+
 function createCapabilities(dependenciesInput = {}) {
   return SOURCE_DEFINITIONS.map((definition) => Object.freeze({
     ...definition,
     id: definition.capabilityId,
     schema: definition.inputSchema,
-    execute: async (input = {}, executionContext = {}) => resolvePort(dependenciesInput, definition.port)(input, executionContext),
+    execute: async (input = {}, executionContext = {}) => resolvePort(dependenciesInput, definition.port)(
+      ...capabilityArgs(definition.capabilityId, input, executionContext),
+    ),
   }));
 }
 

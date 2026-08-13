@@ -12,11 +12,22 @@ const {
 
 const CAPABILITY_SCHEMA_VERSION = "1.0.0";
 
-const moduleManifest = validateModuleManifest({
+const validatedModuleManifest = validateModuleManifest({
   moduleName: "platform",
   moduleVersion: "0.2.0",
   capabilitySchemaVersion: CAPABILITY_SCHEMA_VERSION,
   capabilities: CAPABILITY_DEFINITIONS.map(({ inputSchema, outputSchema, permission, mutation, port, ...definition }) => definition),
+});
+
+// Keep the transport-neutral kernel manifest as the source of validation while
+// retaining the richer source/adapter metadata used by Web and CLI catalogs.
+const moduleManifest = Object.freeze({
+  ...validatedModuleManifest,
+  moduleId: "platform",
+  sourceApiKeys: SOURCE_API_KEYS,
+  sourceFrontendKeys: SOURCE_FRONTEND_KEYS,
+  dependencies: Object.freeze({ "@johnason/data-platform-core-kernel": "0.1.0" }),
+  capabilities: Object.freeze(CAPABILITY_DEFINITIONS.map(({ port, ...definition }) => Object.freeze(definition))),
 });
 
 function resolvePort(dependencies, port) {
