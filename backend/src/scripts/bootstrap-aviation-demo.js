@@ -195,33 +195,154 @@ function buildAviationReportDataset() {
     datasetCode: "aviation_delay_disposal_analysis",
     datasetType: "sql",
     sourceTable: null,
-    sourceSql: `WITH flight_base AS (
-  SELECT f.flight_no, f.tail_no, f.dep_airport, f.arr_airport, f.flight_status,
-         COALESCE(f.delay_minutes, 0) AS delay_minutes,
-         COALESCE(d.category_cn, '未分类') AS delay_category,
-         f.std, f.updated_at
+    sourceSql: `WITH weather_window AS (
+  SELECT DISTINCT ON (w.airport_icao, substr(w.observe_time, 1, 13))
+         w.airport_icao, w.observe_time, w.report_type, w.weather_phenomenon,
+         w.visibility_m, w.wind_gust_kt, w.severity_level
+  FROM ods_weather_metar w
+  WHERE w.severity_level = 'SEVERE'
+  ORDER BY w.airport_icao, substr(w.observe_time, 1, 13), w.observe_time DESC
+), flight_base AS (
+  SELECT f.flight_segment_id, f.flight_no, f.dep_airport, f.arr_airport, f.flight_status,
+         COALESCE(NULLIF(f.delay_minutes::text, '')::numeric, 0) AS delay_minutes,
+         COALESCE(d.category_cn, '天气影响') AS delay_category,
+         w.weather_phenomenon,
+         f.std
   FROM ods_flight_schedule f
-  LEFT JOIN dim_delay_code_coda d ON d.coda_code = COALESCE(f.delay_code_raw, '')
+  JOIN weather_window w
+    ON w.airport_icao = f.dep_airport
+   AND substr(w.observe_time, 1, 13) = substr(f.std, 1, 13)
+  LEFT JOIN dim_delay_code_coda d ON d.raw_code = COALESCE(f.delay_code_raw, '')
 )
-SELECT delay_category, COUNT(*) AS flight_count,
+SELECT delay_category, weather_phenomenon,
+       COUNT(*) AS flight_count,
+       COUNT(*) AS weather_affected_flight_count,
        SUM(CASE WHEN delay_minutes > 0 THEN 1 ELSE 0 END) AS delayed_flight_count,
        SUM(delay_minutes) AS delay_minutes,
-       ROUND(AVG(delay_minutes)::numeric, 1) AS avg_delay_minutes,
+       ROUND(AVG(delay_minutes), 1) AS avg_delay_minutes,
        SUM(CASE WHEN delay_minutes >= 30 THEN 1 ELSE 0 END) AS severe_delay_count
 FROM flight_base
-GROUP BY delay_category
-ORDER BY delayed_flight_count DESC, delay_category`,
+GROUP BY delay_category, weather_phenomenon
+ORDER BY delayed_flight_count DESC, delay_category, weather_phenomenon`,
     fields: [
       { columnName: "delay_category", label: "延误原因分类", dataType: "string", role: "category", visible: true },
+      { columnName: "weather_phenomenon", label: "天气现象", dataType: "string", role: "category", visible: true },
       { columnName: "flight_count", label: "航班数", dataType: "integer", role: "metric", aggregation: "sum", visible: true },
+      { columnName: "weather_affected_flight_count", label: "受天气影响航班数", dataType: "integer", role: "metric", aggregation: "sum", visible: true },
       { columnName: "delayed_flight_count", label: "延误航班数", dataType: "integer", role: "metric", aggregation: "sum", visible: true },
       { columnName: "delay_minutes", label: "延误分钟总数", dataType: "integer", role: "metric", aggregation: "sum", visible: true },
       { columnName: "avg_delay_minutes", label: "平均延误分钟", dataType: "decimal", role: "metric", aggregation: "avg", visible: true },
       { columnName: "severe_delay_count", label: "严重延误数", dataType: "integer", role: "metric", aggregation: "sum", visible: true },
     ],
     queryConfig: { limit: 100, refreshIntervalSec: 300 },
-    description: "由 ods_flight_schedule 与 CODA 延误字典生成，服务于航空延误识别、资源调配和处置复盘。",
+    description: "连接强雷暴天气窗口与航班计划，统计受天气影响的航班和延误处置强度。",
   };
+}
+
+function buildAviationWeatherAdjustmentDataset() {
+  const fields = [
+    ["flight_segment_id", "航班架次标识", "string"],
+    ["flight_no", "航班号", "string"],
+    ["dep_airport", "起飞机场 ICAO", "string"],
+    ["arr_airport", "到达机场 ICAO", "string"],
+    ["segment_type", "航段类型", "string"],
+    ["std", "计划起飞时间", "datetime"],
+    ["sta", "计划到达时间", "datetime"],
+    ["atd", "实际起飞时间", "datetime"],
+    ["flight_status", "航班状态", "string"],
+    ["delay_code_raw", "原始延误原因代码", "string"],
+    ["delay_code_std", "标准延误原因代码", "string"],
+    ["delay_category_cn", "延误原因分类", "string"],
+    ["delay_minutes", "延误分钟数", "decimal"],
+    ["tail_no", "航空器机尾号", "string"],
+    ["carrier_code", "承运人代码", "string"],
+    ["weather_airport_icao", "天气机场 ICAO", "string"],
+    ["weather_observe_time", "天气观测时间", "datetime"],
+    ["weather_report_type", "天气报文类型", "string"],
+    ["weather_raw_report", "原始天气报文", "string"],
+    ["weather_phenomenon", "天气现象", "string"],
+    ["visibility_m", "能见度（米）", "decimal"],
+    ["wind_gust_kt", "阵风（节）", "decimal"],
+    ["severity_level", "天气严重等级", "string"],
+    ["runway_id", "跑道编号", "string"],
+    ["slot_hour", "跑道容量小时", "datetime"],
+    ["declared_capacity", "公布容量", "decimal"],
+    ["available_capacity", "可用容量", "decimal"],
+    ["capacity_ratio", "容量比例", "decimal"],
+    ["restriction_reason", "容量限制原因", "string"],
+    ["adjustment_type", "调整类型", "string"],
+    ["recommended_action", "建议处置动作", "string"],
+    ["impact_evidence", "天气影响证据", "string"],
+  ].map(([columnName, label, dataType]) => ({ columnName, label, dataType, visible: true }));
+  return {
+    datasetName: "受天气影响需调整的航班全字段",
+    datasetCode: "aviation_weather_adjustment_flights",
+    datasetType: "sql",
+    sourceTable: null,
+    sourceSql: `WITH weather_window AS (
+  SELECT DISTINCT ON (w.airport_icao, substr(w.observe_time, 1, 13))
+         w.airport_icao, w.observe_time, w.report_type, w.raw_report, w.weather_phenomenon,
+         w.visibility_m, w.wind_gust_kt, w.severity_level
+  FROM ods_weather_metar w
+  WHERE w.severity_level = 'SEVERE'
+  ORDER BY w.airport_icao, substr(w.observe_time, 1, 13), w.observe_time DESC
+), runway_window AS (
+  SELECT DISTINCT ON (r.airport_icao, substr(r.slot_hour, 1, 13))
+         r.airport_icao, r.runway_id, r.slot_hour, r.declared_capacity,
+         r.available_capacity, r.capacity_ratio, r.restriction_reason
+  FROM ods_runway_slot r
+  ORDER BY r.airport_icao, substr(r.slot_hour, 1, 13), r.slot_hour DESC
+)
+SELECT f.flight_segment_id, f.flight_no, f.dep_airport, f.arr_airport, f.segment_type,
+       f.std, f.sta, f.atd, f.flight_status, f.delay_code_raw,
+       d.coda_code AS delay_code_std, d.category_cn AS delay_category_cn,
+       COALESCE(NULLIF(f.delay_minutes::text, '')::numeric, 0) AS delay_minutes,
+       f.tail_no, f.carrier_code,
+       w.airport_icao AS weather_airport_icao, w.observe_time AS weather_observe_time,
+       w.report_type AS weather_report_type, w.raw_report AS weather_raw_report,
+       w.weather_phenomenon, w.visibility_m, w.wind_gust_kt, w.severity_level,
+       r.runway_id, r.slot_hour, NULLIF(r.declared_capacity::text, '')::numeric AS declared_capacity,
+       NULLIF(r.available_capacity::text, '')::numeric AS available_capacity,
+       NULLIF(r.capacity_ratio::text, '')::numeric AS capacity_ratio, r.restriction_reason,
+       CASE WHEN COALESCE(NULLIF(f.delay_minutes::text, '')::numeric, 0) > 0
+            THEN 'WEATHER_DELAYED_FLIGHT'
+            WHEN COALESCE(r.restriction_reason, '') <> ''
+            THEN 'RUNWAY_CAPACITY_ADJUSTMENT'
+            ELSE 'WEATHER_IMPACT_REVIEW' END AS adjustment_type,
+       CASE WHEN COALESCE(NULLIF(f.delay_minutes::text, '')::numeric, 0) > 0
+            THEN '申请后移时隙并通知旅客'
+            WHEN COALESCE(r.restriction_reason, '') <> ''
+            THEN '申请下一可用跑道时隙'
+            ELSE '复核航班放行条件' END AS recommended_action,
+       'WeatherEvent impacts FlightSegment：起飞机场与天气观测小时匹配' AS impact_evidence
+FROM ods_flight_schedule f
+JOIN weather_window w
+  ON w.airport_icao = f.dep_airport
+ AND substr(w.observe_time, 1, 13) = substr(f.std, 1, 13)
+LEFT JOIN runway_window r
+  ON r.airport_icao = f.dep_airport
+ AND substr(r.slot_hour, 1, 13) = substr(f.std, 1, 13)
+LEFT JOIN dim_delay_code_coda d ON d.raw_code = COALESCE(f.delay_code_raw, '')
+WHERE w.severity_level = 'SEVERE'
+ORDER BY f.std, f.flight_no`,
+    fields,
+    queryConfig: { limit: 100, refreshIntervalSec: 300 },
+    description: "展示受强雷暴影响、需要调整的航班全字段、天气证据、跑道容量和建议处置动作。",
+  };
+}
+
+function buildAviationReportWidgetSpecs({ summaryDatasetId, detailDatasetId, chartIds }) {
+  const detailColumns = buildAviationWeatherAdjustmentDataset().fields.map((field) => ({
+    key: field.columnName,
+    title: field.label,
+    dataIndex: field.columnName,
+  }));
+  return [
+    ["delay-kpi", "受天气影响航班数", "kpi", null, Number(summaryDatasetId), { x: 0, y: 0, w: 3, h: 2 }, { metric: "weather_affected_flight_count", fieldMap: { valueField: "weather_affected_flight_count", nameField: "weather_phenomenon" }, title: "受天气影响航班数" }],
+    ["delay-category", "天气影响原因分布", "chart", chartIds[0], Number(summaryDatasetId), { x: 0, y: 2, w: 6, h: 4 }, { title: "强雷暴窗口内的天气影响航班", fieldMap: { xField: "delay_category", yField: "weather_affected_flight_count" } }],
+    ["delay-severity", "天气影响处置强度", "chart", chartIds[1], Number(summaryDatasetId), { x: 6, y: 2, w: 6, h: 4 }, { title: "平均延误与严重延误", fieldMap: { xField: "delay_category", yField: "avg_delay_minutes", y2Field: "severe_delay_count" } }],
+    ["decision-table", "受天气影响需调整的航班全字段", "table", null, Number(detailDatasetId), { x: 0, y: 6, w: 12, h: 5 }, { title: "受天气影响需调整的航班全字段", columns: detailColumns, table: { pageSize: 20 } }],
+  ];
 }
 
 async function findOne(db, sql, params) {
@@ -527,11 +648,17 @@ async function seedReport(db) {
   const source = await findOne(db, "SELECT id FROM report_data_sources WHERE project_id=? AND source_code='demo_ods' LIMIT 1", [PROJECT_ID]);
   if (!source) throw new Error("航空报表数据源不存在");
   await db.query("UPDATE report_data_sources SET connection_config=? WHERE id=? AND project_id=?", [json({ devDatasourceId: 15, schema: "public" }), source.id, PROJECT_ID]);
-  const datasetSpec = buildAviationReportDataset();
-  let dataset = await findOne(db, "SELECT id FROM report_datasets WHERE project_id=? AND dataset_code=? LIMIT 1", [PROJECT_ID, datasetSpec.datasetCode]);
-  if (!dataset) {
-    const [result] = await db.query("INSERT INTO report_datasets (project_id,dataset_name,dataset_code,source_id,dataset_type,source_sql,fields_json,query_config_json,owner_name,status,description) VALUES (?,?,?,?,?,?,?,?,?,?,?)", [PROJECT_ID, datasetSpec.datasetName, datasetSpec.datasetCode, source.id, datasetSpec.datasetType, datasetSpec.sourceSql, json(datasetSpec.fields), json(datasetSpec.queryConfig), "航空运行控制中心", "published", datasetSpec.description]);
-    dataset = { id: result.insertId };
+  const datasetSpecs = [buildAviationReportDataset(), buildAviationWeatherAdjustmentDataset()];
+  const datasets = new Map();
+  for (const datasetSpec of datasetSpecs) {
+    let dataset = await findOne(db, "SELECT id FROM report_datasets WHERE project_id=? AND dataset_code=? LIMIT 1", [PROJECT_ID, datasetSpec.datasetCode]);
+    if (!dataset) {
+      const [result] = await db.query("INSERT INTO report_datasets (project_id,dataset_name,dataset_code,source_id,dataset_type,source_sql,fields_json,query_config_json,owner_name,status,description) VALUES (?,?,?,?,?,?,?,?,?,?,?)", [PROJECT_ID, datasetSpec.datasetName, datasetSpec.datasetCode, source.id, datasetSpec.datasetType, datasetSpec.sourceSql, json(datasetSpec.fields), json(datasetSpec.queryConfig), "航空运行控制中心", "published", datasetSpec.description]);
+      dataset = { id: result.insertId };
+    } else {
+      await db.query("UPDATE report_datasets SET dataset_name=?,source_id=?,dataset_type=?,source_sql=?,fields_json=?,query_config_json=?,status='published',description=? WHERE id=? AND project_id=?", [datasetSpec.datasetName, source.id, datasetSpec.datasetType, datasetSpec.sourceSql, json(datasetSpec.fields), json(datasetSpec.queryConfig), datasetSpec.description, dataset.id, PROJECT_ID]);
+    }
+    datasets.set(datasetSpec.datasetCode, Number(dataset.id));
   }
   const chartSpecs = [
     { code: "aviation_delay_category_bar", name: "延误原因分布", type: "bar", x: "delay_category", y: "delayed_flight_count" },
@@ -551,19 +678,20 @@ async function seedReport(db) {
     const [result] = await db.query("INSERT INTO report_dashboards (project_id,dashboard_name,dashboard_code,layout_mode,theme_config_json,filter_config_json,canvas_config_json,owner_name,status,description) VALUES (?,?,?,?,?,?,?,?,?,?)", [PROJECT_ID, "航空延误处置分析报表", "aviation_delay_disposal", "grid", json({ accentColor: "#1668dc", background: "#f5f7fb" }), json({ fields: ["delay_category", "flight_status"] }), json({ width: 1440, height: 900 }), "航空运行控制中心", "published", "按照航空延误决策模拟 HTML 生成的可视化分析报表。"]);
     dashboard = { id: result.insertId };
   }
-  const widgetCount = await findOne(db, "SELECT COUNT(*) AS count FROM report_dashboard_widgets WHERE dashboard_id=?", [dashboard.id]);
-  if (Number(widgetCount?.count || 0) === 0) {
-    const widgets = [
-      ["delay-kpi", "延误航班数", "kpi", null, null, { x: 0, y: 0, w: 3, h: 2 }, { metric: "delayed_flight_count", label: "延误航班数" }],
-      ["delay-category", "延误原因分布", "chart", chartIds[0], Number(dataset.id), { x: 0, y: 2, w: 6, h: 4 }, { title: "按 CODA 原因统计延误航班" }],
-      ["delay-severity", "延误处置强度", "chart", chartIds[1], Number(dataset.id), { x: 6, y: 2, w: 6, h: 4 }, { title: "平均延误与严重延误" }],
-      ["decision-table", "航班处置建议", "table", null, Number(dataset.id), { x: 0, y: 6, w: 12, h: 4 }, { columns: ["flight_no", "tail_no", "delay_category", "delay_minutes", "dep_airport", "arr_airport"] }],
-    ];
-    for (const [key, name, type, chartId, datasetId, position, props] of widgets) {
-      await db.query("INSERT INTO report_dashboard_widgets (dashboard_id,widget_key,widget_name,widget_type,dataset_id,chart_asset_id,position_json,props_json,query_params_json) VALUES (?,?,?,?,?,?,?,?,?)", [dashboard.id, key, name, type, datasetId, chartId, json(position), json(props), json({})]);
+  const widgets = buildAviationReportWidgetSpecs({
+    summaryDatasetId: datasets.get("aviation_delay_disposal_analysis"),
+    detailDatasetId: datasets.get("aviation_weather_adjustment_flights"),
+    chartIds,
+  });
+  for (const [key, name, type, chartId, datasetId, position, props] of widgets) {
+    const existingWidget = await findOne(db, "SELECT id FROM report_dashboard_widgets WHERE dashboard_id=? AND widget_key=? LIMIT 1", [dashboard.id, key]);
+    if (existingWidget) {
+      await db.query("UPDATE report_dashboard_widgets SET widget_name=?,widget_type=?,dataset_id=?,chart_asset_id=?,position_json=?,props_json=?,query_params_json=? WHERE id=?", [name, type, datasetId || null, chartId || null, json(position), json(props), json({}), existingWidget.id]);
+    } else {
+      await db.query("INSERT INTO report_dashboard_widgets (dashboard_id,widget_key,widget_name,widget_type,dataset_id,chart_asset_id,position_json,props_json,query_params_json) VALUES (?,?,?,?,?,?,?,?,?)", [dashboard.id, key, name, type, datasetId || null, chartId || null, json(position), json(props), json({})]);
     }
   }
-  return { sourceId: Number(source.id), datasetId: Number(dataset.id), dashboardId: Number(dashboard.id) };
+  return { sourceId: Number(source.id), datasetId: datasets.get("aviation_delay_disposal_analysis"), detailDatasetId: datasets.get("aviation_weather_adjustment_flights"), dashboardId: Number(dashboard.id) };
 }
 
 async function bootstrap() {
@@ -599,5 +727,7 @@ module.exports = {
   buildAviationStandardSpecs,
   buildAviationLogicalModel,
   buildAviationReportDataset,
+  buildAviationWeatherAdjustmentDataset,
+  buildAviationReportWidgetSpecs,
   bootstrap,
 };

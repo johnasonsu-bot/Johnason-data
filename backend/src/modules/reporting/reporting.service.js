@@ -797,7 +797,7 @@ function buildKpiPreview(rows = [], fieldMap = {}, chrome = {}, kpiStyle = {}, k
 
 function buildTablePreview(rows = [], fields = [], fieldMap = {}, chrome = {}, tableStyle = {}, props = {}) {
   const visibleColumns = (props.columns && Array.isArray(props.columns) && props.columns.length > 0)
-    ? props.columns
+    ? normalizeReportTableColumns(props.columns)
     : fields.map((field) => ({
       key: field.columnName,
       title: field.label || field.columnName,
@@ -821,6 +821,26 @@ function buildTablePreview(rows = [], fields = [], fieldMap = {}, chrome = {}, t
       striped: tableStyle.striped !== false,
     },
   };
+}
+
+function normalizeReportTableColumns(columns = []) {
+  return (Array.isArray(columns) ? columns : [])
+    .map((column) => {
+      if (typeof column === "string") {
+        const dataIndex = normalizeText(column);
+        return dataIndex ? { key: dataIndex, title: dataIndex, dataIndex } : null;
+      }
+      if (!column || typeof column !== "object") return null;
+      const dataIndex = normalizeText(column.dataIndex || column.key);
+      if (!dataIndex) return null;
+      return {
+        ...column,
+        key: normalizeText(column.key, dataIndex),
+        title: normalizeText(column.title, dataIndex),
+        dataIndex,
+      };
+    })
+    .filter(Boolean);
 }
 
 function buildSankeyEmptyOption(optionTemplate = {}, message = "请先为桑基图配置有效的来源、去向和权重字段") {
@@ -7359,7 +7379,29 @@ async function previewDashboardChart(payload) {
 
 async function previewRuntimeDashboardChart(id, payload, options = {}) {
   await ensureReportDashboardRuntimeAccess(Number(id), options);
-  return previewDashboardChart(payload);
+  const dashboard = await ensureReportDashboard(Number(id));
+  return previewDashboardChart(resolveRuntimeDashboardPreviewPayload(dashboard, payload));
+}
+
+function resolveRuntimeDashboardPreviewPayload(dashboard, payload = {}) {
+  const hasDirectBinding = Number(payload.datasetId || 0) > 0
+    || Number(payload.sourceId || 0) > 0
+    || Boolean(normalizeText(payload.sourceTable))
+    || Boolean(normalizeText(payload.sourceSql));
+  if (hasDirectBinding) return payload;
+
+  const widgets = Array.isArray(dashboard?.widgets) ? dashboard.widgets : [];
+  const requestedKey = normalizeText(payload.widgetKey);
+  const requestedWidget = requestedKey
+    ? widgets.find((widget) => normalizeText(widget.widgetKey) === requestedKey)
+    : null;
+  const fallbackWidget = requestedWidget?.datasetId
+    ? requestedWidget
+    : widgets.find((widget) => Number(widget.datasetId || 0) > 0);
+  if (fallbackWidget?.datasetId) {
+    return { ...payload, datasetId: Number(fallbackWidget.datasetId) };
+  }
+  return payload;
 }
 
 module.exports = {
@@ -7391,6 +7433,8 @@ module.exports = {
   planAiChartSql,
   previewDashboardChart,
   previewRuntimeDashboardChart,
+  normalizeReportTableColumns,
+  resolveRuntimeDashboardPreviewPayload,
   previewReportDataset,
   publishReportDashboard,
   recommendAiChart,

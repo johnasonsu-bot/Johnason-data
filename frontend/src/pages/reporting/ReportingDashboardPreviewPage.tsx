@@ -744,6 +744,7 @@ export function ReportingDashboardPreviewPage() {
             return { ...widget, __runtimePreview: null, __runtimeDraft: runtimeDraft };
           }
           const previewPayload = {
+            widgetKey: widget.widgetKey,
             widgetType: widget.widgetType,
             chartAssetId: widget.chartAssetId,
             datasetId: widget.datasetId || undefined,

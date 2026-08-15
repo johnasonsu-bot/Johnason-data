@@ -174,6 +174,7 @@ const reportDashboardSchema = z.object({
 });
 
 const dashboardPreviewSchema = z.object({
+  widgetKey: z.string().min(1).optional(),
   widgetType: z.enum(["chart", "kpi", "table", "tabs"]).default("chart"),
   chartAssetId: z.number().int().positive().optional().nullable(),
   datasetId: z.number().int().positive().optional(),
