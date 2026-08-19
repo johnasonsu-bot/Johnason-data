@@ -1,0 +1,3244 @@
+{
+  "moduleName": "quality-control",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "quality-control.001.listqualitysources",
+      "command": "quality list-quality-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/data-sources"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/quality-control/data-sources",
+        "/dashboard/quality-control/insights",
+        "/dashboard/quality-control/rules",
+        "/dashboard/quality-control/strategies",
+        "/dashboard/quality-control/tasks",
+        "/dashboard/quality-control/analysis",
+        "/dashboard/quality-control/reports",
+        "/dashboard/quality-control/issues",
+        "/dashboard/quality-control/models",
+        "/dashboard/quality-control"
+      ],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.002.createqualitysource",
+      "command": "quality create-quality-source",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "qualitySourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.003.updatequalitysource",
+      "command": "quality update-quality-source",
+      "sourceApiKeys": [
+        "PUT /api/v1/quality-control/data-sources/:sourceId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "qualitySourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/quality-control/data-sources/:sourceId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.004.deletequalitysource",
+      "command": "quality delete-quality-source",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/data-sources/:sourceId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/data-sources/:sourceId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.005.listqualitysourcetables",
+      "command": "quality list-quality-source-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/tables"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.006.listqualitysourcecolumns",
+      "command": "quality list-quality-source-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/tables/:tableName/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/tables/:tableName/columns"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.007.getqualitysourcemonitor",
+      "command": "quality get-quality-source-monitor",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/monitor"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/data-sources/:sourceId/monitor"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.008.savequalitysourcemonitor",
+      "command": "quality save-quality-source-monitor",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/data-sources/:sourceId/monitor"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "monitorSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/data-sources/:sourceId/monitor"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.009.syncqualitysourcetables",
+      "command": "quality sync-quality-source-tables",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/data-sources/:sourceId/sync-tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/data-sources/:sourceId/sync-tables"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.010.listaiconfigs",
+      "command": "quality list-ai-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.011.listaiconfigversions",
+      "command": "quality list-ai-config-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/ai-configs/:id/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/ai-configs/:id/versions"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.012.updateaiconfig",
+      "command": "quality update-ai-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/quality-control/ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "updateAiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/quality-control/ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.013.listregexrules",
+      "command": "quality list-regex-rules",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/rules/regex"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/rules/regex"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.014.analyzeregexrule",
+      "command": "quality analyze-regex-rule",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/regex/ai-analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "regexRuleAiAnalyzeSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/regex/ai-analyze"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.015.saveregexrule",
+      "command": "quality save-regex-rule",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/regex"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "regexRuleSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/regex"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.016.deleteregexrule",
+      "command": "quality delete-regex-rule",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/rules/regex/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/rules/regex/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.017.listdictionaries",
+      "command": "quality list-dictionaries",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.018.listdictionarybusinesssystems",
+      "command": "quality list-dictionary-business-systems",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries/options/business-systems"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries/options/business-systems"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.019.previewdictionarysourcerows",
+      "command": "quality preview-dictionary-source-rows",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/source-preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionarySourcePreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/source-preview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.020.previewdictionaryvalues",
+      "command": "quality preview-dictionary-values",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionaryPreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/preview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.021.analyzedictionarytable",
+      "command": "quality analyze-dictionary-table",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/ai-analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionaryAiAnalyzeSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/ai-analyze"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.022.batchsavedictionaries",
+      "command": "quality batch-save-dictionaries",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/batch"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionaryBatchSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/batch"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.023.batchdeletedictionaries",
+      "command": "quality batch-delete-dictionaries",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/batch-delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionaryBatchDeleteSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries/batch-delete"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.024.getdictionarydetail",
+      "command": "quality get-dictionary-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/rules/dictionaries/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.025.savedictionary",
+      "command": "quality save-dictionary",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "dictionarySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/rules/dictionaries"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.026.deletedictionary",
+      "command": "quality delete-dictionary",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/rules/dictionaries/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/rules/dictionaries/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.027.listsubmittedstrategyoptions",
+      "command": "quality list-submitted-strategy-options",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/tasks/strategy-options"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/tasks/strategy-options"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.028.listtasks",
+      "command": "quality list-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/tasks"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.029.previewtasksql",
+      "command": "quality preview-task-sql",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks/preview-sql"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "qualityTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks/preview-sql",
+        "POST /api/v1/quality-control/tasks/:id/preview-sql"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.030.gettaskdetail",
+      "command": "quality get-task-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.031.createtask",
+      "command": "quality create-task",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "qualityTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.032.previewtasksql",
+      "command": "quality preview-task-sql",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/preview-sql"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "updateQualityTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks/preview-sql",
+        "POST /api/v1/quality-control/tasks/:id/preview-sql"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.033.updatetask",
+      "command": "quality update-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/quality-control/tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "updateQualityTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/quality-control/tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.034.deletetask",
+      "command": "quality delete-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.035.starttask",
+      "command": "quality start-task",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/start"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/start"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.036.stoptask",
+      "command": "quality stop-task",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/stop"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/stop"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.037.runtasknow",
+      "command": "quality run-task-now",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/tasks/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.038.listtaskruns",
+      "command": "quality list-task-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/tasks/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/tasks/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.039.liststrategytables",
+      "command": "quality list-strategy-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.040.deletestrategytable",
+      "command": "quality delete-strategy-table",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/strategies/tables/:monitorTableId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/strategies/tables/:monitorTableId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.041.getstrategydetail",
+      "command": "quality get-strategy-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.042.recommendstrategy",
+      "command": "quality recommend-strategy",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommend"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "recommendationSamplingSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommend"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.043.startrecommendation",
+      "command": "quality start-recommendation",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "recommendationSamplingSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.044.getrecommendationrun",
+      "command": "quality get-recommendation-run",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.045.applyrecommendationrun",
+      "command": "quality apply-recommendation-run",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId/apply"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "recommendationApplySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId/apply"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.046.rejectrecommendationrun",
+      "command": "quality reject-recommendation-run",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId/reject"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/recommendations/:runId/reject"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.047.savestrategydraft",
+      "command": "quality save-strategy-draft",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/save-draft"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "strategyDraftSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/save-draft"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.048.submitstrategy",
+      "command": "quality submit-strategy",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/submit"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [
+        "strategyDraftSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/strategies/tables/:monitorTableId/submit"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.049.liststrategyversions",
+      "command": "quality list-strategy-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/strategies/tables/:monitorTableId/versions"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.050.deletestrategyversion",
+      "command": "quality delete-strategy-version",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/strategies/tables/:monitorTableId/versions/:versionId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/strategies/tables/:monitorTableId/versions/:versionId"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.051.getstrategyversionsql",
+      "command": "quality get-strategy-version-sql",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/strategies/versions/:versionId/sql"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/strategies/versions/:versionId/sql"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.052.getanalysisoverview",
+      "command": "quality get-analysis-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/overview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/overview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.053.listanalysisstats",
+      "command": "quality list-analysis-stats",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/stats"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/stats"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.054.listanalysisdetails",
+      "command": "quality list-analysis-details",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/details"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/analysis/:sourceId/details"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.055.deleteanalysistableresults",
+      "command": "quality delete-analysis-table-results",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/analysis/:sourceId/tables/:tableName"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/analysis/:sourceId/tables/:tableName"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.056.getqualityinsightsoverview",
+      "command": "quality get-quality-insights-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/overview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/overview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.057.getqualityopsdashboard",
+      "command": "quality get-quality-ops-dashboard",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/ops-dashboard"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/ops-dashboard"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.058.getqualityopsdrilldown",
+      "command": "quality get-quality-ops-drilldown",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/ops-drilldown"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/ops-drilldown"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.059.listqualitysysteminsights",
+      "command": "quality list-quality-system-insights",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/systems"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/systems"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.060.listqualitytableinsights",
+      "command": "quality list-quality-table-insights",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/tables"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.061.listqualitytablebatches",
+      "command": "quality list-quality-table-batches",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/table-batches"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/table-batches"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.062.comparequalitybatches",
+      "command": "quality compare-quality-batches",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/batch-comparison"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/batch-comparison"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.063.getqualityobservability",
+      "command": "quality get-quality-observability",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/observability"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/observability"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.064.listqualitytags",
+      "command": "quality list-quality-tags",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/tags"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/tags"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.065.listqualitybusinesssystems",
+      "command": "quality list-quality-business-systems",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/business-systems"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/business-systems"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.066.savequalitytag",
+      "command": "quality save-quality-tag",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/tags"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/tags"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.067.updatemonitortablegovernance",
+      "command": "quality update-monitor-table-governance",
+      "sourceApiKeys": [
+        "PUT /api/v1/quality-control/insights/tables/:monitorTableId/governance"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/quality-control/insights/tables/:monitorTableId/governance"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.068.getqualityreportcenteroverview",
+      "command": "quality get-quality-report-center-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/report-center-overview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/report-center-overview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.069.listqualityreportcomparisonoptions",
+      "command": "quality list-quality-report-comparison-options",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/report-comparison-options"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/report-comparison-options"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.070.previewqualityreportcomparison",
+      "command": "quality preview-quality-report-comparison",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/report-comparisons/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/report-comparisons/preview"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.071.createqualityreport",
+      "command": "quality create-quality-report",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/reports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/reports"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.072.listqualityreports",
+      "command": "quality list-quality-reports",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/reports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/reports"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.073.downloadqualityreportmarkdown",
+      "command": "quality download-quality-report-markdown",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id/report.md"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id/report.md"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.074.downloadqualityreportword",
+      "command": "quality download-quality-report-word",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id/report.docx"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id/report.docx"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.075.deletequalityreport",
+      "command": "quality delete-quality-report",
+      "sourceApiKeys": [
+        "DELETE /api/v1/quality-control/insights/reports/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/quality-control/insights/reports/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.076.getqualityreportdetail",
+      "command": "quality get-quality-report-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/reports/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.077.listqualityfindings",
+      "command": "quality list-quality-findings",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/findings"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/findings"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.078.listqualityassignableusers",
+      "command": "quality list-quality-assignable-users",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/assignable-users"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/assignable-users"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.079.reviewqualityfinding",
+      "command": "quality review-quality-finding",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/findings/:id/review"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/findings/:id/review"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.080.listqualityissues",
+      "command": "quality list-quality-issues",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/issues"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/issues"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.081.getqualityissuedetail",
+      "command": "quality get-quality-issue-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/issues/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/issues/:id"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.082.updatequalityissuestatus",
+      "command": "quality update-quality-issue-status",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/issues/:id/status"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/issues/:id/status"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.083.materializequalityfindings",
+      "command": "quality materialize-quality-findings",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/findings/refresh"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/findings/refresh"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.084.runqualityaianalysis",
+      "command": "quality run-quality-ai-analysis",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/ai-analysis"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/ai-analysis"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.085.listqualityopsrobotsessions",
+      "command": "quality list-quality-ops-robot-sessions",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/robot/sessions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/robot/sessions"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.086.getqualityopsrobotsessionmessages",
+      "command": "quality get-quality-ops-robot-session-messages",
+      "sourceApiKeys": [
+        "GET /api/v1/quality-control/insights/robot/sessions/:id/messages"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/quality-control/insights/robot/sessions/:id/messages"
+      ]
+    },
+    {
+      "capabilityId": "quality-control.087.queryqualityopsrobot",
+      "command": "quality query-quality-ops-robot",
+      "sourceApiKeys": [
+        "POST /api/v1/quality-control/insights/robot/query"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "quality-control",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"quality\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/quality-control/insights/robot/query"
+      ]
+    }
+  ]
+}

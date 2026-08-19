@@ -1,8 +1,0 @@
-{
-  "name": "@johnason/data-platform-module-project-spaces",
-  "version": "0.1.0",
-  "private": false,
-  "main": "src/index.js",
-  "files": ["src"],
-  "engines": { "node": ">=22.20.0" }
-}

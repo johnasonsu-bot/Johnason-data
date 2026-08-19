@@ -1,0 +1,259 @@
+{
+  "moduleName": "asset-search",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "asset-search.001.search",
+      "command": "asset-search search",
+      "sourceApiKeys": [
+        "POST /api/v1/asset-search/search"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/asset-search",
+        "/dashboard/asset-search/business-data",
+        "/dashboard/asset-search/models"
+      ],
+      "module": "asset-search",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [
+        "searchSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/asset-search/search"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.002.businessdatasearch",
+      "command": "asset-search business-data-search",
+      "sourceApiKeys": [
+        "POST /api/v1/asset-search/business-data/search"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [
+        "businessDataSearchSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/asset-search/business-data/search"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.003.suggest",
+      "command": "asset-search suggest",
+      "sourceApiKeys": [
+        "GET /api/v1/asset-search/suggest"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/asset-search/suggest"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.004.facets",
+      "command": "asset-search facets",
+      "sourceApiKeys": [
+        "GET /api/v1/asset-search/facets"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/asset-search/facets"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.005.listaiconfigs",
+      "command": "asset-search list-ai-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/asset-search/ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/asset-search/ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.006.updateaiconfig",
+      "command": "asset-search update-ai-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/asset-search/ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [
+        "aiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/asset-search/ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.007.listairuns",
+      "command": "asset-search list-ai-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/asset-search/ai-runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/asset-search/ai-runs"
+      ]
+    },
+    {
+      "capabilityId": "asset-search.008.feedback",
+      "command": "asset-search feedback",
+      "sourceApiKeys": [
+        "POST /api/v1/asset-search/feedback"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "asset-search",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "[\"data_map\", \"ingestion\", \"quality\", \"services\"]",
+      "validationSchemas": [
+        "feedbackSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/asset-search/feedback"
+      ]
+    }
+  ]
+}

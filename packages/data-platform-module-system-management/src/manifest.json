@@ -1,0 +1,829 @@
+{
+  "moduleName": "system-management",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "system-management.001.listservices",
+      "command": "system list-services",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/services"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/services"
+      ]
+    },
+    {
+      "capabilityId": "system-management.002.createservice",
+      "command": "system create-service",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/services"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "createServiceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/services"
+      ]
+    },
+    {
+      "capabilityId": "system-management.003.restartwebstack",
+      "command": "system restart-web-stack",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/services/actions/restart-web-stack"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/services/actions/restart-web-stack"
+      ]
+    },
+    {
+      "capabilityId": "system-management.004.startdefaultservices",
+      "command": "system start-default-services",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/services/actions/start-default"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/services/actions/start-default"
+      ]
+    },
+    {
+      "capabilityId": "system-management.005.runkafkademopump",
+      "command": "system run-kafka-demo-pump",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/services/actions/run-kafka-demo-pump"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/services/actions/run-kafka-demo-pump"
+      ]
+    },
+    {
+      "capabilityId": "system-management.006.operateservice",
+      "command": "system operate-service",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/services/:id/actions/:action"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/services/:id/actions/:action"
+      ]
+    },
+    {
+      "capabilityId": "system-management.007.updateservice",
+      "command": "system update-service",
+      "sourceApiKeys": [
+        "PUT /api/v1/system-management/services/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "updateServiceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/system-management/services/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.008.deleteservice",
+      "command": "system delete-service",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-management/services/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-management/services/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.009.listdatabasedrivers",
+      "command": "system list-database-drivers",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/database-drivers"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/database-drivers"
+      ]
+    },
+    {
+      "capabilityId": "system-management.010.uploadandactivatedatabasedriver",
+      "command": "system upload-and-activate-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/upload-and-activate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/upload-and-activate"
+      ]
+    },
+    {
+      "capabilityId": "system-management.011.uploaddatabasedriver",
+      "command": "system upload-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/upload"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/upload"
+      ]
+    },
+    {
+      "capabilityId": "system-management.012.rollbackdatabasedriver",
+      "command": "system rollback-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/rollback"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/rollback"
+      ]
+    },
+    {
+      "capabilityId": "system-management.013.deactivatedatabasedriver",
+      "command": "system deactivate-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/deactivate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/deactivate"
+      ]
+    },
+    {
+      "capabilityId": "system-management.014.validatedatabasedriver",
+      "command": "system validate-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/:id/validate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/:id/validate"
+      ]
+    },
+    {
+      "capabilityId": "system-management.015.activatedatabasedriver",
+      "command": "system activate-database-driver",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/database-drivers/:id/activate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/database-drivers/:id/activate"
+      ]
+    },
+    {
+      "capabilityId": "system-management.016.listdatabasedriverlogs",
+      "command": "system list-database-driver-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/database-drivers/:id/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/database-drivers/:id/logs"
+      ]
+    },
+    {
+      "capabilityId": "system-management.017.deletedatabasedriver",
+      "command": "system delete-database-driver",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-management/database-drivers/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-management/database-drivers/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.018.listroles",
+      "command": "system list-roles",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/roles"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/roles"
+      ]
+    },
+    {
+      "capabilityId": "system-management.019.createrole",
+      "command": "system create-role",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/roles"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "createRoleSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/roles"
+      ]
+    },
+    {
+      "capabilityId": "system-management.020.updaterole",
+      "command": "system update-role",
+      "sourceApiKeys": [
+        "PUT /api/v1/system-management/roles/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "updateRoleSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/system-management/roles/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.021.deleterole",
+      "command": "system delete-role",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-management/roles/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-management/roles/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.022.listusers",
+      "command": "system list-users",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/users"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/users"
+      ]
+    },
+    {
+      "capabilityId": "system-management.023.createuser",
+      "command": "system create-user",
+      "sourceApiKeys": [
+        "POST /api/v1/system-management/users"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "createUserSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-management/users"
+      ]
+    },
+    {
+      "capabilityId": "system-management.024.updateuser",
+      "command": "system update-user",
+      "sourceApiKeys": [
+        "PUT /api/v1/system-management/users/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "updateUserSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/system-management/users/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.025.deleteuser",
+      "command": "system delete-user",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-management/users/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-management/users/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-management.026.getresources",
+      "command": "system get-resources",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/resources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/resources"
+      ]
+    },
+    {
+      "capabilityId": "system-management.027.getdatabasearchitecture",
+      "command": "system get-database-architecture",
+      "sourceApiKeys": [
+        "GET /api/v1/system-management/database-architecture"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-management",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-management/database-architecture"
+      ]
+    }
+  ]
+}

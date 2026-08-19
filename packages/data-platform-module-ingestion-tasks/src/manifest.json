@@ -1,0 +1,509 @@
+{
+  "moduleName": "ingestion-tasks",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "ingestion-tasks.001.getmonitoroverview",
+      "command": "ingestion get-monitor-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/ingestion-tasks/monitor-overview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/ingestion-tasks/monitor-overview"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.002.listtasks",
+      "command": "ingestion list-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/ingestion-tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/ingestion-tasks"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.003.gettask",
+      "command": "ingestion get-task",
+      "sourceApiKeys": [
+        "GET /api/v1/ingestion-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/ingestion-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.004.createtask",
+      "command": "ingestion create-task",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "createTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.005.updatetask",
+      "command": "ingestion update-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/ingestion-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "updateTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/ingestion-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.006.deletetask",
+      "command": "ingestion delete-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/ingestion-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/ingestion-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.007.recommendtaskconfig",
+      "command": "ingestion recommend-task-config",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/recommend-config"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "recommendTaskConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/recommend-config"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.008.parseapidocument",
+      "command": "ingestion parse-api-document",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/parse-api-document"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/parse-api-document"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.009.previewsourcedata",
+      "command": "ingestion preview-source-data",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/preview-source"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "previewSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/preview-source"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.010.starttask",
+      "command": "ingestion start-task",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/start"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/start"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.011.stoptask",
+      "command": "ingestion stop-task",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/stop"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/stop"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.012.runtasknow",
+      "command": "ingestion run-task-now",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.013.getjobruns",
+      "command": "ingestion get-job-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/ingestion-tasks/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/ingestion-tasks/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-tasks.014.analyzejobrunfailure",
+      "command": "ingestion analyze-job-run-failure",
+      "sourceApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/runs/:runId/analyze-failure"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-tasks",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "analyzeFailureSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/ingestion-tasks/:id/runs/:runId/analyze-failure"
+      ]
+    }
+  ]
+}

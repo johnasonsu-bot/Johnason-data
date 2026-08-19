@@ -74,7 +74,28 @@ function createKeychain(options = {}) {
     deleteSessionToken(profile) {
       return Boolean(invoke(profile, "session-token", "deletePassword"));
     },
+    setRuntimeSigningSecret(profile, value) {
+      assertValue(value);
+      invoke(profile, "runtime-signing-secret", "setPassword", value);
+    },
+    getRuntimeSigningSecret(profile) {
+      return invoke(profile, "runtime-signing-secret", "getPassword") ?? null;
+    },
+    deleteRuntimeSigningSecret(profile) {
+      return Boolean(invoke(profile, "runtime-signing-secret", "deletePassword"));
+    },
   });
 }
 
-module.exports = { createKeychain, KeychainError };
+function createLazyKeychain(options = {}) {
+  let keychain;
+  return new Proxy({}, {
+    get(_target, property) {
+      keychain ||= createKeychain(options);
+      const value = keychain[property];
+      return typeof value === "function" ? value.bind(keychain) : value;
+    },
+  });
+}
+
+module.exports = { createKeychain, createLazyKeychain, KeychainError };

@@ -1,0 +1,1592 @@
+{
+  "moduleName": "reporting",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "reporting.001.listconfigs",
+      "command": "reporting ai-config list-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting-ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting-ai-configs",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting-ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "reporting.002.updateconfig",
+      "command": "reporting ai-config update-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting-ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting-ai-configs",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "updateReportingAiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting-ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.003.listruntimereportthemetemplates",
+      "command": "reporting list-runtime-report-theme-templates",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/runtime/dashboards/:id/theme-templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/runtime/dashboards/:id/theme-templates"
+      ]
+    },
+    {
+      "capabilityId": "reporting.004.previewruntimedashboardchart",
+      "command": "reporting preview-runtime-dashboard-chart",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/runtime/dashboards/:id/preview-chart"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "dashboardPreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/runtime/dashboards/:id/preview-chart"
+      ]
+    },
+    {
+      "capabilityId": "reporting.005.getoverview",
+      "command": "reporting get-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/overview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/overview"
+      ]
+    },
+    {
+      "capabilityId": "reporting.006.suggestaichartanalysis",
+      "command": "reporting suggest-ai-chart-analysis",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/analysis-suggestions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartAnalysisSuggestionSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/analysis-suggestions"
+      ]
+    },
+    {
+      "capabilityId": "reporting.007.planaichartsql",
+      "command": "reporting plan-ai-chart-sql",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/sql-plan"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartSqlPlanSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/sql-plan"
+      ]
+    },
+    {
+      "capabilityId": "reporting.008.reviseaichartsql",
+      "command": "reporting revise-ai-chart-sql",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/sql-revise"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartSqlRevisionSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/sql-revise"
+      ]
+    },
+    {
+      "capabilityId": "reporting.009.runaichartquery",
+      "command": "reporting run-ai-chart-query",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/query"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartQuerySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/query"
+      ]
+    },
+    {
+      "capabilityId": "reporting.010.recommendaichart",
+      "command": "reporting recommend-ai-chart",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/recommend"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartRecommendSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/recommend"
+      ]
+    },
+    {
+      "capabilityId": "reporting.011.allocateaichartfieldmap",
+      "command": "reporting allocate-ai-chart-field-map",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/ai/chart/field-map"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "aiChartFieldMapSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/ai/chart/field-map"
+      ]
+    },
+    {
+      "capabilityId": "reporting.012.listreportdatasources",
+      "command": "reporting list-report-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "reporting.013.createreportdatasource",
+      "command": "reporting create-report-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "reporting.014.updatereportdatasource",
+      "command": "reporting update-report-data-source",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.015.deletereportdatasource",
+      "command": "reporting delete-report-data-source",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.016.testreportdatasourceconnection",
+      "command": "reporting test-report-data-source-connection",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/data-sources/test-connection"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDataSourceTestSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/data-sources/test-connection"
+      ]
+    },
+    {
+      "capabilityId": "reporting.017.listreportdatasourcetables",
+      "command": "reporting list-report-data-source-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables"
+      ]
+    },
+    {
+      "capabilityId": "reporting.018.listreportdatasourcecolumns",
+      "command": "reporting list-report-data-source-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables/:tableName/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables/:tableName/columns"
+      ]
+    },
+    {
+      "capabilityId": "reporting.019.samplereportdatasourcerows",
+      "command": "reporting sample-report-data-source-rows",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables/:tableName/sample"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/data-sources/:id/tables/:tableName/sample"
+      ]
+    },
+    {
+      "capabilityId": "reporting.020.listreportdatasetfolders",
+      "command": "reporting list-report-dataset-folders",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/dataset-folders"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/dataset-folders"
+      ]
+    },
+    {
+      "capabilityId": "reporting.021.createreportdatasetfolder",
+      "command": "reporting create-report-dataset-folder",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/dataset-folders"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDatasetFolderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/dataset-folders"
+      ]
+    },
+    {
+      "capabilityId": "reporting.022.updatereportdatasetfolder",
+      "command": "reporting update-report-dataset-folder",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/dataset-folders/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDatasetFolderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/dataset-folders/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.023.deletereportdatasetfolder",
+      "command": "reporting delete-report-dataset-folder",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/dataset-folders/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/dataset-folders/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.024.listreportdatasets",
+      "command": "reporting list-report-datasets",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/datasets"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/datasets"
+      ]
+    },
+    {
+      "capabilityId": "reporting.025.previewreportdataset",
+      "command": "reporting preview-report-dataset",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/datasets/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "datasetPreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/datasets/preview"
+      ]
+    },
+    {
+      "capabilityId": "reporting.026.createreportdataset",
+      "command": "reporting create-report-dataset",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/datasets"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDatasetSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/datasets"
+      ]
+    },
+    {
+      "capabilityId": "reporting.027.updatereportdataset",
+      "command": "reporting update-report-dataset",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/datasets/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDatasetSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/datasets/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.028.deletereportdataset",
+      "command": "reporting delete-report-dataset",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/datasets/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/datasets/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.029.listreportchartassets",
+      "command": "reporting list-report-chart-assets",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/chart-assets"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/chart-assets"
+      ]
+    },
+    {
+      "capabilityId": "reporting.030.createreportchartasset",
+      "command": "reporting create-report-chart-asset",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/chart-assets"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportChartAssetSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/chart-assets"
+      ]
+    },
+    {
+      "capabilityId": "reporting.031.updatereportchartasset",
+      "command": "reporting update-report-chart-asset",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/chart-assets/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportChartAssetSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/chart-assets/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.032.deletereportchartasset",
+      "command": "reporting delete-report-chart-asset",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/chart-assets/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/chart-assets/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.033.listreportthemetemplates",
+      "command": "reporting list-report-theme-templates",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/theme-templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/theme-templates"
+      ]
+    },
+    {
+      "capabilityId": "reporting.034.createreportthemetemplate",
+      "command": "reporting create-report-theme-template",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/theme-templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportThemeTemplateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/theme-templates"
+      ]
+    },
+    {
+      "capabilityId": "reporting.035.updatereportthemetemplate",
+      "command": "reporting update-report-theme-template",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/theme-templates/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportThemeTemplateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/theme-templates/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.036.deletereportthemetemplate",
+      "command": "reporting delete-report-theme-template",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/theme-templates/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/theme-templates/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.037.listreportdashboards",
+      "command": "reporting list-report-dashboards",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/dashboards"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/dashboards"
+      ]
+    },
+    {
+      "capabilityId": "reporting.038.getreportdashboard",
+      "command": "reporting get-report-dashboard",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/dashboards/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/dashboards/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.039.publishreportdashboard",
+      "command": "reporting publish-report-dashboard",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/dashboards/:id/publish"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/dashboards/:id/publish"
+      ]
+    },
+    {
+      "capabilityId": "reporting.040.previewdashboardchart",
+      "command": "reporting preview-dashboard-chart",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/dashboards/preview-chart"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "dashboardPreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/dashboards/preview-chart"
+      ]
+    },
+    {
+      "capabilityId": "reporting.041.createreportdashboard",
+      "command": "reporting create-report-dashboard",
+      "sourceApiKeys": [
+        "POST /api/v1/reporting/dashboards"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDashboardSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/reporting/dashboards"
+      ]
+    },
+    {
+      "capabilityId": "reporting.042.updatereportdashboard",
+      "command": "reporting update-report-dashboard",
+      "sourceApiKeys": [
+        "PUT /api/v1/reporting/dashboards/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [
+        "reportDashboardSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/reporting/dashboards/:id"
+      ]
+    },
+    {
+      "capabilityId": "reporting.043.deletereportdashboard",
+      "command": "reporting delete-report-dashboard",
+      "sourceApiKeys": [
+        "DELETE /api/v1/reporting/dashboards/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "reporting",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"reporting\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/reporting/dashboards/:id"
+      ]
+    }
+  ]
+}

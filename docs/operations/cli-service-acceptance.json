@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "accepted",
+  "verifiedAt": "2026-08-19T01:51:08.697Z",
+  "installation": ".local/data-platform-cli/install",
+  "capabilityCount": 596,
+  "commandDefinitions": 570,
+  "commandCalls": 1166,
+  "health": {
+    "status": "ok",
+    "capabilityIds": [
+      "platform.002.get.api.health"
+    ]
+  },
+  "realInfrastructureRequired": [
+    "api",
+    "mysql",
+    "postgresql",
+    "oracle",
+    "dm",
+    "aviationTwice",
+    "rollback21"
+  ],
+  "failures": []
+}

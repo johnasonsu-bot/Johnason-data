@@ -2,10 +2,29 @@
   "name": "@johnason/data-platform-module-data-source-research",
   "version": "0.2.0",
   "private": false,
-  "description": "Transport-neutral data-source research capabilities",
   "main": "src/index.js",
-  "exports": { ".": "./src/index.js", "./contracts": "./contracts/index.js" },
-  "files": ["src", "contracts"],
-  "engines": { "node": ">=22.20.0" },
-  "dependencies": { "@johnason/data-platform-core-kernel": "0.1.0" }
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "basic-ftp": "5.3.1",
+    "dmdb": "1.0.52452",
+    "docx": "9.7.1",
+    "hive-driver": "1.0.1",
+    "iconv-lite": "0.4.24",
+    "kafkajs": "2.2.4",
+    "mammoth": "1.12.1",
+    "mysql2": "3.23.3",
+    "node-opengauss": "1.1.0",
+    "oracledb": "7.0.1",
+    "pdf-parse": "1.1.4",
+    "pg": "8.23.0",
+    "xlsx": "0.18.5",
+    "xml-js": "1.6.11"
+  },
+  "license": "UNLICENSED"
 }

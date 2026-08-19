@@ -29,8 +29,10 @@ test("namespaces database and session secrets per profile", () => {
   const keychain = createKeychain({ EntryClass: FakeEntry });
   keychain.setDatabasePassword("dev", "db-pass");
   keychain.setSessionToken("dev", "jwt");
+  keychain.setRuntimeSigningSecret("dev", "signing-secret");
   assert.equal(FakeEntry.values.get("data-platform-cli/profile:dev:database-password"), "db-pass");
   assert.equal(FakeEntry.values.get("data-platform-cli/profile:dev:session-token"), "jwt");
+  assert.equal(FakeEntry.values.get("data-platform-cli/profile:dev:runtime-signing-secret"), "signing-secret");
 });
 
 test("reads database and session values without exposing account internals", () => {

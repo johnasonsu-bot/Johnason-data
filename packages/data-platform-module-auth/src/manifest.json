@@ -1,0 +1,131 @@
+{
+  "moduleName": "auth",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "auth.001.login",
+      "command": "auth login",
+      "sourceApiKeys": [
+        "POST /api/v1/auth/login"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "auth",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "loginSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/auth/login",
+        "POST /api/auth/login"
+      ]
+    },
+    {
+      "capabilityId": "auth.002.profile",
+      "command": "auth profile",
+      "sourceApiKeys": [
+        "GET /api/v1/auth/profile"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "auth",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/auth/profile",
+        "GET /api/auth/profile"
+      ]
+    },
+    {
+      "capabilityId": "auth.003.logout",
+      "command": "auth logout",
+      "sourceApiKeys": [
+        "POST /api/v1/auth/logout"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "auth",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/auth/logout"
+      ]
+    },
+    {
+      "capabilityId": "auth.004.logoutbeacon",
+      "command": "auth logout-beacon",
+      "sourceApiKeys": [
+        "POST /api/v1/auth/logout-beacon"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "auth",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/auth/logout-beacon"
+      ]
+    }
+  ]
+}

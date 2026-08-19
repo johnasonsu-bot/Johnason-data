@@ -6,7 +6,24 @@
 
 本仓库正在将 Johnason Data Platform 改造为可全局安装、可供人员、脚本与 Agent 直接使用的 CLI。当前交付范围包括 CLI 基础运行时，以及覆盖 596 个 API、84 个前端功能入口、共享核心拆分、API/数据库双阶段测试和航空本体端到端验收的设计与实施方案。
 
-> 当前状态：共享核心、全部业务能力包和动态 CLI capability registry 已落到 `codex/data-platform-cli`。API/数据库双阶段的真实外部环境门禁，以及航空本体 Skill 的两次真实运行，仍需在具备 MySQL、PostgreSQL、Oracle、达梦和 Kafka 的验收环境中完成。
+> 当前状态：共享 kernel、21 个业务模块、aggregate core 与 CLI 命令树已实现，596 个 API 与 84 个前端入口已映射。仓库内隔离安装、单元/合同/Web 回归已通过；真实外部 API、四种数据库、21 个历史版本回退及航空流程连续两次的最终证据尚未齐全，因此聚合发布状态仍为 `blocked`，不是 `accepted`。
+
+本地验收安装固定在 `./.local/data-platform-cli`，执行 `npm run install:cli:local`。该流程不覆盖根 `node_modules`、不全局安装 CLI，也不影响现有开发服务。
+
+本地构建与 CLI 验收命令：
+
+```bash
+npm run build                 # 生成模块运行时、边界扫描和 596/596 覆盖门禁
+npm test                      # kernel、aggregate、CLI 和 backend 合同测试
+npm run install:cli:local     # 24 个 tarball 的隔离安装与任意 cwd 健康检查
+npm run acceptance:cli        # 已安装 CLI 的 570 命令 + 596 capability dispatch
+```
+
+`docs/cli/source/PROJECT_OPERATION_MANUAL.md`、`api-inventory.json` 与 `project-operation-knowledge-graph.html` 是验收输入；覆盖报告写入 `docs/operations/cli-coverage-verification.json`，CLI 服务调用报告写入 `docs/operations/cli-service-acceptance.json`。真实外部 API、Oracle/达梦实例、模块回退和航空双次运行仍需对应基础设施与脱敏证据，缺失时聚合状态保持 `blocked`。
+
+完整的本地安装、构建、启动、登录、验收和停止流程已整理为 [data-platform-deployment skill](README/skills/data-platform-deployment/SKILL.md)。
+
+CLI 架构、两份实施方案、Data Platform 三件套、机器映射和运行证据的统一入口见 [Data Platform CLI 项目文档索引](docs/cli/README.md)。
 
 ### 核心交付件
 
@@ -27,7 +44,15 @@
 
 This repository is evolving Johnason Data Platform into a globally installable CLI for people, scripts, and Agents. The current delivery scope includes the CLI foundation plus the architecture and implementation plans covering 596 APIs, 84 frontend entry points, shared-core packaging, two-stage API/database testing, and end-to-end aviation ontology acceptance.
 
-> Current status: the shared core, all business capability packages, and the dynamic CLI capability registry are implemented on `codex/data-platform-cli`. Live API/database gates and the two-run aviation-ontology acceptance still require an environment with MySQL, PostgreSQL, Oracle, Dameng, and Kafka.
+> Current status: the shared kernel, 21 business modules, aggregate core, and generated CLI tree are implemented, mapping all 596 APIs and 84 frontend entries. Isolated repository-local installation plus unit, contract, and Web regressions pass. Final aggregate status remains `blocked`, not `accepted`, until real external API/four-database evidence, all 21 historical-package rollback drills, and two installed-CLI aviation runs are complete.
+
+Run `npm run install:cli:local` for the isolated acceptance install under `./.local/data-platform-cli`. It does not replace the root `node_modules`, install globally, or touch running development services.
+
+Use `npm run build`, `npm test`, `npm run install:cli:local`, and `npm run acceptance:cli` for the local build and installed-CLI acceptance sequence. The three files under `docs/cli/source/` are hashed and checked as the acceptance inputs; aggregate release remains blocked until real external infrastructure, rollback, and aviation evidence is available.
+
+The full local install, build, start, login, acceptance, and stop workflow is documented in the [data-platform-deployment skill](README/skills/data-platform-deployment/SKILL.md).
+
+See the [Data Platform CLI documentation index](docs/cli/README.md) for the architecture, two implementation plans, the three source-of-truth Data Platform artifacts, machine mappings, and runtime evidence.
 
 ### Core Deliverables
 

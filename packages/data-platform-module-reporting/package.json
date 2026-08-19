@@ -3,18 +3,23 @@
   "version": "0.2.0",
   "private": false,
   "main": "src/index.js",
-  "exports": {
-    ".": "./src/index.js",
-    "./contracts": "./contracts/index.js"
-  },
   "files": [
-    "src",
-    "contracts"
+    "src"
   ],
   "engines": {
     "node": ">=22.20.0"
   },
   "dependencies": {
-    "@johnason/data-platform-core-kernel": "0.1.0"
-  }
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "basic-ftp": "5.3.1",
+    "dmdb": "1.0.52452",
+    "hive-driver": "1.0.1",
+    "kafkajs": "2.2.4",
+    "mysql2": "3.23.3",
+    "node-opengauss": "1.1.0",
+    "node-sql-parser": "5.4.0",
+    "oracledb": "7.0.1",
+    "pg": "8.23.0"
+  },
+  "license": "UNLICENSED"
 }

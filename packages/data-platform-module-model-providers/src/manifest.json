@@ -1,0 +1,169 @@
+{
+  "moduleName": "model-providers",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "model-providers.001.listmodelproviders",
+      "command": "model-provider list-model-providers",
+      "sourceApiKeys": [
+        "GET /api/v1/model-providers"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/system-models"
+      ],
+      "module": "model-providers",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "[\"system_models\", \"data_map\", \"standards\", \"ingestion\", \"quality\", \"development\", \"services\", \"reporting\", \"data_modeling\"]",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/model-providers"
+      ]
+    },
+    {
+      "capabilityId": "model-providers.002.testmodelprovider",
+      "command": "model-provider test-model-provider",
+      "sourceApiKeys": [
+        "POST /api/v1/model-providers/test-connection"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "model-providers",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "model-provider"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "[\"system_models\", \"data_map\", \"standards\", \"ingestion\", \"quality\", \"development\", \"services\", \"reporting\", \"data_modeling\"]",
+      "validationSchemas": [
+        "testModelProviderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/model-providers/test-connection"
+      ]
+    },
+    {
+      "capabilityId": "model-providers.003.createmodelprovider",
+      "command": "model-provider create-model-provider",
+      "sourceApiKeys": [
+        "POST /api/v1/model-providers"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "model-providers",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "[\"system_models\", \"data_map\", \"standards\", \"ingestion\", \"quality\", \"development\", \"services\", \"reporting\", \"data_modeling\"]",
+      "validationSchemas": [
+        "createModelProviderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/model-providers"
+      ]
+    },
+    {
+      "capabilityId": "model-providers.004.updatemodelprovider",
+      "command": "model-provider update-model-provider",
+      "sourceApiKeys": [
+        "PUT /api/v1/model-providers/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "model-providers",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "[\"system_models\", \"data_map\", \"standards\", \"ingestion\", \"quality\", \"development\", \"services\", \"reporting\", \"data_modeling\"]",
+      "validationSchemas": [
+        "updateModelProviderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/model-providers/:id"
+      ]
+    },
+    {
+      "capabilityId": "model-providers.005.deletemodelprovider",
+      "command": "model-provider delete-model-provider",
+      "sourceApiKeys": [
+        "DELETE /api/v1/model-providers/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "model-providers",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "[\"system_models\", \"data_map\", \"standards\", \"ingestion\", \"quality\", \"development\", \"services\", \"reporting\", \"data_modeling\"]",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/model-providers/:id"
+      ]
+    }
+  ]
+}

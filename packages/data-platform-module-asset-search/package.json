@@ -2,17 +2,21 @@
   "name": "@johnason/data-platform-module-asset-search",
   "version": "0.2.0",
   "private": false,
-  "description": "Transport-neutral asset search capabilities for the Data Platform",
   "main": "src/index.js",
-  "exports": {
-    ".": "./src/index.js",
-    "./contracts": "./contracts/index.js"
-  },
-  "files": ["src", "contracts"],
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=22.20.0"
   },
   "dependencies": {
-    "@johnason/data-platform-core-kernel": "0.1.0"
-  }
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "dmdb": "1.0.52452",
+    "hive-driver": "1.0.1",
+    "mysql2": "3.23.3",
+    "node-opengauss": "1.1.0",
+    "oracledb": "7.0.1",
+    "pg": "8.23.0"
+  },
+  "license": "UNLICENSED"
 }

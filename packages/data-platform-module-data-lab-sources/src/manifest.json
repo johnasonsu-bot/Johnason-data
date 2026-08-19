@@ -1,0 +1,401 @@
+{
+  "moduleName": "data-lab-sources",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-lab-sources.001.listdatasources",
+      "command": "data-lab source list-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.002.listreferencedscenes",
+      "command": "data-lab source list-referenced-scenes",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/scenes"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/scenes"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.003.listtables",
+      "command": "data-lab source list-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.004.listcolumns",
+      "command": "data-lab source list-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables/:tableName/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables/:tableName/columns"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.005.samplerows",
+      "command": "data-lab source sample-rows",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables/:tableName/sample"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling-sources/:id/tables/:tableName/sample"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.006.createdatasource",
+      "command": "data-lab source create-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "createDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.007.updatedatasource",
+      "command": "data-lab source update-data-source",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-modeling-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "updateDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-modeling-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.008.deletedatasource",
+      "command": "data-lab source delete-data-source",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-modeling-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-modeling-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab-sources.009.testconnection",
+      "command": "data-lab source test-connection",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling-sources/test-connection"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling-sources",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling-sources/test-connection"
+      ]
+    }
+  ]
+}

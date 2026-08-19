@@ -1,0 +1,1181 @@
+{
+  "moduleName": "data-services",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-services.001.getoverview",
+      "command": "service get-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/overview"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/service-authorizations",
+        "/dashboard/service-ops",
+        "/dashboard/service-data-sources",
+        "/dashboard/services",
+        "/dashboard/service-apps",
+        "/dashboard/service-audit",
+        "/dashboard/service-usage",
+        "/dashboard/service-models"
+      ],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/overview"
+      ]
+    },
+    {
+      "capabilityId": "data-services.002.getopsdashboard",
+      "command": "service get-ops-dashboard",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/ops-dashboard"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/ops-dashboard"
+      ]
+    },
+    {
+      "capabilityId": "data-services.003.listservicedatasources",
+      "command": "service list-service-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-services.004.createservicedatasource",
+      "command": "service create-service-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-services.005.updateservicedatasource",
+      "command": "service update-service-data-source",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.006.deleteservicedatasource",
+      "command": "service delete-service-data-source",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-services/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-services/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.007.testservicedatasourceconnection",
+      "command": "service test-service-data-source-connection",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/data-sources/test-connection"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/data-sources/test-connection"
+      ]
+    },
+    {
+      "capabilityId": "data-services.008.listservicedatasourcetables",
+      "command": "service list-service-data-source-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables"
+      ]
+    },
+    {
+      "capabilityId": "data-services.009.listservicedatasourcecolumns",
+      "command": "service list-service-data-source-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables/:tableName/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables/:tableName/columns"
+      ]
+    },
+    {
+      "capabilityId": "data-services.010.sampleservicedatasourcerows",
+      "command": "service sample-service-data-source-rows",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables/:tableName/sample"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/data-sources/:id/tables/:tableName/sample"
+      ]
+    },
+    {
+      "capabilityId": "data-services.011.previewservicesql",
+      "command": "service preview-service-sql",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/data-sources/sql-preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceSqlPreviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/data-sources/sql-preview"
+      ]
+    },
+    {
+      "capabilityId": "data-services.012.listservices",
+      "command": "service list-services",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/services"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/services"
+      ]
+    },
+    {
+      "capabilityId": "data-services.013.recommendserviceconfig",
+      "command": "service recommend-service-config",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/services/recommend-config"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceRecommendSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/services/recommend-config"
+      ]
+    },
+    {
+      "capabilityId": "data-services.014.createservice",
+      "command": "service create-service",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/services"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/services"
+      ]
+    },
+    {
+      "capabilityId": "data-services.015.updateservicestatus",
+      "command": "service update-service-status",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/services/:id/status"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceStatusSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/services/:id/status"
+      ]
+    },
+    {
+      "capabilityId": "data-services.016.updateservice",
+      "command": "service update-service",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/services/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/services/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.017.deleteservice",
+      "command": "service delete-service",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-services/services/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-services/services/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.018.exportserviceinterfacedoc",
+      "command": "service export-service-interface-doc",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/services/:id/docx"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/services/:id/docx"
+      ]
+    },
+    {
+      "capabilityId": "data-services.019.debugservice",
+      "command": "service debug-service",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/services/:id/debug"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/services/:id/debug"
+      ]
+    },
+    {
+      "capabilityId": "data-services.020.listserviceaiconfigs",
+      "command": "service list-service-ai-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "data-services.021.updateserviceaiconfig",
+      "command": "service update-service-ai-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceAiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.022.listserviceapps",
+      "command": "service list-service-apps",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/apps"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/apps"
+      ]
+    },
+    {
+      "capabilityId": "data-services.023.createserviceapp",
+      "command": "service create-service-app",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/apps"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceAppSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/apps"
+      ]
+    },
+    {
+      "capabilityId": "data-services.024.updateserviceapp",
+      "command": "service update-service-app",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/apps/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "serviceAppSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/apps/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.025.deleteserviceapp",
+      "command": "service delete-service-app",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-services/apps/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-services/apps/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.026.listauthorizations",
+      "command": "service list-authorizations",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/authorizations"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/authorizations"
+      ]
+    },
+    {
+      "capabilityId": "data-services.027.createauthorization",
+      "command": "service create-authorization",
+      "sourceApiKeys": [
+        "POST /api/v1/data-services/authorizations"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "authorizationSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-services/authorizations"
+      ]
+    },
+    {
+      "capabilityId": "data-services.028.updateauthorization",
+      "command": "service update-authorization",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-services/authorizations/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [
+        "authorizationSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-services/authorizations/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.029.deleteauthorization",
+      "command": "service delete-authorization",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-services/authorizations/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-services/authorizations/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-services.030.listservicelogs",
+      "command": "service list-service-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-services/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-services",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-services/logs"
+      ]
+    },
+    {
+      "capabilityId": "data-services.031.handleinvoke",
+      "command": "service invoke handle-invoke",
+      "sourceApiKeys": [
+        "GET /api/service/*"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "service-runtime",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-runtime-invocation",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "service-runtime"
+        }
+      ],
+      "authRequired": true,
+      "projectScoped": false,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/service/*",
+        "POST /api/service/*"
+      ]
+    },
+    {
+      "capabilityId": "data-services.032.handleinvoke",
+      "command": "service invoke handle-invoke",
+      "sourceApiKeys": [
+        "POST /api/service/*"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "service-runtime",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-runtime-invocation",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "service-runtime"
+        }
+      ],
+      "authRequired": true,
+      "projectScoped": false,
+      "featureGuard": "\"services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/service/*",
+        "POST /api/service/*"
+      ]
+    }
+  ]
+}

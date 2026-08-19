@@ -1,0 +1,69 @@
+{
+  "moduleName": "dev-ai-configs",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "dev-ai-configs.001.listconfigs",
+      "command": "development ai-config list-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/dev-ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "dev-ai-configs",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/dev-ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "dev-ai-configs.002.updateconfig",
+      "command": "development ai-config update-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/dev-ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "dev-ai-configs",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "updateDevAiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/dev-ai-configs/:id"
+      ]
+    }
+  ]
+}

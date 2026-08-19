@@ -1,17 +1,14 @@
 {
   "name": "@johnason/data-platform-core-kernel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
-  "description": "Transport-neutral contracts for Johnason Data Platform capabilities",
+  "description": "Transport-neutral runtime and contracts for Johnason Data Platform",
   "main": "src/index.js",
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=22.20.0"
   },
-  "scripts": {
-    "test": "node --test tests/*.test.js"
-  },
-  "dependencies": {
-    "zod": "3.24.1"
-  }
+  "license": "UNLICENSED"
 }

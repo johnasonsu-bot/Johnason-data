@@ -1,0 +1,4208 @@
+{
+  "moduleName": "data-lab",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-lab.001.listknowledgebases",
+      "command": "data-lab list-knowledge-bases",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/kb/list"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-modeling/model-overview",
+        "/dashboard/data-modeling/simulation",
+        "/dashboard/data-modeling/research",
+        "/dashboard/data-modeling/logical-models",
+        "/dashboard/data-modeling/scenes",
+        "/dashboard/data-modeling/prompts",
+        "/dashboard/data-modeling/physical-models",
+        "/dashboard/data-modeling/ai-business-data",
+        "/dashboard/data-modeling",
+        "/dashboard/data-modeling/data-sources"
+      ],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/kb/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.002.getknowledgebasedetail",
+      "command": "data-lab get-knowledge-base-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/kb/detail/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/kb/detail/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.003.createknowledgebase",
+      "command": "data-lab create-knowledge-base",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/kb/create"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "knowledgeBaseSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/kb/create"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.004.updateknowledgebase",
+      "command": "data-lab update-knowledge-base",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/kb/update/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "knowledgeBaseSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/kb/update/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.005.uploadknowledgedocument",
+      "command": "data-lab upload-knowledge-document",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/kb/upload"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "multipart:file"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/kb/upload"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.006.reparseknowledgedocument",
+      "command": "data-lab reparse-knowledge-document",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/kb/doc/reparse/:docId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/kb/doc/reparse/:docId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.007.deleteknowledgebase",
+      "command": "data-lab delete-knowledge-base",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/kb/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/kb/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.008.listscenes",
+      "command": "data-lab list-scenes",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.009.getscenedetail",
+      "command": "data-lab get-scene-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/detail/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/detail/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.010.createscene",
+      "command": "data-lab create-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/create"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "sceneSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/create"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.011.updatescene",
+      "command": "data-lab update-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/update"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "sceneSchema.extend({ id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/update"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.012.copyscene",
+      "command": "data-lab copy-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/copy/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/copy/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.013.deletescene",
+      "command": "data-lab delete-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.014.analyzescene",
+      "command": "data-lab analyze-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "sceneAnalyzeSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/analyze"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.015.generateschema",
+      "command": "data-lab generate-schema",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "schemaGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.016.adjustschema",
+      "command": "data-lab adjust-schema",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/adjust"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "schemaAdjustSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/adjust"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.017.saveschema",
+      "command": "data-lab save-schema",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "schemaSaveSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.018.confirmschema",
+      "command": "data-lab confirm-schema",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/confirm"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "schemaConfirmSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/confirm"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.019.deploysceneschema",
+      "command": "data-lab deploy-scene-schema",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/deploy"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "schemaDeploySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/deploy"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.020.listschemaversions",
+      "command": "data-lab list-schema-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/list/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/list/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.021.getschemaversiondetail",
+      "command": "data-lab get-schema-version-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/detail/:sceneId/:versionId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/detail/:sceneId/:versionId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.022.getschemaversiondiff",
+      "command": "data-lab get-schema-version-diff",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/diff/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/schema/version/diff/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.023.rollbackschemaversion",
+      "command": "data-lab rollback-schema-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/version/rollback"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({ sceneId: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/schema/version/rollback"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.024.generatestrategy",
+      "command": "data-lab generate-strategy",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "strategyGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.025.adjuststrategy",
+      "command": "data-lab adjust-strategy",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/adjust"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "strategyAdjustSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/adjust"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.026.confirmstrategy",
+      "command": "data-lab confirm-strategy",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/confirm"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "strategyConfirmSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/confirm"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.027.liststrategyversions",
+      "command": "data-lab list-strategy-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/strategy/version/list/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/strategy/version/list/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.028.getstrategyversiondiff",
+      "command": "data-lab get-strategy-version-diff",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/strategy/version/diff/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/strategy/version/diff/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.029.rollbackstrategyversion",
+      "command": "data-lab rollback-strategy-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/version/rollback"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({ sceneId: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/strategy/version/rollback"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.030.initscene",
+      "command": "data-lab init-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/init/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/init/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.031.startscenetask",
+      "command": "data-lab start-scene-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/start/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/start/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.032.stopscenetask",
+      "command": "data-lab stop-scene-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/stop/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/stop/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.033.runsceneonce",
+      "command": "data-lab run-scene-once",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/runOnce/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/runOnce/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.034.rerunfailedtasks",
+      "command": "data-lab rerun-failed-tasks",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/rerunFailed/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/task/rerunFailed/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.035.backfillscene",
+      "command": "data-lab backfill-scene",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/backfill/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({ rows: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/backfill/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.036.startrealtime",
+      "command": "data-lab start-realtime",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/realtime/start/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/realtime/start/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.037.stoprealtime",
+      "command": "data-lab stop-realtime",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/realtime/stop/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/realtime/stop/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.038.listtopics",
+      "command": "data-lab list-topics",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/list/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/list/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.039.previewtopicmessages",
+      "command": "data-lab preview-topic-messages",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/message/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/message/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.040.createtopic",
+      "command": "data-lab create-topic",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/topic/create"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "topicSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/topic/create"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.041.deletetopic",
+      "command": "data-lab delete-topic",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/topic/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "deleteTopicSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/topic/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.042.gettopicmetrics",
+      "command": "data-lab get-topic-metrics",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/metrics/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/topic/metrics/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.043.listscenetables",
+      "command": "data-lab list-scene-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/list/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/list/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.044.previewscenetabledata",
+      "command": "data-lab preview-scene-table-data",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/dataPreview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/dataPreview"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.045.exportscenetablecsv",
+      "command": "data-lab export-scene-table-csv",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/exportCsv"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/table/exportCsv"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.046.reviewscenerealism",
+      "command": "data-lab review-scene-realism",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/reviewRealism/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "realismReviewSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/reviewRealism/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.047.generatedirtyscript",
+      "command": "data-lab generate-dirty-script",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/dirty/script/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "dirtyScriptSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/dirty/script/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.048.getqualityreport",
+      "command": "data-lab get-quality-report",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/quality/report/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/quality/report/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.049.refreshqualityreport",
+      "command": "data-lab refresh-quality-report",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scene/quality/report/rebuild/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scene/quality/report/rebuild/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.050.getrunlogs",
+      "command": "data-lab get-run-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scene/run/log/:sceneId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scene/run/log/:sceneId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.051.listbusinesssystemtemplates",
+      "command": "data-lab list-business-system-templates",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.052.startbusinesssystemtemplatebuildjob",
+      "command": "data-lab start-business-system-template-build-job",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/build-jobs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemTemplateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/build-jobs"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.053.getbusinesssystemtemplatebuildjob",
+      "command": "data-lab get-business-system-template-build-job",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/build-jobs/:jobId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/build-jobs/:jobId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.054.listbusinesssystemtemplatelogicalversions",
+      "command": "data-lab list-business-system-template-logical-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/:id/logical-model/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/:id/logical-model/versions"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.055.getbusinesssystemtemplatedetail",
+      "command": "data-lab get-business-system-template-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/templates/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.056.createbusinesssystemtemplate",
+      "command": "data-lab create-business-system-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemTemplateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.057.updatebusinesssystemtemplatebasic",
+      "command": "data-lab update-business-system-template-basic",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/update-basic"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemTemplateUpdateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/update-basic"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.058.deletebusinesssystemtemplate",
+      "command": "data-lab delete-business-system-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.059.savebusinesssystemtemplatelogicalmodel",
+      "command": "data-lab save-business-system-template-logical-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/logical-model/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemLogicalModelSaveSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/templates/:id/logical-model/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.060.createbusinesssysteminstance",
+      "command": "data-lab create-business-system-instance",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemInstanceCreateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.061.listbusinesssysteminstances",
+      "command": "data-lab list-business-system-instances",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.062.getbusinesssysteminstancedetail",
+      "command": "data-lab get-business-system-instance-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.063.deletebusinesssysteminstance",
+      "command": "data-lab delete-business-system-instance",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.064.listindustrydatasources",
+      "command": "data-lab list-industry-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.065.getindustrydatasourcedetail",
+      "command": "data-lab get-industry-data-source-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.066.getindustrydatasourcesharedentitydetail",
+      "command": "data-lab get-industry-data-source-shared-entity-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources/:id/entities/:entityId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/data-sources/:id/entities/:entityId"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.067.createindustrydatasource",
+      "command": "data-lab create-industry-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "industryDataSourceCreateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.068.deleteindustrydatasource",
+      "command": "data-lab delete-industry-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources/:id/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources/:id/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.069.rebuildindustrydatasourcepreview",
+      "command": "data-lab rebuild-industry-data-source-preview",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources/:id/rebuild-preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/data-sources/:id/rebuild-preview"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.070.listbusinesssysteminstancephysicalversions",
+      "command": "data-lab list-business-system-instance-physical-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/physical-model/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/physical-model/versions"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.071.generatebusinesssysteminstancephysicalmodel",
+      "command": "data-lab generate-business-system-instance-physical-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemPhysicalModelGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.072.savebusinesssysteminstancephysicalmodel",
+      "command": "data-lab save-business-system-instance-physical-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemPhysicalModelSaveSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.073.deletebusinesssysteminstancephysicalversion",
+      "command": "data-lab delete-business-system-instance-physical-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/versions/:versionId/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/versions/:versionId/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.074.exportbusinesssysteminstancephysicaldesigndoc",
+      "command": "data-lab export-business-system-instance-physical-design-doc",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/design-doc"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemPhysicalDesignDocSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/design-doc"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.075.deploybusinesssysteminstancephysicalmodel",
+      "command": "data-lab deploy-business-system-instance-physical-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/deploy"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemPhysicalModelDeploySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/physical-model/deploy"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.076.listbusinesssysteminstancegenerationversions",
+      "command": "data-lab list-business-system-instance-generation-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/versions"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.077.generatebusinesssysteminstancegenerationplan",
+      "command": "data-lab generate-business-system-instance-generation-plan",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemGenerationPlanGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.078.deletebusinesssysteminstancegenerationversion",
+      "command": "data-lab delete-business-system-instance-generation-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/versions/:versionId/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/generation-plan/versions/:versionId/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.079.listbusinesssysteminstancedirtyversions",
+      "command": "data-lab list-business-system-instance-dirty-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/versions"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.080.generatebusinesssysteminstancedirtydata",
+      "command": "data-lab generate-business-system-instance-dirty-data",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemDirtyDataGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.081.deletebusinesssysteminstancedirtyversion",
+      "command": "data-lab delete-business-system-instance-dirty-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/versions/:versionId/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/dirty-data/versions/:versionId/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.082.patchbusinesssystemdirtydataversion",
+      "command": "data-lab patch-business-system-dirty-data-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/dirty-profiles/:versionId/patch"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "businessSystemDirtyDataPatchSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/dirty-profiles/:versionId/patch"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.083.getbusinesssysteminstancequalityreport",
+      "command": "data-lab get-business-system-instance-quality-report",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/quality-report"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/quality-report"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.084.rebuildbusinesssysteminstancequalityreport",
+      "command": "data-lab rebuild-business-system-instance-quality-report",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/quality-report/rebuild"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/quality-report/rebuild"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.085.listaibusinessdataplans",
+      "command": "data-lab list-ai-business-data-plans",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/plans"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/plans"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.086.generateaibusinessdataplan",
+      "command": "data-lab generate-ai-business-data-plan",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/plans/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "aiBusinessDataPlanGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/plans/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.087.listaibusinessdatabatches",
+      "command": "data-lab list-ai-business-data-batches",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.088.generateaibusinessdatabatch",
+      "command": "data-lab generate-ai-business-data-batch",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "aiBusinessDataBatchGenerateSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.089.loadaibusinessdatabatch",
+      "command": "data-lab load-ai-business-data-batch",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches/:batchId/load"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "aiBusinessDataBatchLoadSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/instances/:id/ai-business-data/batches/:batchId/load"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.090.listaibusinessdatatasks",
+      "command": "data-lab list-ai-business-data-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/ai-business-data/tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/scenario-management/ai-business-data/tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.091.saveaibusinessdatatask",
+      "command": "data-lab save-ai-business-data-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "aiBusinessDataTaskSaveSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.092.updateaibusinessdatataskschedule",
+      "command": "data-lab update-ai-business-data-task-schedule",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/schedule"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "aiBusinessDataTaskScheduleSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/schedule"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.093.runaibusinessdatatask",
+      "command": "data-lab run-ai-business-data-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/run"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.094.deleteaibusinessdatatask",
+      "command": "data-lab delete-ai-business-data-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/scenario-management/ai-business-data/tasks/:taskId/delete"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.095.getopsdashboard",
+      "command": "data-lab get-ops-dashboard",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/ops/dashboard"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/ops/dashboard"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.096.listlabmodels",
+      "command": "data-lab list-lab-models",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/model/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/model/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.097.savelabmodel",
+      "command": "data-lab save-lab-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/model/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "modelProfileSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/model/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.098.deletelabmodel",
+      "command": "data-lab delete-lab-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/model/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/model/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.099.setdefaultlabmodel",
+      "command": "data-lab set-default-lab-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/model/setDefault/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/model/setDefault/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.100.debuglabmodel",
+      "command": "data-lab debug-lab-model",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/model/debug"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  profileId: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/model/debug"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.101.listprompttemplates",
+      "command": "data-lab list-prompt-templates",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/prompt/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/prompt/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.102.syncdefaultprompttemplates",
+      "command": "data-lab sync-default-prompt-templates",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/sync-defaults"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/sync-defaults"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.103.saveprompttemplate",
+      "command": "data-lab save-prompt-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.104.saveprompttemplatedraft",
+      "command": "data-lab save-prompt-template-draft",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/save-draft"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  promptType: z.string("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/save-draft"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.105.publishprompttemplate",
+      "command": "data-lab publish-prompt-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/publish"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/publish"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.106.deleteprompttemplate",
+      "command": "data-lab delete-prompt-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.107.listprompttemplateversions",
+      "command": "data-lab list-prompt-template-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/prompt/version/list/:promptType"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/prompt/version/list/:promptType"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.108.debugprompttemplate",
+      "command": "data-lab debug-prompt-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/prompt/debug"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  promptType: z.string("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/prompt/debug"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.109.listscenetemplates",
+      "command": "data-lab list-scene-templates",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/template/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/template/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.110.savescenetemplate",
+      "command": "data-lab save-scene-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/template/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/template/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.111.deletescenetemplate",
+      "command": "data-lab delete-scene-template",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/template/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/template/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.112.listoperationlogs",
+      "command": "data-lab list-operation-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/operation/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/operation/logs"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.113.listscenarioenhancements",
+      "command": "data-lab list-scenario-enhancements",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.114.getscenarioenhancementdetail",
+      "command": "data-lab get-scenario-enhancement-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/detail/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/detail/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.115.savescenarioenhancement",
+      "command": "data-lab save-scenario-enhancement",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.116.deletescenarioenhancement",
+      "command": "data-lab delete-scenario-enhancement",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.117.previewscenariorecognition",
+      "command": "data-lab preview-scenario-recognition",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  sceneName: z.string("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.118.exportscenarioenhancement",
+      "command": "data-lab export-scenario-enhancement",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/export/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/enhancement/export/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.119.importscenarioenhancement",
+      "command": "data-lab import-scenario-enhancement",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/import"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/enhancement/import"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.120.listindustryincubations",
+      "command": "data-lab list-industry-incubations",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/incubation/list"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/incubation/list"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.121.getindustryincubationdetail",
+      "command": "data-lab get-industry-incubation-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/incubation/detail/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/incubation/detail/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.122.getindustryincubationstats",
+      "command": "data-lab get-industry-incubation-stats",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/incubation/stats/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/incubation/stats/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.123.listindustryincubationlogs",
+      "command": "data-lab list-industry-incubation-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-modeling/incubation/logs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-modeling/incubation/logs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.124.saveindustryincubation",
+      "command": "data-lab save-industry-incubation",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/save"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/save"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.125.deleteindustryincubation",
+      "command": "data-lab delete-industry-incubation",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.126.deleteindustrycategory",
+      "command": "data-lab delete-industry-category",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/category/delete/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  categoryCode: z.string("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/category/delete/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.127.refreshindustrymetadata",
+      "command": "data-lab refresh-industry-metadata",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/refresh-metadata/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/refresh-metadata/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.128.startindustryincubationrun",
+      "command": "data-lab start-industry-incubation-run",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/run/start/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  roundCount: z.coerce.number("
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/run/start/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.129.stopindustryincubationrun",
+      "command": "data-lab stop-industry-incubation-run",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/run/stop/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/run/stop/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.130.updateindustrycategoryiteration",
+      "command": "data-lab update-industry-category-iteration",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/category-iteration/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  categoryCode: z.string("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/category-iteration/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.131.generateindustryincubationround",
+      "command": "data-lab generate-industry-incubation-round",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/generate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  incubationId: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/generate"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.132.executeindustryincubationround",
+      "command": "data-lab execute-industry-incubation-round",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/execute/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/execute/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.133.updateindustryincubationround",
+      "command": "data-lab update-industry-incubation-round",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/update"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [
+        "z.object({\n  id: z.coerce.number("
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/round/update"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.134.syncindustryincubationtoenhancement",
+      "command": "data-lab sync-industry-incubation-to-enhancement",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/sync-enhancement/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/sync-enhancement/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-lab.135.rebuildindustryincubationdictionaryownership",
+      "command": "data-lab rebuild-industry-incubation-dictionary-ownership",
+      "sourceApiKeys": [
+        "POST /api/v1/data-modeling/incubation/rebuild-dictionary-ownership/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-modeling",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_modeling\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-modeling/incubation/rebuild-dictionary-ownership/:id"
+      ]
+    }
+  ]
+}

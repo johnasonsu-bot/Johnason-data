@@ -1,0 +1,827 @@
+{
+  "moduleName": "data-source-research",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-source-research.001.listresearchtasks",
+      "command": "source-research list-research-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/tasks"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-source-research"
+      ],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.002.createresearchtask",
+      "command": "source-research create-research-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-source-research/tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "createResearchTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-source-research/tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.003.getresearchtask",
+      "command": "source-research get-research-task",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.004.updateresearchtask",
+      "command": "source-research update-research-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-source-research/tasks/:taskId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "updateResearchTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-source-research/tasks/:taskId"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.005.deleteresearchtask",
+      "command": "source-research delete-research-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-source-research/tasks/:taskId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-source-research/tasks/:taskId"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.006.listresearchtaskruns",
+      "command": "source-research list-research-task-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.007.createresearchtaskrun",
+      "command": "source-research create-research-task-run",
+      "sourceApiKeys": [
+        "POST /api/v1/data-source-research/tasks/:taskId/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-source-research/tasks/:taskId/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.008.listresearchcomparisons",
+      "command": "source-research list-research-comparisons",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId/comparisons"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/tasks/:taskId/comparisons"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.009.compareresearchreports",
+      "command": "source-research compare-research-reports",
+      "sourceApiKeys": [
+        "POST /api/v1/data-source-research/tasks/:taskId/compare"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "compareResearchReportsSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-source-research/tasks/:taskId/compare"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.010.getresearchcomparison",
+      "command": "source-research get-research-comparison",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/comparisons/:comparisonId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/comparisons/:comparisonId"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.011.createresearchrun",
+      "command": "source-research create-research-run",
+      "sourceApiKeys": [
+        "POST /api/v1/data-source-research/source/:sourceId/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "createResearchRunSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-source-research/source/:sourceId/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.012.listresearchruns",
+      "command": "source-research list-research-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/source/:sourceId/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/source/:sourceId/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.013.getresearchrun",
+      "command": "source-research get-research-run",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.014.listresearchlogs",
+      "command": "source-research list-research-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/logs"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.015.getresearchreport",
+      "command": "source-research get-research-report",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/report"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/report"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.016.downloadresearchreportword",
+      "command": "source-research download-research-report-word",
+      "sourceApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/report.docx"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-source-research/runs/:runId/report.docx"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.017.terminateresearchrun",
+      "command": "source-research terminate-research-run",
+      "sourceApiKeys": [
+        "POST /api/v1/data-source-research/runs/:runId/terminate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-source-research/runs/:runId/terminate"
+      ]
+    },
+    {
+      "capabilityId": "data-source-research.018.deleteresearchrun",
+      "command": "source-research delete-research-run",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-source-research/runs/:runId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-source-research",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-source-research/runs/:runId"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,972 @@
+{
+  "moduleName": "data-standards",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-standards.001.getoverview",
+      "command": "standard get-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/overview"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-standards/overview",
+        "/dashboard/data-standards/catalogs",
+        "/dashboard/data-standards/elements",
+        "/dashboard/data-standards/value-domains",
+        "/dashboard/data-standards/references",
+        "/dashboard/data-standards/mappings",
+        "/dashboard/data-standards/models",
+        "/dashboard/data-standards"
+      ],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/overview"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.002.downloadimporttemplate",
+      "command": "standard download-import-template",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/import-templates"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/import-templates"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.003.exportstandards",
+      "command": "standard export-standards",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/exports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/exports"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.004.listimportbatches",
+      "command": "standard list-import-batches",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/imports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/imports"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.005.downloadimporterrors",
+      "command": "standard download-import-errors",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/imports/:id/errors"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/imports/:id/errors"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.006.previewimport",
+      "command": "standard preview-import",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/imports/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/imports/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.007.commitimport",
+      "command": "standard commit-import",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/imports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/imports"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.008.listcatalogtree",
+      "command": "standard list-catalog-tree",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/catalogs/tree"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/catalogs/tree"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.009.listcatalogs",
+      "command": "standard list-catalogs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/catalogs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/catalogs"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.010.createcatalog",
+      "command": "standard create-catalog",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/catalogs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "catalogSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/catalogs"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.011.updatecatalog",
+      "command": "standard update-catalog",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-standards/catalogs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "catalogSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-standards/catalogs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.012.deletecatalog",
+      "command": "standard delete-catalog",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-standards/catalogs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-standards/catalogs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.013.listreferencestandards",
+      "command": "standard list-reference-standards",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/reference-standards"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/reference-standards"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.014.createreferencestandard",
+      "command": "standard create-reference-standard",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/reference-standards"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "referenceStandardSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/reference-standards"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.015.updatereferencestandard",
+      "command": "standard update-reference-standard",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-standards/reference-standards/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "referenceStandardSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-standards/reference-standards/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.016.deletereferencestandard",
+      "command": "standard delete-reference-standard",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-standards/reference-standards/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-standards/reference-standards/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.017.listvaluedomains",
+      "command": "standard list-value-domains",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/value-domains"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/value-domains"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.018.getvaluedomaindetail",
+      "command": "standard get-value-domain-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/value-domains/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/value-domains/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.019.createvaluedomain",
+      "command": "standard create-value-domain",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/value-domains"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "valueDomainSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/value-domains"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.020.updatevaluedomain",
+      "command": "standard update-value-domain",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-standards/value-domains/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "valueDomainSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-standards/value-domains/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.021.deletevaluedomain",
+      "command": "standard delete-value-domain",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-standards/value-domains/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-standards/value-domains/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.022.listdataelements",
+      "command": "standard list-data-elements",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/elements"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/elements"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.023.getdataelementdetail",
+      "command": "standard get-data-element-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/elements/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/elements/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.024.createdataelement",
+      "command": "standard create-data-element",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/elements"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "dataElementSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/elements"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.025.updatedataelement",
+      "command": "standard update-data-element",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-standards/elements/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "dataElementSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-standards/elements/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.026.publishdataelement",
+      "command": "standard publish-data-element",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/elements/:id/publish"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "publishElementSchema"
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/elements/:id/publish"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.027.deletedataelement",
+      "command": "standard delete-data-element",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-standards/elements/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-standards/elements/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.028.listfieldmappings",
+      "command": "standard list-field-mappings",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/mappings"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/mappings"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.029.listaiconfigs",
+      "command": "standard list-ai-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-standards/ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-standards/ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.030.updateaiconfig",
+      "command": "standard update-ai-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-standards/ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "aiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-standards/ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-standards.031.suggestdataelements",
+      "command": "standard suggest-data-elements",
+      "sourceApiKeys": [
+        "POST /api/v1/data-standards/ai/suggest-elements"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-standards",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"standards\"",
+      "validationSchemas": [
+        "aiSuggestElementSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-standards/ai/suggest-elements"
+      ]
+    }
+  ]
+}

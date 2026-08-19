@@ -1,0 +1,531 @@
+{
+  "moduleName": "project-spaces",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "project-spaces.001.listmyprojects",
+      "command": "project list-my-projects",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/my"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/system-projects"
+      ],
+      "module": "projects",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/my"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.002.listprojectassettransferlogs",
+      "command": "project list-project-asset-transfer-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/asset-transfer-logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/asset-transfer-logs"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.003.previewprojectassetimport",
+      "command": "project preview-project-asset-import",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/assets/import/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "multipart:file"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/assets/import/preview"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.004.importprojectassets",
+      "command": "project import-project-assets",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/assets/import"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "multipart:file"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/assets/import"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.005.listprojects",
+      "command": "project list-projects",
+      "sourceApiKeys": [
+        "GET /api/v1/projects"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.006.createproject",
+      "command": "project create-project",
+      "sourceApiKeys": [
+        "POST /api/v1/projects"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "projectSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.007.listprojectassetbackups",
+      "command": "project list-project-asset-backups",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/:id/assets/backups"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/:id/assets/backups"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.008.createprojectassetbackup",
+      "command": "project create-project-asset-backup",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/:id/assets/backups"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/:id/assets/backups"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.009.downloadprojectassetbackup",
+      "command": "project download-project-asset-backup",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/:id/assets/backups/:backupId/download"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/:id/assets/backups/:backupId/download"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.010.exportprojectassets",
+      "command": "project export-project-assets",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/:id/assets/export"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/:id/assets/export"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.011.getprojectdetail",
+      "command": "project get-project-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/projects/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/projects/:id"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.012.updateproject",
+      "command": "project update-project",
+      "sourceApiKeys": [
+        "PUT /api/v1/projects/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "projectSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/projects/:id"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.013.deleteproject",
+      "command": "project delete-project",
+      "sourceApiKeys": [
+        "DELETE /api/v1/projects/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/projects/:id"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.014.setdefaultproject",
+      "command": "project set-default-project",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/:id/default"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/:id/default"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.015.updateprojectstatus",
+      "command": "project update-project-status",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/:id/status"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "projectStatusSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/:id/status"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.016.upsertprojectmember",
+      "command": "project upsert-project-member",
+      "sourceApiKeys": [
+        "POST /api/v1/projects/:id/members"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [
+        "projectMemberSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/projects/:id/members"
+      ]
+    },
+    {
+      "capabilityId": "project-spaces.017.removeprojectmember",
+      "command": "project remove-project-member",
+      "sourceApiKeys": [
+        "DELETE /api/v1/projects/:id/members/:userId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "projects",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/projects/:id/members/:userId"
+      ]
+    }
+  ]
+}

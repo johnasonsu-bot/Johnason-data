@@ -1,0 +1,345 @@
+{
+  "moduleName": "file-imports",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "file-imports.001.listtasks",
+      "command": "file-import list-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/file-imports"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-file-imports"
+      ],
+      "module": "file-imports",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/file-imports"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.002.gettask",
+      "command": "file-import get-task",
+      "sourceApiKeys": [
+        "GET /api/v1/file-imports/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/file-imports/:id"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.003.listruns",
+      "command": "file-import list-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/file-imports/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/file-imports/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.004.listrunerrors",
+      "command": "file-import list-run-errors",
+      "sourceApiKeys": [
+        "GET /api/v1/file-imports/:id/runs/:runId/errors"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/file-imports/:id/runs/:runId/errors"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.005.cancelrun",
+      "command": "file-import cancel-run",
+      "sourceApiKeys": [
+        "POST /api/v1/file-imports/:id/runs/:runId/cancel"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/file-imports/:id/runs/:runId/cancel"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.006.previewfiles",
+      "command": "file-import preview-files",
+      "sourceApiKeys": [
+        "POST /api/v1/file-imports/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "multipart:files"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/file-imports/preview"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.007.createtask",
+      "command": "file-import create-task",
+      "sourceApiKeys": [
+        "POST /api/v1/file-imports"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "multipart:files"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/file-imports"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.008.suggesttechnicalnames",
+      "command": "file-import suggest-technical-names",
+      "sourceApiKeys": [
+        "POST /api/v1/file-imports/suggest-technical-names"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "suggestTechnicalNamesSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/file-imports/suggest-technical-names"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.009.updatetask",
+      "command": "file-import update-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/file-imports/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/file-imports/:id"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.010.runtasknow",
+      "command": "file-import run-task-now",
+      "sourceApiKeys": [
+        "POST /api/v1/file-imports/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/file-imports/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "file-imports.011.deletetask",
+      "command": "file-import delete-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/file-imports/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "file-imports",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/file-imports/:id"
+      ]
+    }
+  ]
+}

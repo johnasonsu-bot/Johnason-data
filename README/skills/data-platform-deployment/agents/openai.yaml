@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Platform Deployment"
+  short_description: "Deploy and verify the local Data Platform stack"
+  default_prompt: "Use $data-platform-deployment to install, start, and verify the local Data Platform and its database-backed CLI."

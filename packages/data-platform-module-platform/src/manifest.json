@@ -1,0 +1,236 @@
+{
+  "moduleName": "platform",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "platform.001.overview",
+      "command": "platform overview",
+      "sourceApiKeys": [
+        "GET /api/v1/platform/overview"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/overview"
+      ],
+      "module": "platform",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"overview\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/platform/overview"
+      ]
+    },
+    {
+      "capabilityId": "platform.002.get.api.health",
+      "command": "system doctor health",
+      "sourceApiKeys": [
+        "GET /api/health"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/system-services",
+        "/dashboard/system-database-drivers",
+        "/dashboard/system-users",
+        "/dashboard/system-roles",
+        "/dashboard/system"
+      ],
+      "module": "health",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "local"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/health"
+      ]
+    },
+    {
+      "capabilityId": "platform.003.get.api.v1.platform.database.capabilities",
+      "command": "system doctor database-capabilities",
+      "sourceApiKeys": [
+        "GET /api/v1/platform/database-capabilities"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "platform-runtime",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/platform/database-capabilities"
+      ]
+    },
+    {
+      "capabilityId": "platform.004.get.api.v1.jobs.id",
+      "command": "job show",
+      "sourceApiKeys": [
+        "GET /api/v1/jobs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "platform-runtime",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/jobs/:id"
+      ]
+    },
+    {
+      "capabilityId": "platform.005.post.api.auth.login",
+      "command": "auth login",
+      "sourceApiKeys": [
+        "POST /api/auth/login"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "platform-runtime",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [
+        "loginSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/auth/login",
+        "POST /api/auth/login"
+      ]
+    },
+    {
+      "capabilityId": "platform.006.get.api.auth.profile",
+      "command": "auth profile",
+      "sourceApiKeys": [
+        "GET /api/auth/profile"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "platform-runtime",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": true,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/auth/profile",
+        "GET /api/auth/profile"
+      ]
+    },
+    {
+      "capabilityId": "platform.007.get.api.v1.reporting.runtime.dashboards.id",
+      "command": "reporting runtime dashboard show",
+      "sourceApiKeys": [
+        "GET /api/v1/reporting/runtime/dashboards/:id"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/reporting/overview",
+        "/dashboard/reporting/data-sources",
+        "/dashboard/reporting/datasets",
+        "/dashboard/reporting/workbench",
+        "/dashboard/reporting/chart-library",
+        "/dashboard/reporting/theme-templates",
+        "/dashboard/reporting/models",
+        "/dashboard/reporting"
+      ],
+      "module": "platform-runtime",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": false,
+      "projectScoped": false,
+      "featureGuard": null,
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/reporting/runtime/dashboards/:id"
+      ]
+    }
+  ]
+}

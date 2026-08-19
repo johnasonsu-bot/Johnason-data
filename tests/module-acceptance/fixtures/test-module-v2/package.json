@@ -1,7 +1,0 @@
-{
-  "name": "@johnason/data-platform-module-rollback-fixture",
-  "version": "0.2.0",
-  "main": "index.js",
-  "files": ["index.js"],
-  "engines": { "node": ">=22.20.0" }
-}

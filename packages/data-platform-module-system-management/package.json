@@ -3,8 +3,16 @@
   "version": "0.2.0",
   "private": false,
   "main": "src/index.js",
-  "exports": { ".": "./src/index.js", "./contracts": "./contracts/index.js" },
-  "files": ["src", "contracts"],
-  "engines": { "node": ">=22.20.0" },
-  "dependencies": { "@johnason/data-platform-core-kernel": "0.1.0" }
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "bcryptjs": "2.4.3",
+    "uuid": "9.0.1"
+  },
+  "license": "UNLICENSED"
 }

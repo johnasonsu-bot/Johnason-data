@@ -1,14 +1,31 @@
 {
   "name": "johnason-data-platform-workspace",
+  "version": "0.2.0",
   "private": true,
-  "workspaces": ["packages/*", "backend"],
-  "engines": { "node": ">=22.20.0" },
+  "workspaces": [
+    "packages/*",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=22.20.0"
+  },
   "scripts": {
-    "test:core": "npm test --workspaces --if-present",
-    "test:shared-core-install": "node --test tests/shared-core-install/*.test.js",
-    "check:boundaries": "node scripts/check-core-package-boundaries.js"
+    "build": "npm run generate:core && npm run build:module-runtimes && npm run check:boundaries && npm run check:coverage",
+    "generate:core": "node scripts/generate-shared-core-packages.js",
+    "build:module-runtimes": "node scripts/build-module-runtimes.js",
+    "install:cli:local": "node scripts/install-local-data-platform-cli.js",
+    "test": "npm run test:core && npm run test:cli",
+    "test:core": "node --test packages/data-platform-core-kernel/tests/*.test.js packages/data-platform-core/tests/*.test.js",
+    "test:cli": "npm test --workspace @johnason/data-platform-cli",
+    "test:workspaces": "npm test --workspaces --if-present",
+    "check:boundaries": "node scripts/check-core-package-boundaries.js",
+    "check:coverage": "node scripts/verify-cli-coverage.js",
+    "acceptance:cli": "node scripts/run-cli-service-acceptance.js",
+    "acceptance": "node --test tests/module-acceptance/aggregate/aggregate-acceptance.test.js"
   },
   "devDependencies": {
+    "acorn": "8.15.0",
+    "esbuild": "^0.25.9",
     "verdaccio": "6.9.2"
   }
 }

@@ -1,0 +1,380 @@
+{
+  "moduleName": "system-knowledge-base",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "system-knowledge-base.001.listknowledgebases",
+      "command": "knowledge-base list-knowledge-bases",
+      "sourceApiKeys": [
+        "GET /api/v1/system-knowledge-bases"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/system-knowledge-bases/industry",
+        "/dashboard/system-knowledge-bases/platform",
+        "/dashboard/system-knowledge-bases/personal",
+        "/dashboard/system-knowledge-bases"
+      ],
+      "module": "system-knowledge-bases",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-knowledge-bases"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.002.createknowledgebase",
+      "command": "knowledge-base create-knowledge-base",
+      "sourceApiKeys": [
+        "POST /api/v1/system-knowledge-bases"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [
+        "knowledgeBaseSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-knowledge-bases"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.003.reparseknowledgedocument",
+      "command": "knowledge-base reparse-knowledge-document",
+      "sourceApiKeys": [
+        "POST /api/v1/system-knowledge-bases/documents/:documentId/reparse"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-knowledge-bases/documents/:documentId/reparse"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.004.previewknowledgedocument",
+      "command": "knowledge-base preview-knowledge-document",
+      "sourceApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/preview"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.005.streamknowledgedocumentcontent",
+      "command": "knowledge-base stream-knowledge-document-content",
+      "sourceApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/content"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "read",
+      "interaction": "stream",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human stream or NDJSON",
+      "executionMode": "foreground-stream",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/content"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.006.downloadknowledgedocument",
+      "command": "knowledge-base download-knowledge-document",
+      "sourceApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/download"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "read",
+      "interaction": "download",
+      "inputMode": "validated flags/path parameters",
+      "outputMode": "required --output file",
+      "executionMode": "sync-file",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-knowledge-bases/documents/:documentId/download"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.007.deleteknowledgedocument",
+      "command": "knowledge-base delete-knowledge-document",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-knowledge-bases/documents/:documentId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-knowledge-bases/documents/:documentId"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.008.syncincubationknowledgebase",
+      "command": "knowledge-base sync-incubation-knowledge-base",
+      "sourceApiKeys": [
+        "POST /api/v1/system-knowledge-bases/sync/incubation/:incubationId"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [
+        "incubationKnowledgeSyncSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-knowledge-bases/sync/incubation/:incubationId"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.009.uploadknowledgedocument",
+      "command": "knowledge-base upload-knowledge-document",
+      "sourceApiKeys": [
+        "POST /api/v1/system-knowledge-bases/:id/documents"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "upload",
+      "interaction": "multipart",
+      "inputMode": "--file/--files plus validated flags",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [
+        "multipart:file"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/system-knowledge-bases/:id/documents"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.010.getknowledgebasedetail",
+      "command": "knowledge-base get-knowledge-base-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/system-knowledge-bases/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/system-knowledge-bases/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.011.updateknowledgebase",
+      "command": "knowledge-base update-knowledge-base",
+      "sourceApiKeys": [
+        "PUT /api/v1/system-knowledge-bases/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [
+        "knowledgeBaseSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/system-knowledge-bases/:id"
+      ]
+    },
+    {
+      "capabilityId": "system-knowledge-base.012.deleteknowledgebase",
+      "command": "knowledge-base delete-knowledge-base",
+      "sourceApiKeys": [
+        "DELETE /api/v1/system-knowledge-bases/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "system-knowledge-bases",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"system_services\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/system-knowledge-bases/:id"
+      ]
+    }
+  ]
+}

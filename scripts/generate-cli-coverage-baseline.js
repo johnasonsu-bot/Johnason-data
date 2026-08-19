@@ -3,7 +3,6 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { validateExecutionTargets } = require("../packages/data-platform-cli/src/registry/execution-targets");
 
 const [, , inventoryPath, outputPath] = process.argv;
 
@@ -161,118 +160,49 @@ function confirmationRequired(route) {
   return route.method === "DELETE" || /\/(run|start|publish|activate|reject|stop)(\/|$)/.test(route.path);
 }
 
-const EXTERNAL_API_ROUTE_KEYS = new Set([
-  // research runs and comparisons call the configured model provider asynchronously.
-  "POST /api/v1/data-source-research/tasks/:taskId/runs",
-  "POST /api/v1/data-source-research/tasks/:taskId/compare",
-  "POST /api/v1/data-source-research/source/:sourceId/runs",
-]);
-
-const CONDITIONAL_DATASOURCE_API_ROUTE_KEYS = new Set([
-  // These routes call apiIngestionService only when the resolved datasource/task source is API-backed.
-  "GET /api/v1/data-sources/:id/tables/:tableName/columns",
-  "GET /api/v1/data-sources/:id/tables/:tableName/sample",
-  "POST /api/v1/data-sources/test-connection",
-  "POST /api/v1/ingestion-tasks/:id/run",
-  "POST /api/v1/ingestion-tasks/preview-source",
-]);
-
-const CONNECTIVITY_API_ROUTE_KEY = "GET /api/v1/data-sources";
-
-const EXTERNAL_API_CONTROLLERS = new Set([
-  "analyzeDictionaryTable",
-  "analyzeJobRunFailure",
-  "analyzeRegexRule",
-  "analyzeResourceContentProfile",
-  "analyzeResourceFieldProfile",
-  "analyzeResourceProfile",
-  "analyzeScene",
-  "generateAiBusinessDataBatch",
-  "generateAiBusinessDataPlan",
-  "planAiChartSql",
-  "queryQualityOpsRobot",
-  "recommendAiChart",
-  "recommendServiceConfig",
-  "recommendStrategy",
-  "recommendTaskConfig",
-  "reviseAiChartSql",
-  "runAiBusinessDataTask",
-  "runAiChartQuery",
-  "runCopilotTask",
-  "runCopilotTaskStream",
-  "runQualityAiAnalysis",
-  "startRecommendation",
-  "suggestAiChartAnalysis",
-  "suggestDataElements",
-  "allocateAiChartFieldMap",
-]);
-
-const FOUR_DATABASE_ENGINES = Object.freeze(["mysql", "postgresql", "oracle", "dm"]);
-
-const BUSINESS_DATASOURCE_ENGINES = new Map([
-  // data-source.metadata + the managed adapter capability suite implement these operations for all four engines.
-  ...["listTables", "listColumns", "sampleRows", "testConnection"].map((controller) => [
-    `data-sources:${controller}`,
-    FOUR_DATABASE_ENGINES,
-  ]),
-  ...["listTables", "listColumns", "sampleRows", "testConnection"].map((controller) => [
-    `data-modeling-sources:${controller}`,
-    FOUR_DATABASE_ENGINES,
-  ]),
-  // DataX/database adapters exercise source preview and ingestion runs against all four engines.
-  ["ingestion-tasks:previewSourceData", FOUR_DATABASE_ENGINES],
-  ["ingestion-tasks:runTaskNow", FOUR_DATABASE_ENGINES],
-  // Research execution explicitly accepts MySQL/PostgreSQL (plus non-database source kinds outside this schema).
-  ["data-source-research:createResearchTaskRun", Object.freeze(["mysql", "postgresql"])],
-  ["data-source-research:createResearchRun", Object.freeze(["mysql", "postgresql"])],
-  // Development uses the shared managed adapters/JDBC inference for metadata, queries, and executable plans.
-  ...[
-    "testDatasourceConfig",
-    "testDatasource",
-    "listDatasourceDatabases",
-    "listDatasourceTables",
-    "listDatasourceColumns",
-    "listDatasourceFunctions",
-    "executeQuery",
-    "previewOrchestrationNode",
-    "runOrchestration",
-    "previewProcessingJobDraft",
-    "previewProcessingJob",
-    "runProcessingJob",
-    "runWorkflow",
-  ].map((controller) => [`data-development:${controller}`, FOUR_DATABASE_ENGINES]),
-  // Quality source metadata/preview and synchronous runs dispatch through configured source adapters.
-  ...[
-    "listQualitySourceTables",
-    "listQualitySourceColumns",
-    "syncQualitySourceTables",
-    "previewDictionarySourceRows",
-    "runTaskNow",
-  ].map((controller) => [`quality-control:${controller}`, FOUR_DATABASE_ENGINES]),
-  // Service authoring currently validates MySQL/PostgreSQL sources; runtime invocation separately supports all four.
-  ...[
-    "testServiceDataSourceConnection",
-    "listServiceDataSourceTables",
-    "listServiceDataSourceColumns",
-    "sampleServiceDataSourceRows",
-    "previewServiceSql",
-    "debugService",
-  ].map((controller) => [`data-services:${controller}`, Object.freeze(["mysql", "postgresql"])]),
-  ["service-runtime:handleInvoke", FOUR_DATABASE_ENGINES],
-  // Reporting schemas and runtime query paths explicitly support all four database dialects.
-  ["reporting:previewRuntimeDashboardChart", FOUR_DATABASE_ENGINES],
-  ["reporting:runAiChartQuery", FOUR_DATABASE_ENGINES],
-]);
+function hasAnyText(route, patterns) {
+  const text = [route.module, route.path, route.controller, ...(route.validation || [])].join(" ").toLowerCase();
+  return patterns.some((pattern) => text.includes(pattern));
+}
 
 function executionTargets(route) {
-  if (route.path === "/api/health" || route.path === "/api/v1/platform/database-capabilities") {
+  if (route.path === "/api/health") {
     return [{ kind: "local" }];
   }
 
   const targets = [{ kind: "database", engine: "mysql", role: "platform-authority" }];
-  const businessDatasourceEngines = BUSINESS_DATASOURCE_ENGINES.get(`${route.module}:${route.controller}`) || [];
-  for (const engine of businessDatasourceEngines) {
-    targets.push({ kind: "database", engine, role: "business-datasource" });
+  const datasourceModules = new Set([
+    "data-sources",
+    "data-source-research",
+    "data-modeling-sources",
+    "ingestion-tasks",
+    "data-development",
+    "quality-control",
+    "data-services",
+    "service-runtime",
+    "reporting",
+  ]);
+  const datasourceOperation = hasAnyText(route, [
+    "datasource",
+    "data-source",
+    "source/",
+    "source:",
+    "connection",
+    "database",
+    "table",
+    "column",
+    "query",
+    "sql",
+    "sample",
+    "preview",
+    "run",
+    "invoke",
+  ]);
+
+  if (datasourceModules.has(route.module) && datasourceOperation) {
+    for (const engine of ["postgresql", "oracle", "dm"]) {
+      targets.push({ kind: "database", engine, role: "business-datasource" });
+    }
   }
 
   if (route.module === "service-runtime") {
@@ -283,36 +213,41 @@ function executionTargets(route) {
     targets.push({ kind: "api", provider: "model-provider" });
   }
 
-  const apiKey = `${route.method} ${route.path}`;
-  if (apiKey === CONNECTIVITY_API_ROUTE_KEY) {
-    for (const engine of FOUR_DATABASE_ENGINES) {
-      targets.push({
-        kind: "database",
-        engine,
-        role: "connectivity-check",
-      });
-    }
+  const invokesExternalApi = route.method !== "GET" && hasAnyText(route, [
+    "preview-source",
+    "internet-research",
+    "auto-research",
+    "copilot",
+    "/ai/",
+    "ai-analysis",
+    "ai-business-data",
+    "recommend",
+    "analyze",
+    "robot/query",
+    "debug-lab-model",
+    "debug-prompt-template",
+  ]);
+  const dynamicApiIngestion = route.module === "ingestion-tasks" && hasAnyText(route, [
+    "start-task",
+    "run-task-now",
+    "preview-source-data",
+  ]);
+  const dynamicApiDatasource = route.module === "data-sources" && hasAnyText(route, [
+    "test-connection",
+    "sample",
+    "preview",
+  ]);
+
+  if (invokesExternalApi || dynamicApiIngestion || dynamicApiDatasource) {
     targets.push({
       kind: "api",
-      provider: "external-api",
-      role: "connectivity-check",
-    });
-  } else if (CONDITIONAL_DATASOURCE_API_ROUTE_KEYS.has(apiKey)) {
-    targets.push({
-      kind: "api",
-      provider: "external-api",
-      role: "conditional-datasource",
-    });
-  } else if (EXTERNAL_API_ROUTE_KEYS.has(apiKey) || EXTERNAL_API_CONTROLLERS.has(route.controller)) {
-    targets.push({
-      kind: "api",
-      provider: "external-api",
+      provider: route.module === "model-providers" ? "model-provider" : "external-api",
     });
   }
 
-  return validateExecutionTargets(targets.filter((target, index, values) => (
+  return targets.filter((target, index, values) => (
     values.findIndex((candidate) => JSON.stringify(candidate) === JSON.stringify(target)) === index
-  )));
+  ));
 }
 
 const apiCoverageRaw = inventory.routes.map((route, index) => ({

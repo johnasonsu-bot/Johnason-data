@@ -1,441 +1,289 @@
 const fs = require("node:fs");
 const os = require("node:os");
-const path = require("node:path");
-const crypto = require("node:crypto");
-const { Command } = require("commander");
-const { createRenderer } = require("./output/renderer");
-const { runRepl } = require("./repl/repl");
-const { createCommandRegistry } = require("./registry/command-registry");
-const { resolveRuntimeTargets } = require("./registry/execution-targets");
-const { createFoundationCommands } = require("./registry/foundation-commands");
-const { createBusinessCommands } = require("./registry/business-commands");
-const { createOntologyAcceptanceCommands } = require("./commands/ontology-acceptance");
-const { createProfileDatabaseRuntime } = require("./runtime/database");
-const { createKeychain } = require("./runtime/keychain");
+const { Command, CommanderError } = require("commander");
+const { createCoreRuntime } = require("@johnason/data-platform-core");
+const { PlatformError } = require("@johnason/data-platform-core-kernel");
+const { createDomainCommands } = require("./registry/domain-commands");
+const { readInputFile, readUploadFile, assertOutputPath } = require("./commands/file-io");
+const { envelope, errorEnvelope, exitCodeFor, writeJson, writeNdjson, writeNdjsonText } = require("./output");
 const { resolveCliPaths } = require("./runtime/paths");
 const { createProfileStore } = require("./runtime/profile-store");
-const { createProcessManager } = require("./daemon/process-manager");
-const { CliError } = require("./runtime/cli-execution");
-const packageManifest = require("../package.json");
+const { createLazyKeychain } = require("./runtime/keychain");
+const { createCliExecution } = require("./runtime/cli-execution");
+const { readHiddenInput } = require("./runtime/hidden-input");
+const { registerConfigCommands } = require("./commands/config");
+const { registerFoundationCommands } = require("./commands/foundation");
+const { registerDaemonCommands } = require("./commands/daemon");
+const { runRepl } = require("./repl/repl");
 
-function loadCorePackage() {
-  return require("@johnason/data-platform-core");
-}
-
-function createCliRuntimeDependencies({ profile, keychain, mysqlImpl, runtimePorts = {}, corePackage = loadCorePackage() }) {
-  if (!keychain || typeof keychain.getSessionToken !== "function") throw new TypeError("Keychain must expose getSessionToken");
-  if (!runtimePorts || typeof runtimePorts !== "object" || Array.isArray(runtimePorts)) throw new TypeError("CLI runtime ports must be an object");
-  const databaseRuntime = createProfileDatabaseRuntime(profile, keychain, mysqlImpl || require("mysql2/promise"), corePackage);
-  const sessionToken = keychain.getSessionToken(profile.name);
-  return Object.freeze({
-    ...runtimePorts,
-    databaseRuntime,
-    session: Object.freeze({ token: sessionToken }),
-    profile: Object.freeze({
-      name: profile.name,
-      ...(profile.dataxHome === undefined ? {} : { dataxHome: profile.dataxHome }),
-      ...(profile.kafkaBootstrapServers === undefined ? {} : { kafkaBootstrapServers: Object.freeze([...profile.kafkaBootstrapServers]) }),
-      ...(profile.currentProjectId === undefined ? {} : { currentProjectId: profile.currentProjectId }),
-    }),
-  });
-}
-
-function createCliDataPlatformCore(options) {
-  const corePackage = options?.corePackage || loadCorePackage();
-  return corePackage.createDataPlatformCore(createCliRuntimeDependencies({ ...options, corePackage }));
-}
-
-function createDoctorPorts({ keychain, fsImpl = fs }) {
-  return Object.freeze({
-    async keychain(profile) {
-      const password = keychain.getDatabasePassword(profile.name);
-      if (typeof password !== "string" || password.length === 0) throw new Error("Keychain database password unavailable");
-    },
-    async schema(_profile, databaseRuntime) {
-      if (typeof databaseRuntime?.pool?.query !== "function") throw new Error("Database schema check unavailable");
-      await databaseRuntime.pool.query("SELECT 1 FROM information_schema.tables LIMIT 1");
-    },
-    async datax(profile) {
-      if (!profile.dataxHome) throw new Error("DataX home is not configured");
-      fsImpl.accessSync(path.join(profile.dataxHome, "bin", "datax.py"), fsImpl.constants?.X_OK ?? fs.constants.X_OK);
-    },
-    async kafka(profile) {
-      const addresses = profile.kafkaBootstrapServers;
-      if (!Array.isArray(addresses) || addresses.length === 0 || addresses.some((value) => !/^[^\s:,]+:\d{1,5}$/.test(value))) {
-        throw new Error("Kafka bootstrap servers are not configured");
-      }
-    },
-  });
-}
-
-function createAuthRuntimePort(_profile, _keychain, overrides = {}) {
-  function signingSecret() {
-    const value = overrides.authSigningSecret ?? (overrides.env || process.env).JWT_SECRET;
-    if (typeof value !== "string" || value.trim().length === 0) {
-      throw new CliError("JWT_SECRET is required for CLI authentication", {
-        code: "SECURITY_DEPENDENCY_MISSING", statusCode: 503, exitCode: 7,
-      });
-    }
-    return value.trim();
+function addCommonOptions(command, definition) {
+  command
+    .option("--api-key <method-and-path>", "select one API when a command is an explicit alias")
+    .option("--id <id>", "resource identifier")
+    .option("--input <json>", "inline JSON input")
+    .option("--file <path>", definition.interactions.includes("multipart") ? "binary upload file" : "JSON or YAML input file")
+    .option("--files <paths...>", "binary upload files")
+    .option("--project <id>", "project context")
+    .option("--idempotency-key <key>", "idempotency key for a write command");
+  if (definition.requiresYes) command.option("--yes", "confirm the operation");
+  if (definition.requiresOutput) command.requiredOption("--output <path>", "output file");
+  if (definition.supportsWait) {
+    command.option("--wait", "wait for the durable job");
+    command.option("--timeout <milliseconds>", "wait timeout", (value) => Number(value));
   }
-  const jwtImpl = overrides.jwtImpl || require("jsonwebtoken");
-  return Object.freeze({
-    ...(overrides.runtimePorts?.auth || {}),
-    jwtCodec: Object.freeze({
-      sign(payload) {
-        const expiresIn = String(overrides.jwtExpiresIn ?? (overrides.env || process.env).JWT_EXPIRES_IN ?? "8h").trim() || "8h";
-        return jwtImpl.sign(payload, signingSecret(), { expiresIn });
-      },
-      decode(token) { return jwtImpl.decode(token); },
-      verify(token) { return jwtImpl.verify(token, signingSecret()); },
-    }),
-    passwordHasher: overrides.passwordHasher || require("bcryptjs"),
-    clock: overrides.clock || Object.freeze({ now: () => new Date() }),
-    idGenerator: overrides.idGenerator || crypto.randomUUID,
-  });
+  if (definition.command === "auth login") {
+    command.requiredOption("--username <username>", "platform username");
+    command.option("--password-stdin", "read the platform password from stdin");
+  }
 }
 
-function createProductionDaemonRuntimeFactory(dependencies) {
-  return ({ profileName }) => {
-    const ports = dependencies.daemonPorts;
-    const corePackage = dependencies.corePackage;
-    if (!ports || typeof ports !== "object" || Array.isArray(ports)) throw new TypeError("Production daemon ports are unavailable");
-    if (typeof ports.transaction !== "function") throw new TypeError("Production daemon ports require a MySQL transaction port");
-    if (!ports.producer || ["connect", "send", "disconnect"].some((name) => typeof ports.producer[name] !== "function")) {
-      throw new TypeError("Production daemon ports require a Kafka producer port");
+function positionalParams(definition) {
+  const names = [];
+  for (const apiKey of definition.sourceApiKeys) {
+    const path = apiKey.slice(apiKey.indexOf(" ") + 1);
+    for (const match of path.matchAll(/:([A-Za-z0-9_]+)/g)) {
+      if (!names.includes(match[1])) names.push(match[1]);
     }
-    if (!ports.jobHandlers || typeof ports.jobHandlers !== "object" || Array.isArray(ports.jobHandlers)
-      || Object.keys(ports.jobHandlers).length === 0 || typeof ports.authorize !== "function") {
-      throw new TypeError("Production daemon ports require job handlers and authorization");
-    }
-    if (typeof ports.createConsumerSchedulers !== "function") {
-      throw new TypeError("Production daemon ports require Inbox consumer schedulers");
-    }
-    for (const name of ["createOutboxPublisher", "createInboxConsumer", "createJobWorker", "createDaemonRuntime"]) {
-      if (typeof corePackage?.[name] !== "function") throw new TypeError(`Aggregate core daemon port is unavailable: ${name}`);
-    }
-    const publisher = corePackage.createOutboxPublisher({
-      transaction: ports.transaction,
-      producer: ports.producer,
-      topic: ports.topic,
-      destination: ports.destination,
-      workerId: ports.publisherWorkerId,
-      maxAttempts: ports.publisherMaxAttempts,
-      backoffMs: ports.publisherBackoffMs,
-    });
-    const inbox = corePackage.createInboxConsumer({ transaction: ports.transaction });
-    const worker = corePackage.createJobWorker({
-      transaction: ports.transaction,
-      handlers: ports.jobHandlers,
-      authorize: ports.authorize,
-      backoffMs: ports.jobBackoffMs,
-    });
-    const consumerSchedulers = ports.createConsumerSchedulers({ inbox, profileName });
-    if (!Array.isArray(consumerSchedulers)) throw new TypeError("Inbox consumer schedulers must be an array");
-    const publisherInput = Object.freeze({ limit: ports.publisherBatchSize || 10, leaseMs: ports.publisherLeaseMs || 30_000 });
-    const workerInput = Object.freeze({
-      workerId: ports.jobWorkerId,
-      limit: ports.jobBatchSize || 10,
-      leaseMs: ports.jobLeaseMs || 30_000,
-    });
-    return corePackage.createDaemonRuntime({
-      loops: [
-        Object.freeze({ runBatch: () => publisher.publishBatch(publisherInput) }),
-        Object.freeze({ runBatch: () => worker.runBatch(workerInput) }),
-      ],
-      schedulers: [
-        Object.freeze({ start: () => ports.producer.connect(), stop: () => ports.producer.disconnect() }),
-        ...consumerSchedulers,
-      ],
-      checkpoint: ports.checkpoint,
-      resources: ports.resources || [],
-      wait: ports.wait,
-    });
-  };
+  }
+  return names;
 }
 
-function createDefaultDependencies(overrides = {}) {
-  const paths = overrides.paths || resolveCliPaths({ homeDir: os.homedir() });
-  const profileStore = overrides.profileStore || createProfileStore({ configFile: paths.configFile, fsImpl: fs });
-  const keychain = overrides.keychain || createKeychain();
-  const corePackage = overrides.corePackage || loadCorePackage();
-  const processManager = overrides.processManager || createProcessManager({
-    dataDir: paths.dataDir,
-    binPath: path.resolve(__dirname, "../bin/data-platform.js"),
-  });
-  const dependencies = {
-    ...overrides,
-    corePackage,
-    keychain,
-    profileStore,
-    processManager,
-    doctorPorts: overrides.doctorPorts || createDoctorPorts({ keychain, fsImpl: overrides.fsImpl || fs }),
-    createRuntimePorts: overrides.createRuntimePorts || ((profile) => Object.freeze({
-      ...(overrides.runtimePorts || {}),
-      auth: createAuthRuntimePort(profile, keychain, overrides),
-    })),
-    createDatabaseRuntime: overrides.createDatabaseRuntime || ((profile) => createProfileDatabaseRuntime(
-      profile,
-      keychain,
-      overrides.mysqlImpl || require("mysql2/promise"),
-      corePackage,
-    )),
-  };
-  dependencies.createDaemonRuntime = overrides.createDaemonRuntime || createProductionDaemonRuntimeFactory(dependencies);
-  return dependencies;
-}
-
-function commandFor(program, commandName) {
-  let parent = program;
-  for (const name of commandName.split(/\s+/)) {
-    const existing = Array.isArray(parent.commands)
-      ? parent.commands.find((candidate) => typeof candidate.name === "function" && candidate.name() === name)
-      : null;
-    parent = existing || parent.command(name);
+function commandNode(root, words, cache) {
+  let parent = root;
+  let key = "";
+  for (const word of words) {
+    key = `${key} ${word}`.trim();
+    let child = cache.get(key);
+    if (!child) {
+      child = parent.commands.find((candidate) => candidate.name() === word)
+        || parent.command(word).description(`${key} capabilities`);
+      cache.set(key, child);
+    }
+    parent = child;
   }
   return parent;
 }
 
-const commandOptions = Object.freeze({
-  "auth.login": [["requiredOption", "--username <username>", "Platform username"]],
-  "auth.profile": [["option", "--user-id <id>", "Authenticated user ID"]],
-  "auth.logout": [["option", "--user-id <id>", "Authenticated user ID"]],
-  "config.show": [["option", "--name <name>", "Profile name"]],
-  "config.add": [
-    ["requiredOption", "--name <name>", "Profile name"],
-    ["requiredOption", "--db-host <host>", "Database host"],
-    ["option", "--db-port <port>", "Database port", "3306"],
-    ["requiredOption", "--db-name <database>", "Database name"],
-    ["requiredOption", "--db-user <user>", "Database user"],
-    ["option", "--datax-home <path>", "DataX home"],
-    ["option", "--kafka-bootstrap-servers <addresses>", "Comma-separated Kafka bootstrap servers"],
-  ],
-  "config.use": [["requiredOption", "--name <name>", "Profile name"]],
-  "config.remove": [["requiredOption", "--name <name>", "Profile name"]],
-  "project.resolve": [
-    ["option", "--code <code>", "Project code"],
-    ["option", "--name <name>", "Project name"],
-    ["option", "--require-one", "Require exactly one result"],
-  ],
-  "project.use": [
-    ["option", "--code <code>", "Project code"],
-    ["option", "--name <name>", "Project name"],
-  ],
-  "project.access-check": [["requiredOption", "--action <action>", "Access action"]],
-  "project.access-check-alias": [["requiredOption", "--action <action>", "Access action"]],
-  "system.doctor": [["option", "--all", "Run every dependency check"]],
-  "daemon.start": [["option", "--readiness-timeout-ms <milliseconds>", "Daemon readiness timeout", "10000"]],
-  "daemon.run": [
-    ["option", "--instance-id <id>", "Internal daemon instance ID"],
-    ["option", "--readiness-id <id>", "Internal daemon readiness ID"],
-  ],
-  "daemon.logs": [["option", "--lines <count>", "Number of log lines", "100"]],
-  "daemon.restart": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
-  "daemon.stop": [["option", "--timeout-ms <milliseconds>", "Graceful stop timeout", "10000"]],
-  "ontology.contract.validate": [["option", "--contract <path>", "Ontology contract JSON file"]],
-  "ontology.contract.import": [["option", "--contract <path>", "Ontology contract JSON file"]],
-  "ontology.contract.show": [["option", "--project <id>", "Project ID"]],
-  "ontology.contract.diff": [["option", "--contract <path>", "Ontology contract JSON file"]],
-  "ontology.lineage.show": [["option", "--project <id>", "Project ID"]],
-  "ontology.graph.export": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--output <path>", "Output HTML path"]],
-  "ontology.graph.verify": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--html <path>", "Graph HTML path"]],
-  "ontology.simulation.export": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--output <path>", "Output HTML path"]],
-  "ontology.simulation.verify": [["option", "--contract <path>", "Ontology contract JSON file"], ["requiredOption", "--html <path>", "Simulation HTML path"]],
-  "acceptance.aviation-ontology.preflight": [["option", "--contract <path>", "Ontology contract JSON file"]],
-  "acceptance.aviation-ontology.run": [["option", "--contract <path>", "Ontology contract JSON file"]],
-  "acceptance.aviation-ontology.verify": [["requiredOption", "--run <id>", "Acceptance run ID"]],
-  "acceptance.aviation-ontology.report": [["requiredOption", "--run <id>", "Acceptance run ID"], ["requiredOption", "--output <path>", "Report output path"]],
-});
-
-function positiveInteger(value, label) {
-  if (value === undefined) return undefined;
-  const parsed = Number(value);
-  if (!Number.isSafeInteger(parsed) || parsed <= 0) throw new TypeError(`${label} must be a positive integer`);
-  return parsed;
-}
-
-function inputFor(definition, options) {
-  const input = { ...options };
-  delete input.color;
-  delete input.json;
-  if (input.profile !== undefined) {
-    input.profileName = input.profile;
-    delete input.profile;
+function parseInput(options, definition = { interactions: [] }) {
+  const multipart = definition.interactions.includes("multipart");
+  if (options.file && options.input && !multipart) throw new PlatformError("INPUT_CONFLICT", "Use either --file or --input");
+  let input = {};
+  if (options.input) input = JSON.parse(options.input);
+  if (options.files?.length && !multipart) throw new PlatformError("INPUT_INVALID", "--files is only valid for upload commands");
+  if (options.file) {
+    if (multipart) input.file = readUploadFile(options.file);
+    else input = readInputFile(options.file);
   }
-  if (input.project !== undefined) {
-    input.projectId = positiveInteger(input.project, "project");
-    delete input.project;
+  if (options.files?.length) input.files = options.files.map(readUploadFile);
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw new PlatformError("INPUT_INVALID", "Command input must be a JSON object");
   }
-  if (input.userId !== undefined) input.userId = positiveInteger(input.userId, "user-id");
-  if (input.lines !== undefined) input.lines = positiveInteger(input.lines, "lines");
-  if (input.timeoutMs !== undefined) input.timeoutMs = positiveInteger(input.timeoutMs, "timeout-ms");
-  if (input.readinessTimeoutMs !== undefined) input.readinessTimeoutMs = positiveInteger(input.readinessTimeoutMs, "readiness-timeout-ms");
-  if (definition.capabilityId === "config.show" && input.name !== undefined) {
-    input.profileName = input.name;
-    delete input.name;
-  }
-  if (definition.capabilityId === "config.add") {
-    input.db = {
-      host: input.dbHost,
-      port: positiveInteger(input.dbPort, "db-port"),
-      database: input.dbName,
-      user: input.dbUser,
-    };
-    delete input.dbHost;
-    delete input.dbPort;
-    delete input.dbName;
-    delete input.dbUser;
-    if (input.kafkaBootstrapServers !== undefined) {
-      input.kafkaBootstrapServers = input.kafkaBootstrapServers.split(",").map((value) => value.trim()).filter(Boolean);
-    }
-  }
-  if (definition.inputMode === "json") {
-    const raw = input.input;
-    const file = input.file;
-    delete input.input;
-    delete input.file;
-    if (raw !== undefined && file !== undefined) throw new TypeError("Use either --input or --file, not both");
-    let payload = {};
-    if (raw !== undefined || file !== undefined) {
-      const text = file === undefined ? raw : fs.readFileSync(path.resolve(String(file)), "utf8");
-      try {
-        payload = JSON.parse(text);
-      } catch (error) {
-        throw new TypeError(`Capability JSON input is invalid: ${error.message}`);
-      }
-      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-        throw new TypeError("Capability JSON input must be an object");
-      }
-    }
-    if (["ontology.", "acceptance."].some((prefix) => definition.capabilityId.startsWith(prefix))
-      && typeof input.contract === "string") {
-      try {
-        input.contract = JSON.parse(fs.readFileSync(path.resolve(input.contract), "utf8"));
-      } catch (error) {
-        throw new TypeError(`Contract input is invalid: ${error.message}`);
-      }
-    }
-    return { ...payload, ...input };
-  }
+  if (options.id !== undefined) input.id = options.id;
   return input;
 }
 
-function configureCommand(command, definition) {
-  for (const [method, flags, description, defaultValue] of commandOptions[definition.capabilityId] || []) {
-    command[method](flags, description, defaultValue);
-  }
-  if (definition.inputMode === "json") {
-    command.option("--input <json>", "Capability JSON input");
-    command.option("--file <path>", "Read capability JSON input from a file");
-  }
+function selectCapabilities(definition, options) {
+  if (!options.apiKey) return definition.capabilityIds.slice(0, 1);
+  const index = definition.sourceApiKeys.indexOf(options.apiKey);
+  if (index < 0) throw new PlatformError("API_ALIAS_NOT_FOUND", `Command does not own API key: ${options.apiKey}`);
+  const matches = definition.capabilityIds.filter((_, capabilityIndex) => {
+    return definition.capabilityIds.length === definition.sourceApiKeys.length ? capabilityIndex === index : true;
+  });
+  return matches.length ? matches : definition.capabilityIds;
 }
 
-function bindDefinitions(program, definitions, renderer, state) {
-  if (!program || typeof program.command !== "function") return;
+function createInstalledEnvironment(options) {
+  const paths = resolveCliPaths({
+    platform: options.platform || process.platform,
+    env: options.env || process.env,
+    homeDir: options.homeDir || os.homedir(),
+  });
+  const profileStore = options.profileStore || createProfileStore({ configFile: paths.configFile, fsImpl: options.fsImpl || fs });
+  const keychain = options.keychain || createLazyKeychain(options.keychainOptions);
+  const coreRuntime = createCoreRuntime(options.dependencies);
+  const runtime = createCliExecution({
+    runtime: coreRuntime,
+    profileStore,
+    keychain,
+    databaseRuntimeFactory: options.databaseRuntimeFactory,
+    jwtImpl: options.jwtImpl,
+  });
+  return { runtime, profileStore, keychain, paths };
+}
+
+function createInstalledRuntime(options = {}) {
+  return createInstalledEnvironment(options).runtime;
+}
+
+function createProgram(options = {}) {
+  const stdout = options.stdout || process.stdout;
+  const stderr = options.stderr || process.stderr;
+  const environment = options.runtime
+    ? { runtime: options.runtime, profileStore: options.profileStore, keychain: options.keychain, paths: options.paths }
+    : createInstalledEnvironment(options);
+  const { runtime, profileStore, keychain, paths } = environment;
+  const secretReader = options.secretReader || readHiddenInput;
+  const definitions = createDomainCommands(runtime.catalog);
+  const program = new Command();
+  const nodes = new Map();
+  program
+    .name("data-platform")
+    .description("Johnason Data Platform command line interface")
+    .version("0.2.0")
+    .option("--json", "write a stable JSON envelope")
+    .option("--ndjson", "write newline-delimited JSON")
+    .option("--profile <name>", "runtime profile")
+    .option("--project <id>", "project context")
+    .option("--no-color", "disable color output");
+  program.configureOutput({
+    writeOut: (value) => stdout.write(value),
+    writeErr: (value) => { if (!options.jsonMode) stderr.write(value); },
+  });
+  if (options.exitOverride) program.exitOverride();
+
+  if (profileStore && keychain) {
+    registerConfigCommands(program, {
+      profileStore,
+      keychain,
+      input: options.stdin || process.stdin,
+      output: stdout,
+      errorOutput: stderr,
+      secretReader,
+    });
+  }
+
   for (const definition of definitions) {
-    const command = commandFor(program, definition.command);
-    configureCommand(command, definition);
+    const words = definition.command.split(/\s+/);
+    const actionName = words.pop();
+    const parent = commandNode(program, words, nodes);
+    const command = parent.command(actionName)
+      .description(`${definition.actions.join("/")} ${definition.sourceApiKeys.join(", ")}`);
+    const params = positionalParams(definition);
+    for (const name of params) command.argument(`[${name}]`);
+    addCommonOptions(command, definition);
     command.action(async (...args) => {
-      state.executed = true;
-      const commanderCommand = args.at(-1);
-      const options = typeof commanderCommand?.optsWithGlobals === "function" ? commanderCommand.optsWithGlobals() : {};
-      try {
-        const parsedInput = definition.inputSchema.parse(inputFor(definition, options));
-        const result = definition.outputSchema.parse(await definition.handler(parsedInput));
-        const executionTargets = resolveRuntimeTargets(definition, parsedInput, result);
-        state.exitCode = renderer.success(result, { meta: { executionTargets } });
-      } catch (error) {
-        state.exitCode = renderer.error(error);
+      const commandObject = args.at(-1);
+      const positionals = args.slice(0, -1);
+      const localOptions = commandObject.opts();
+      const rootOptions = commandObject.optsWithGlobals();
+      if (definition.requiresYes && !localOptions.yes) {
+        throw new PlatformError("CONFIRMATION_REQUIRED", "This operation requires --yes");
+      }
+      const input = parseInput(localOptions, definition);
+      params.forEach((name, index) => {
+        if (positionals[index] !== undefined && input[name] === undefined) input[name] = positionals[index];
+      });
+      if (definition.command === "auth login") {
+        if (Object.hasOwn(input, "password")) {
+          throw new PlatformError("SENSITIVE_INPUT_FORBIDDEN", "Platform password must be read from stdin or a hidden prompt");
+        }
+        input.username = localOptions.username;
+        if (!localOptions.passwordStdin && !(options.stdin || process.stdin).isTTY) {
+          throw new PlatformError("INPUT_REQUIRED", "Use --password-stdin when stdin is not a terminal");
+        }
+        input.password = await secretReader({
+          input: options.stdin || process.stdin,
+          output: stderr,
+          prompt: "Platform password: ",
+        });
+        if (!input.password) throw new PlatformError("INPUT_REQUIRED", "Platform password is required");
+        input.headers = { "user-agent": "data-platform-cli" };
+      }
+      const context = {
+        profile: rootOptions.profile || null,
+        projectId: localOptions.project || rootOptions.project || null,
+        idempotencyKey: localOptions.idempotencyKey || null,
+        wait: Boolean(localOptions.wait),
+        timeout: localOptions.timeout || null,
+      };
+      const capabilityIds = selectCapabilities(definition, localOptions);
+      const results = [];
+      for (const capabilityId of capabilityIds) {
+        results.push(await runtime.executeCapability(capabilityId, input, context));
+      }
+      const combined = results.length === 1 ? results[0] : results;
+      const data = results.length === 1 && combined && typeof combined === "object" && Object.hasOwn(combined, "data")
+        ? combined.data
+        : combined;
+      if (localOptions.output) {
+        const target = assertOutputPath(localOptions.output);
+        if (data?.path && fs.existsSync(data.path)) fs.copyFileSync(data.path, target);
+        else {
+          const content = Buffer.isBuffer(data) || typeof data === "string" ? data : JSON.stringify(data, null, 2);
+          fs.writeFileSync(target, content);
+        }
+        writeJson(stdout, envelope({ output: target, bytes: fs.statSync(target).size }));
+      } else if (rootOptions.ndjson || definition.streamOutput === "ndjson") {
+        if (definition.streamOutput === "ndjson" && (Buffer.isBuffer(data) || typeof data === "string")) {
+          await writeNdjsonText(stdout, data);
+        } else {
+          await writeNdjson(stdout, data);
+        }
+      } else {
+        const resultMeta = results.length === 1 && combined?.meta ? combined.meta : {};
+        writeJson(stdout, envelope(data, { ...resultMeta, capabilityIds }));
       }
     });
   }
-}
-
-function defaultProgram() {
-  return new Command()
-    .name("data-platform")
-    .version(packageManifest.version)
-    .exitOverride()
-    .description("Direct-runtime CLI for the Data Platform")
-    .option("--profile <name>")
-    .option("--project <id>")
-    .option("--json")
-    .option("--no-color");
-}
-
-async function main(argv = process.argv.slice(2), dependencies = {}) {
-  const stdin = dependencies.stdin || process.stdin;
-  const stdout = dependencies.stdout || process.stdout;
-  const stderr = dependencies.stderr || process.stderr;
-  const program = dependencies.program || defaultProgram();
-  const commandRoots = new Set(["acceptance", "auth", "capability", "config", "daemon", "knowledge-base", "ontology", "platform", "project", "reconcile", "standard", "system"]);
-  const interactive = argv.length === 0 && stdin.isTTY && stdout.isTTY;
-  const needsDefaultRuntime = !dependencies.createCommands
-    && (interactive || argv.some((value) => commandRoots.has(value) || value === "--help" || value === "-h"));
-  let runtimeDependencies;
-  let candidates;
-  try {
-    runtimeDependencies = needsDefaultRuntime ? createDefaultDependencies(dependencies) : dependencies;
-    candidates = dependencies.createCommands
-      ? dependencies.createCommands(runtimeDependencies)
-      : (needsDefaultRuntime
-        ? [
-          ...createFoundationCommands(runtimeDependencies),
-          ...createBusinessCommands(runtimeDependencies),
-          ...createOntologyAcceptanceCommands(runtimeDependencies),
-        ]
-        : []);
-  } catch (error) {
-    const renderer = dependencies.renderer || createRenderer({ json: argv.includes("--json"), stdout, stderr });
-    return renderer.error(error);
+  registerFoundationCommands(program, { runtime, profileStore, paths, output: stdout });
+  if (profileStore && paths) {
+    registerDaemonCommands(program, {
+      profileStore,
+      paths,
+      output: stdout,
+      errorOutput: stderr,
+      daemonTasks: options.daemonTasks,
+      daemonRuntimeFactory: options.daemonRuntimeFactory,
+      processOps: options.processOps,
+      spawnImpl: options.spawnImpl,
+      binPath: options.binPath,
+    });
   }
-  const registry = dependencies.registry || createCommandRegistry();
-  for (const candidate of candidates) registry.register(candidate);
-  const definitions = registry.values();
-  const json = argv.includes("--json");
-  const renderer = dependencies.renderer || createRenderer({ json, stdout, stderr });
-  const state = { exitCode: 0, executed: false };
-  bindDefinitions(program, definitions, renderer, state);
+  return { program, definitions, runtime, profileStore, keychain, paths };
+}
 
+async function main(argv = process.argv.slice(2), options = {}) {
+  const stdout = options.stdout || process.stdout;
+  const stderr = options.stderr || process.stderr;
+  const jsonMode = argv.includes("--json");
   try {
+    const created = createProgram({ ...options, exitOverride: true, jsonMode });
+    const { program } = created;
+    const commandArguments = [];
+    for (let index = 0; index < argv.length; index += 1) {
+      if (["--json", "--ndjson", "--no-color"].includes(argv[index])) continue;
+      if (["--profile", "--project"].includes(argv[index])) {
+        index += 1;
+        continue;
+      }
+      commandArguments.push(argv[index]);
+    }
+    if (commandArguments.length === 0) {
+      const input = options.stdin || process.stdin;
+      const output = options.stdout || process.stdout;
+      if (!jsonMode && !options.disableRepl && input.isTTY && output.isTTY) {
+        await runRepl({
+          input,
+          output,
+          getContext() {
+            const profile = created.profileStore?.current();
+            return { profile: profile?.name || null, project: profile?.currentProjectId || null };
+          },
+          executeArgv: (tokens) => main(tokens, { ...options, stdin: input, stdout: output, stderr, disableRepl: true }),
+        });
+        return 0;
+      }
+      const error = new PlatformError("COMMAND_REQUIRED", "A command is required");
+      error.statusCode = 400;
+      throw error;
+    }
     await program.parseAsync(argv, { from: "user" });
+    return 0;
   } catch (error) {
-    if (["commander.helpDisplayed", "commander.version"].includes(error?.code)) return 0;
-    if (typeof error?.code === "string" && error.code.startsWith("commander.")) {
-      return renderer.error(new CliError(error.message, { code: "INPUT_INVALID", statusCode: 400 }));
-    }
-    return renderer.error(error);
+    if (error instanceof CommanderError && ["commander.helpDisplayed", "commander.version"].includes(error.code)) return 0;
+    writeJson(jsonMode ? stdout : stderr, errorEnvelope(error));
+    return exitCodeFor(error);
   }
-
-  if (!state.executed) {
-    if (interactive) {
-      const replDependencies = { ...runtimeDependencies, stdin, stdout, stderr };
-      delete replDependencies.program;
-      delete replDependencies.renderer;
-      delete replDependencies.runRepl;
-      const executeArgv = dependencies.executeArgv || ((tokens) => main(tokens, replDependencies));
-      const getContext = dependencies.getContext || (() => {
-        const profile = runtimeDependencies.profile || runtimeDependencies.profileStore?.current?.();
-        return { profile: profile?.name || null, projectId: profile?.currentProjectId ?? null };
-      });
-      await (dependencies.runRepl || runRepl)({ registry, executeArgv, input: stdin, output: stdout, getContext });
-      return 0;
-    }
-    if (typeof program.configureOutput === "function") {
-      program.configureOutput({ writeOut: (text) => stdout.write(text), writeErr: (text) => stderr.write(text) });
-    }
-    if (typeof program.outputHelp === "function") program.outputHelp({ error: false });
-    return 2;
-  }
-  return state.exitCode;
 }
 
-module.exports = {
-  createAuthRuntimePort,
-  createCliDataPlatformCore,
-  createCliRuntimeDependencies,
-  createDefaultDependencies,
-  createDoctorPorts,
-  createProductionDaemonRuntimeFactory,
-  main,
-};
+module.exports = { main, createProgram, createInstalledEnvironment, createInstalledRuntime, parseInput, selectCapabilities };

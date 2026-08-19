@@ -1,0 +1,1294 @@
+{
+  "moduleName": "data-map",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-map.001.getoverview",
+      "command": "data-map get-overview",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/overview"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-map/resources",
+        "/dashboard/data-map/departments",
+        "/dashboard/data-map/systems",
+        "/dashboard/data-map/sources",
+        "/dashboard/data-map/models",
+        "/dashboard/data-map"
+      ],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/overview"
+      ]
+    },
+    {
+      "capabilityId": "data-map.002.listdepartments",
+      "command": "data-map list-departments",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/departments"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/departments"
+      ]
+    },
+    {
+      "capabilityId": "data-map.003.createdepartment",
+      "command": "data-map create-department",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/departments"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "departmentSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/departments"
+      ]
+    },
+    {
+      "capabilityId": "data-map.004.updatedepartment",
+      "command": "data-map update-department",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/departments/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "departmentSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/departments/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.005.deletedepartment",
+      "command": "data-map delete-department",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-map/departments/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-map/departments/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.006.listbusinesssystems",
+      "command": "data-map list-business-systems",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/business-systems"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/business-systems"
+      ]
+    },
+    {
+      "capabilityId": "data-map.007.createbusinesssystem",
+      "command": "data-map create-business-system",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/business-systems"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "businessSystemSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/business-systems"
+      ]
+    },
+    {
+      "capabilityId": "data-map.008.updatebusinesssystem",
+      "command": "data-map update-business-system",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/business-systems/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "businessSystemSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/business-systems/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.009.deletebusinesssystem",
+      "command": "data-map delete-business-system",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-map/business-systems/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-map/business-systems/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.010.listexternaldatasources",
+      "command": "data-map list-external-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/data-sources/external"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/data-sources/external"
+      ]
+    },
+    {
+      "capabilityId": "data-map.011.listdatasources",
+      "command": "data-map list-data-sources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-map.012.createdatasource",
+      "command": "data-map create-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/data-sources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "dataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/data-sources"
+      ]
+    },
+    {
+      "capabilityId": "data-map.013.updatedatasource",
+      "command": "data-map update-data-source",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "dataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.014.deletedatasource",
+      "command": "data-map delete-data-source",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-map/data-sources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-map/data-sources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.015.testdatasource",
+      "command": "data-map test-data-source",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/data-sources/test-connection"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "testDataSourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/data-sources/test-connection"
+      ]
+    },
+    {
+      "capabilityId": "data-map.016.listdatasourcetables",
+      "command": "data-map list-data-source-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/data-sources/:id/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/data-sources/:id/tables"
+      ]
+    },
+    {
+      "capabilityId": "data-map.017.listdatasourcecolumns",
+      "command": "data-map list-data-source-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/data-sources/:id/tables/:tableName/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/data-sources/:id/tables/:tableName/columns"
+      ]
+    },
+    {
+      "capabilityId": "data-map.018.listcatalogtree",
+      "command": "data-map list-catalog-tree",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/catalogs/tree"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/catalogs/tree"
+      ]
+    },
+    {
+      "capabilityId": "data-map.019.listcatalogs",
+      "command": "data-map list-catalogs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/catalogs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/catalogs"
+      ]
+    },
+    {
+      "capabilityId": "data-map.020.createcatalog",
+      "command": "data-map create-catalog",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/catalogs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "catalogSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/catalogs"
+      ]
+    },
+    {
+      "capabilityId": "data-map.021.updatecatalog",
+      "command": "data-map update-catalog",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/catalogs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "catalogSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/catalogs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.022.deletecatalog",
+      "command": "data-map delete-catalog",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-map/catalogs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-map/catalogs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.023.registerresources",
+      "command": "data-map register-resources",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/catalogs/:id/register-resources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "registerResourcesSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/catalogs/:id/register-resources"
+      ]
+    },
+    {
+      "capabilityId": "data-map.024.refreshingestionlineage",
+      "command": "data-map refresh-ingestion-lineage",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/lineage/refresh-ingestion"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/lineage/refresh-ingestion"
+      ]
+    },
+    {
+      "capabilityId": "data-map.025.listaiconfigs",
+      "command": "data-map list-ai-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/ai-configs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "data-map.026.updateaiconfig",
+      "command": "data-map update-ai-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "aiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/ai-configs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.027.searchresources",
+      "command": "data-map search-resources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/search/resources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/search/resources"
+      ]
+    },
+    {
+      "capabilityId": "data-map.028.listresources",
+      "command": "data-map list-resources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/resources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/resources"
+      ]
+    },
+    {
+      "capabilityId": "data-map.029.deleteresources",
+      "command": "data-map delete-resources",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/resources/batch-delete"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "batchDeleteResourcesSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/resources/batch-delete"
+      ]
+    },
+    {
+      "capabilityId": "data-map.030.getresourcedetail",
+      "command": "data-map get-resource-detail",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/resources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/resources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.031.updateresource",
+      "command": "data-map update-resource",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/resources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "updateResourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/resources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.032.deleteresource",
+      "command": "data-map delete-resource",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-map/resources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-map/resources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-map.033.updateresourcecontent",
+      "command": "data-map update-resource-content",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/resources/:id/content"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "resourceContentSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/resources/:id/content"
+      ]
+    },
+    {
+      "capabilityId": "data-map.034.updateresourcefield",
+      "command": "data-map update-resource-field",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-map/resources/:id/fields/:columnName"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "updateResourceFieldSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-map/resources/:id/fields/:columnName"
+      ]
+    },
+    {
+      "capabilityId": "data-map.035.getresourceprofile",
+      "command": "data-map get-resource-profile",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/resources/:id/profile"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/resources/:id/profile"
+      ]
+    },
+    {
+      "capabilityId": "data-map.036.refreshresourceprofile",
+      "command": "data-map refresh-resource-profile",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/refresh"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "refreshResourceProfileSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/refresh"
+      ]
+    },
+    {
+      "capabilityId": "data-map.037.analyzeresourcecontentprofile",
+      "command": "data-map analyze-resource-content-profile",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/content-ai-analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "analyzeResourceProfileSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/content-ai-analyze"
+      ]
+    },
+    {
+      "capabilityId": "data-map.038.analyzeresourcefieldprofile",
+      "command": "data-map analyze-resource-field-profile",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/fields-ai-analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "analyzeResourceProfileSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/fields-ai-analyze"
+      ]
+    },
+    {
+      "capabilityId": "data-map.039.analyzeresourceprofile",
+      "command": "data-map analyze-resource-profile",
+      "sourceApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/ai-analyze"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [
+        "analyzeResourceProfileSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-map/resources/:id/profile/ai-analyze"
+      ]
+    },
+    {
+      "capabilityId": "data-map.040.getresourcelineagegraph",
+      "command": "data-map get-resource-lineage-graph",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/resources/:id/lineage-graph"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/resources/:id/lineage-graph"
+      ]
+    },
+    {
+      "capabilityId": "data-map.041.sampleresourcerows",
+      "command": "data-map sample-resource-rows",
+      "sourceApiKeys": [
+        "GET /api/v1/data-map/resources/:id/sample"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-map",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"data_map\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-map/resources/:id/sample"
+      ]
+    }
+  ]
+}

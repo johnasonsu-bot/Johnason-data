@@ -1,0 +1,30 @@
+{
+  "name": "@johnason/data-platform-module-data-lab",
+  "version": "0.2.0",
+  "private": false,
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "dmdb": "1.0.52452",
+    "docx": "9.7.1",
+    "hive-driver": "1.0.1",
+    "iconv-lite": "0.4.24",
+    "kafkajs": "2.2.4",
+    "mammoth": "1.12.1",
+    "mysql2": "3.23.3",
+    "node-cron": "3.0.3",
+    "node-opengauss": "1.1.0",
+    "oracledb": "7.0.1",
+    "pdf-parse": "1.1.4",
+    "pg": "8.23.0",
+    "word-extractor": "1.0.4",
+    "xlsx": "0.18.5"
+  },
+  "license": "UNLICENSED"
+}

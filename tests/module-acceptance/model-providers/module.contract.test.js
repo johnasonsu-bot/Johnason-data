@@ -1,8 +1,0 @@
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const test = require("node:test");
-const packageDir = path.resolve(__dirname, "../../../packages/data-platform-module-model-providers");
-const API_KEYS = ["GET /api/v1/model-providers", "POST /api/v1/model-providers/test-connection", "POST /api/v1/model-providers", "PUT /api/v1/model-providers/:id", "DELETE /api/v1/model-providers/:id"];
-test("model-providers exposes exact API coverage and model-provider conditional target", () => { const pkg = JSON.parse(fs.readFileSync(path.join(packageDir, "package.json"), "utf8")); assert.equal(pkg.name, "@johnason/data-platform-module-model-providers"); assert.equal(pkg.version, "0.2.0"); const candidate = require(packageDir); assert.deepEqual(candidate.moduleManifest.sourceApiKeys, API_KEYS); const testConnection = candidate.createCapabilities({}).find((c) => c.capabilityId === "modelProviders.testConnection"); assert.deepEqual(testConnection.executionTargets, ["mysql", "api"]); });
-test("model-providers delegates injected service ports and fails closed", async () => { const candidate = require(packageDir); let received; const capabilities = candidate.createCapabilities({ service: { listModelProviders: async (input, context) => { received = [input, context]; return []; } } }); assert.deepEqual(await capabilities[0].execute({ projectId: 2 }, { actor: { id: 1 } }), []); assert.deepEqual(received, [{ projectId: 2 }, { actor: { id: 1 } }]); await assert.rejects(() => candidate.createRuntimeAdapters({}).listModelProviders({}), /not configured/i); });

@@ -1,91 +1,13 @@
-const { getDatabaseRuntime: kernelGetDatabaseRuntime, validateModuleManifest, authorizeCapability } = require("@johnason/data-platform-core-kernel");
-const { createProjectSpaceRepository } = require("./project-space.repository");
-const { createProjectSpaceService } = require("./project-space.service");
-const { getProjectContext, resolveProject, runWithProjectContext } = require("./project-policy");
-const { mappedPortError, projectOperationSchemas, projectServiceSchemas } = require("./project-operation-contracts");
+const { validateModuleManifest } = require("@johnason/data-platform-core-kernel");
+const { executeCapability } = require("./runtime");
+const moduleManifest = validateModuleManifest(require("./manifest.json"));
 
-const moduleManifest = validateModuleManifest({
-  moduleName: "project-spaces", moduleVersion: "0.2.0", capabilitySchemaVersion: "1.0.0",
-  capabilities: [
-    { capabilityId: "project.list-my", sourceApiKeys: ["GET /api/v1/projects/my"], sourceFrontendKeys: ["/projects/my"], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.list", sourceApiKeys: ["GET /api/v1/projects"], sourceFrontendKeys: ["/projects"], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.current", sourceApiKeys: [], sourceFrontendKeys: ["/projects/current"], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.detail", sourceApiKeys: ["GET /api/v1/projects/:id"], sourceFrontendKeys: ["/projects/:id"], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.resolve", sourceApiKeys: [], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.use", sourceApiKeys: [], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.access-check", sourceApiKeys: [], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.set-default", sourceApiKeys: ["POST /api/v1/projects/:id/default"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.create", sourceApiKeys: ["POST /api/v1/projects"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.update", sourceApiKeys: ["PUT /api/v1/projects/:id"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.remove", sourceApiKeys: ["DELETE /api/v1/projects/:id"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.set-status", sourceApiKeys: ["POST /api/v1/projects/:id/status"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.upsert-member", sourceApiKeys: ["POST /api/v1/projects/:id/members"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.remove-member", sourceApiKeys: ["DELETE /api/v1/projects/:id/members/:userId"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.list-transfer-logs", sourceApiKeys: ["GET /api/v1/projects/asset-transfer-logs"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.preview-import", sourceApiKeys: ["POST /api/v1/projects/assets/import/preview"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.import-assets", sourceApiKeys: ["POST /api/v1/projects/assets/import"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.list-backups", sourceApiKeys: ["GET /api/v1/projects/:id/assets/backups"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.create-backup", sourceApiKeys: ["POST /api/v1/projects/:id/assets/backups"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.download-backup", sourceApiKeys: ["GET /api/v1/projects/:id/assets/backups/:backupId/download"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-    { capabilityId: "project.export-assets", sourceApiKeys: ["GET /api/v1/projects/:id/assets/export"], sourceFrontendKeys: [], executionTargets: ["web", "cli"] },
-  ],
-});
-
-function createRuntimeAdapters(dependencies = {}) {
-  const getDatabaseRuntime = () => dependencies.databaseRuntime || kernelGetDatabaseRuntime();
-  const projectRepository = dependencies.projectRepository || createProjectSpaceRepository({ getDatabaseRuntime });
-  const service = dependencies.projectService || createProjectSpaceService({ projectRepository });
-  return Object.freeze({ projectRepository, projectOperations: dependencies.projectOperations || {}, service });
+function createCapabilities(dependencies = {}) {
+  const execute = dependencies.executeCapability || executeCapability;
+  return new Map(moduleManifest.capabilities.map((definition) => [definition.capabilityId, {
+    ...definition,
+    execute(input, context) { return execute(definition, input, context); },
+  }]));
 }
 
-function createProjectCapabilities(dependencies = {}) {
-  const { service, projectOperations } = createRuntimeAdapters(dependencies);
-  function operation(name) {
-    const schema = projectOperationSchemas[name];
-    return async (...args) => {
-      authorizeCapability(args.at(-1), { modules: ["system_projects"], action: schema.action, readOnlyAllowed: schema.action === "read" });
-      if (typeof projectOperations[name] !== "function") throw new TypeError(`Project capability requires projectOperations.${name}`);
-      const portArguments = schema.parseInput(...args);
-      let result;
-      try {
-        result = await projectOperations[name](...portArguments);
-      } catch (error) {
-        throw mappedPortError(error);
-      }
-      return Object.freeze({ data: schema.parseResult(result) });
-    };
-  }
-  function serviceOperation(name) {
-    const schema = projectServiceSchemas[name];
-    return async (...args) => {
-      if (schema.action) authorizeCapability(args.at(-1), { modules: ["system_projects"], action: schema.action, readOnlyAllowed: schema.action === "read" });
-      const result = await service[schema.method](...args);
-      return schema.parseResult(result);
-    };
-  }
-  return Object.freeze({ project: Object.freeze({
-    listMy: serviceOperation("listMy"),
-    list: serviceOperation("list"),
-    current: serviceOperation("current"),
-    detail: operation("detail"),
-    resolve: serviceOperation("resolve"),
-    use: serviceOperation("use"),
-    accessCheck: serviceOperation("accessCheck"),
-    setDefault: serviceOperation("setDefault"),
-    create: operation("create"),
-    update: operation("update"),
-    remove: operation("remove"),
-    setStatus: operation("setStatus"),
-    upsertMember: operation("upsertMember"),
-    removeMember: operation("removeMember"),
-    listTransferLogs: operation("listTransferLogs"),
-    previewImport: operation("previewImport"),
-    importAssets: operation("importAssets"),
-    listBackups: operation("listBackups"),
-    createBackup: operation("createBackup"),
-    downloadBackup: operation("downloadBackup"),
-    exportAssets: operation("exportAssets"),
-  }) });
-}
-
-module.exports = { moduleManifest, projectOperationSchemas, projectServiceSchemas, createProjectCapabilities, createProjectSpaceRepository, createProjectSpaceService, createRuntimeAdapters, authorizeCapability, getProjectContext, resolveProject, runWithProjectContext };
+module.exports = { moduleManifest, createCapabilities };

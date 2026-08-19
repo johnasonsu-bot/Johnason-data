@@ -1,0 +1,4 @@
+interface:
+  display_name: "构建航空业本体"
+  short_description: "在 Data Platform 中构建并验收航空业本体全流程"
+  default_prompt: "使用 $build-aviation-ontology 在 Data Platform 中构建航空业本体并完成分阶段验收。"

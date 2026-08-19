@@ -1,40 +1,23 @@
 ---
 name: cli-anything-data-platform
-description: Use when an agent needs to operate or automate an installed Data Platform CLI, configure profiles, authenticate, select projects, check access, or diagnose local runtime dependencies.
+description: Operate Data Platform through the installed data-platform CLI without calling the platform HTTP server.
 ---
 
 # Data Platform CLI
 
-Operate Data Platform through the installed `data-platform` executable. It connects through the aggregate core and database runtime; never replace it with platform HTTP calls.
+Use the installed `data-platform` executable for Data Platform operations. Discover commands with `data-platform --help` and prefer JSON output for automation. Never persist credentials outside the operating-system keychain.
 
-## Safety boundary
+## Operating rules
 
-- Require Node.js 22.20+ and install with `npm install --global @johnason/data-platform-cli`.
-- Profiles may contain host, port, database, user, DataX home, and Kafka addresses only.
-- Let hidden prompts collect database/login passwords. The OS keychain stores database passwords and session tokens; there is no plaintext fallback.
-- Supply JWT signing material through the trusted runtime or secure `JWT_SECRET` environment. Never write secrets into profiles, scripts, logs, or command arguments.
+- Use `--json` for automation and interpret exit codes `0` through `8` according to the CLI README.
+- Select a profile before database-backed commands and resolve/select a project before project-scoped commands.
+- Pass login passwords through `--password-stdin`; never place a password, token, API key, or authorization header in command arguments, input files, logs, or evidence.
+- Use `--file`/`--files` for input and `--output` for downloads. Pass `--yes` only after the requested destructive operation and target have been checked.
+- Use `daemon start|run|status|logs|restart|stop` for background work. The daemon is a direct core consumer and must not start or call an HTTP server.
+- Treat missing real API/database evidence as `blocked`. Never substitute mocks, skipped cases, empty checkpoint files, or claimed success.
 
-## Quick reference
+## Repository-local acceptance install
 
-| Goal | Command |
-| --- | --- |
-| Discover | `data-platform --help` |
-| Add/select profile | `data-platform config add --name NAME --db-host HOST --db-port PORT --db-name DB --db-user USER`; `config use --name NAME` |
-| Authenticate | `data-platform auth login --username USER`; `auth profile`; `auth logout` |
-| Find/select project | `data-platform project list`; `project resolve --code CODE --require-one`; `project use --code CODE` |
-| Check access | `data-platform --project ID project access-check --action ACTION` |
-| Inspect platform | `data-platform platform overview` |
-| Diagnose | `data-platform system doctor`; `system doctor database-capabilities` |
+When operating this repository, use `npm run install:cli:local`. The accepted binary is `.local/data-platform-cli/install/node_modules/.bin/data-platform`; do not replace the root dependency tree or install globally during development verification.
 
-Use `--profile NAME` to override the selected profile. Prefer `--json` for automation: stdout is exactly one redacted success envelope `{success,data,meta,auditId}` or error envelope `{success,error,auditId}`; diagnostics stay on stderr. Interpret exits as: 0 success, 1 internal, 2 input, 3 authentication, 4 permission, 5 not found, 6 conflict/ambiguous, 7 dependency, 8 partial success.
-
-With no arguments, an interactive TTY enters the shared-command REPL. Use `help`, `context`, `exit`, or `quit`. `--json` without a subcommand never opens it.
-
-Foundation scope is `config`, `auth`, `project`, `platform`, and `system doctor`; inspect `--help` before assuming later business command groups exist.
-
-## Common mistakes
-
-- Do not put passwords or tokens in flags, config files, transcripts, or REPL input.
-- Do not continue after keychain/signing/database checks fail; exit 7 is fail-closed.
-- Do not parse human output in automation; request `--json` and check both envelope and exit status.
-- Do not bypass the CLI with HTTP, import package `src` paths, or start Express.
+Before claiming aggregate acceptance, require all 596 API and 84 frontend mappings, all external API and MySQL/PostgreSQL/Oracle/DM gates, 21 real rollback/re-upgrade drills, zero secret findings/bypasses, and two idempotent installed-CLI aviation runs.

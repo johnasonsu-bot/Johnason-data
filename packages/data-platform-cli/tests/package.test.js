@@ -12,3 +12,11 @@ test("package exposes data-platform for Node 22.20+", () => {
   assert.equal(pkg.engines.node, ">=22.20.0");
   assert.deepEqual(pkg.files.sort(), ["README.md", "bin", "src"].sort());
 });
+
+test("workspace local installer is pinned below .local and verifies the installed catalog", () => {
+  const installer = fs.readFileSync(path.resolve(packageRoot, "../../scripts/install-local-data-platform-cli.js"), "utf8");
+  assert.match(installer, /\.local", "data-platform-cli/);
+  assert.match(installer, /Expected 24 tarballs/);
+  assert.match(installer, /counts\.capabilities !== 596 \|\| counts\.modules !== 21/);
+  assert.doesNotMatch(installer, /npm", \["install", "-g"/);
+});

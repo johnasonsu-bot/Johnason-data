@@ -1,98 +1,123 @@
-const { CliError, selectedProfile: defaultSelectedProfile } = require("../runtime/cli-execution");
+const fs = require("node:fs");
+const path = require("node:path");
+const { spawn } = require("node:child_process");
+const { createDaemonRuntime, PlatformError } = require("@johnason/data-platform-core-kernel");
+const { createProcessManager } = require("../daemon/process-manager");
+const { envelope, writeJson } = require("../output");
 
-function createDaemonCommands(dependencies) {
-  const manager = dependencies.processManager;
-  if (!manager) throw new TypeError("Daemon commands require processManager");
+function defaultProcessOps() {
+  return {
+    pid: process.pid,
+    execPath: process.execPath,
+    kill(pid, signal) { return process.kill(pid, signal); },
+    isAlive(pid) {
+      try { process.kill(pid, 0); return true; } catch { return false; }
+    },
+    on(signal, handler) { process.once(signal, handler); },
+    off(signal, handler) { process.off(signal, handler); },
+  };
+}
 
-  function profileName(input = {}) {
-    const profile = dependencies.selectedProfile
-      ? dependencies.selectedProfile(input.profileName)
-      : defaultSelectedProfile(dependencies, input.profileName);
-    return profile.name;
+function selectedProfile(profileStore, name) {
+  const profile = name ? profileStore.get(name) : profileStore.current();
+  if (!profile) throw new PlatformError("PROFILE_REQUIRED", "Select a profile or pass --profile");
+  return profile;
+}
+
+function registerDaemonCommands(program, options) {
+  const {
+    profileStore,
+    paths,
+    output,
+    daemonTasks = [],
+    daemonRuntimeFactory = createDaemonRuntime,
+    processOps = defaultProcessOps(),
+    spawnImpl = spawn,
+    binPath = path.resolve(__dirname, "../../bin/data-platform.js"),
+  } = options;
+  const daemon = program.command("daemon").description("profile-scoped background workers without an HTTP listener");
+
+  function resources(command) {
+    const profile = selectedProfile(profileStore, command.optsWithGlobals().profile);
+    const directory = path.join(paths.dataDir, "daemon", profile.name);
+    const logFile = path.join(directory, "daemon.log");
+    const manager = createProcessManager({ dataDir: paths.dataDir, profile: profile.name, fsImpl: fs, isProcessAlive: processOps.isAlive });
+    return { profile, directory, logFile, manager };
   }
 
-  async function runtimeFor(input) {
-    if (dependencies.daemonRuntime?.run) return dependencies.daemonRuntime;
-    if (typeof dependencies.createDaemonRuntime === "function") {
-      const runtime = await dependencies.createDaemonRuntime({ profileName: profileName(input) });
-      if (runtime?.run) return runtime;
+  async function stop(command) {
+    const state = resources(command);
+    const status = state.manager.status();
+    if (!status.running) return { ...state, stopped: false };
+    processOps.kill(status.pid, "SIGTERM");
+    return { ...state, stopped: true, pid: status.pid };
+  }
+
+  async function waitForExit(manager, timeoutMs = 10000) {
+    const deadline = Date.now() + timeoutMs;
+    while (manager.status().running && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
-    throw new CliError("Daemon runtime dependencies are unavailable", {
-      code: "DEPENDENCY_UNAVAILABLE",
-      statusCode: 503,
-      exitCode: 7,
-    });
+    if (manager.status().running) throw new PlatformError("DAEMON_STOP_TIMEOUT", "Daemon did not stop before the restart timeout");
   }
 
-  return Object.freeze({
-    start(input = {}) {
-      return manager.start({ profileName: profileName(input), readinessTimeoutMs: input.readinessTimeoutMs });
-    },
-    async run(input = {}) {
-      const selected = profileName(input);
-      const controller = dependencies.signal ? null : new AbortController();
-      const signal = dependencies.signal || controller.signal;
-      const stop = () => controller?.abort();
-      if (controller) {
-        process.once("SIGTERM", stop);
-        process.once("SIGINT", stop);
-      }
-      let record;
-      let primaryError;
-      let readinessReported = false;
-      try {
-        const runtime = await runtimeFor(input);
-        if (!input.readinessId) {
-          record = await manager.registerCurrent({ profileName: selected, instanceId: input.instanceId });
-        }
-        await runtime.run({
-          signal,
-          onReady: input.readinessId ? async () => {
-            await manager.reportReadiness({
-              profileName: selected,
-              readinessId: input.readinessId,
-              instanceId: input.instanceId,
-              status: "ready",
-            });
-            readinessReported = true;
-          } : undefined,
-        });
-        return { stopped: true, profileName: selected };
-      } catch (error) {
-        primaryError = error;
-        if (input.readinessId && !readinessReported) {
-          await manager.reportReadiness({
-            profileName: selected,
-            readinessId: input.readinessId,
-            instanceId: input.instanceId,
-            status: "error",
-            error,
-          });
-        }
-        throw error;
-      } finally {
-        if (controller) {
-          process.removeListener("SIGTERM", stop);
-          process.removeListener("SIGINT", stop);
-        }
-        if (record || input.readinessId) {
-          try {
-            await manager.archiveCurrent({
-              profileName: selected,
-              instanceId: record?.instanceId || input.instanceId,
-              allowMissing: Boolean(input.readinessId),
-            });
-          } catch (error) {
-            if (!primaryError) throw error;
-          }
-        }
-      }
-    },
-    status(input = {}) { return manager.status({ profileName: profileName(input) }); },
-    logs(input = {}) { return manager.logs({ profileName: profileName(input), lines: input.lines || 100 }); },
-    restart(input = {}) { return manager.restart({ profileName: profileName(input), timeoutMs: input.timeoutMs }); },
-    stop(input = {}) { return manager.stop({ profileName: profileName(input), timeoutMs: input.timeoutMs }); },
+  function start(command) {
+    const state = resources(command);
+    const status = state.manager.status();
+    if (status.running) throw new PlatformError("DAEMON_ALREADY_RUNNING", `Daemon already running for profile ${state.profile.name}`);
+    fs.mkdirSync(state.directory, { recursive: true, mode: 0o700 });
+    const descriptor = fs.openSync(state.logFile, "a", 0o600);
+    let child;
+    try {
+      child = spawnImpl(processOps.execPath, [binPath, "--profile", state.profile.name, "daemon", "run"], {
+        detached: true,
+        stdio: ["ignore", descriptor, descriptor],
+      });
+      child.unref?.();
+    } finally {
+      fs.closeSync(descriptor);
+    }
+    return { ...state, pid: child.pid };
+  }
+
+  daemon.command("run").description("run worker loops in the foreground").action(async (_options, command) => {
+    const state = resources(command);
+    state.manager.acquire(processOps.pid);
+    const runtime = daemonRuntimeFactory({ tasks: daemonTasks, onError: (error) => fs.appendFileSync(state.logFile, `${new Date().toISOString()} ${error.code || "DAEMON_TASK_FAILED"}\n`) });
+    const shutdown = () => { void runtime.stop(); };
+    processOps.on("SIGINT", shutdown);
+    processOps.on("SIGTERM", shutdown);
+    try {
+      await runtime.run();
+    } finally {
+      processOps.off("SIGINT", shutdown);
+      processOps.off("SIGTERM", shutdown);
+      state.manager.release(processOps.pid);
+    }
+  });
+  daemon.command("start").action((_options, command) => {
+    const state = start(command);
+    writeJson(output, envelope({ running: true, profile: state.profile.name, pid: state.pid, logFile: state.logFile }));
+  });
+  daemon.command("status").action((_options, command) => {
+    const state = resources(command);
+    writeJson(output, envelope({ profile: state.profile.name, ...state.manager.status(), logFile: state.logFile }));
+  });
+  daemon.command("logs").option("--lines <count>", "number of trailing lines", (value) => Number(value), 100).action((local, command) => {
+    const state = resources(command);
+    const lines = fs.existsSync(state.logFile) ? fs.readFileSync(state.logFile, "utf8").trimEnd().split("\n").slice(-Math.max(1, local.lines)) : [];
+    writeJson(output, envelope({ profile: state.profile.name, logFile: state.logFile, lines }));
+  });
+  daemon.command("stop").action(async (_options, command) => {
+    const state = await stop(command);
+    writeJson(output, envelope({ profile: state.profile.name, stopped: state.stopped, pid: state.pid || null }));
+  });
+  daemon.command("restart").action(async (_options, command) => {
+    const stopped = await stop(command);
+    if (stopped.stopped) await waitForExit(stopped.manager);
+    const state = start(command);
+    writeJson(output, envelope({ running: true, restarted: true, profile: state.profile.name, pid: state.pid, logFile: state.logFile }));
   });
 }
 
-module.exports = { createDaemonCommands };
+module.exports = { registerDaemonCommands, defaultProcessOps };

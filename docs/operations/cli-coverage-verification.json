@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "accepted",
+  "verifiedAt": "2026-08-19T01:50:42.582Z",
+  "sourceAssets": {
+    "api-inventory.json": "6cd896d1e38fb54ebd8317842eb618c4a28ede4eecf5e09f5bfb16374d696d0f",
+    "PROJECT_OPERATION_MANUAL.md": "619cf9c139ebd49788acd8a1a7440d5d8574cb9034b4bb7e13de1a14ca8db350",
+    "project-operation-knowledge-graph.html": "1fa8acde4615bc6bed8af23ad277fde1089643781bbb1414dd45d5302c03468f"
+  },
+  "gates": {
+    "apiExpected": 596,
+    "apiMapped": 596,
+    "apiUnmapped": 0,
+    "apiExtra": 0,
+    "frontendExpected": 84,
+    "frontendMapped": 84,
+    "frontendUnmapped": 0,
+    "frontendExtra": 0,
+    "duplicateApiKeys": 0,
+    "unknownCliGroups": 0,
+    "staleSourceFingerprint": 0,
+    "catalogCapabilities": 596,
+    "commandDefinitions": 570,
+    "handlerBindings": {
+      "expected": 596,
+      "bound": 596,
+      "unresolved": 0
+    }
+  },
+  "failures": [],
+  "missingApi": [],
+  "extraApi": [],
+  "missingFrontend": [],
+  "extraFrontend": []
+}

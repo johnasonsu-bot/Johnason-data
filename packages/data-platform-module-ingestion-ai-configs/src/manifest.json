@@ -1,0 +1,73 @@
+{
+  "moduleName": "ingestion-ai-configs",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "ingestion-ai-configs.001.listconfigs",
+      "command": "ingestion ai-config list-configs",
+      "sourceApiKeys": [
+        "GET /api/v1/ingestion-ai-configs"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-ingestion-monitor",
+        "/dashboard/data-ingestion-jobs",
+        "/dashboard/data-ingestion-ai"
+      ],
+      "module": "ingestion-ai-configs",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/ingestion-ai-configs"
+      ]
+    },
+    {
+      "capabilityId": "ingestion-ai-configs.002.updateconfig",
+      "command": "ingestion ai-config update-config",
+      "sourceApiKeys": [
+        "PUT /api/v1/ingestion-ai-configs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "ingestion-ai-configs",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": false,
+      "featureGuard": "\"ingestion\"",
+      "validationSchemas": [
+        "updateIngestionAiConfigSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/ingestion-ai-configs/:id"
+      ]
+    }
+  ]
+}

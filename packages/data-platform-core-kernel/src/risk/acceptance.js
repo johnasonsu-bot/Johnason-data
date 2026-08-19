@@ -1,71 +1,56 @@
-const { RISK_GATES, moduleEvidenceSchema } = require("./evidence-schema");
+const { EXACT_VERSION, deepFreeze } = require("../contracts/module-manifest");
 
-const SECRET_KEY = /(?:password|secret|token|authorization|api[-_]?key|credential)/i;
-const SECRET_OPTION = /^--?(?:password|secret|token|authorization|api[-_]?key|credential)(?:=|$)/i;
-const SECRET_VALUE = /(?:[a-z][a-z0-9+.-]*:\/\/[^\s/:]+:[^\s/@]+@|\b(?:Bearer|Basic)\s+\S+|(?:^|[;?&\s])(?:password|pwd|token|access_token|api[-_]?key)\s*=\s*[^;?&\s]+|(?:^|[\s=])[^\s;/]+\/[^\s@/]+@[^\s]+|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)/i;
-const SCOPED_PACKAGE_SPEC = /^@[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*@(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/i;
+const RISK_GATES = Object.freeze([
+  "dependencyBoundary",
+  "runtimeIsolation",
+  "transaction",
+  "webCompatibility",
+  "cliParity",
+  "executionTargets",
+  "faultInjection",
+  "packageInstall",
+  "schemaCompatibility",
+  "rollbackDrill",
+  "reUpgradeIdempotency",
+]);
 
-function scanSecrets(value, path = "$", failures = [], seen = new Set()) {
-  if (typeof value === "string") {
-    if (!SCOPED_PACKAGE_SPEC.test(value) && SECRET_VALUE.test(value)) failures.push(`PLAINTEXT_SECRET:${path}`);
-    return failures;
-  }
-  if (!value || typeof value !== "object" || seen.has(value)) return failures;
-  seen.add(value);
-  if (Array.isArray(value)) {
-    value.forEach((child, index) => scanSecrets(child, `${path}[${index}]`, failures, seen));
-    return failures;
-  }
+function containsSecretShape(value, trail = []) {
+  if (!value || typeof value !== "object") return null;
   for (const [key, child] of Object.entries(value)) {
-    const childPath = `${path}.${key}`;
-    if (key !== "secrets" && SECRET_KEY.test(key) && child !== undefined && child !== null && child !== "[REDACTED]") {
-      failures.push(`SECRET_FIELD:${childPath}`);
-    }
-    scanSecrets(child, childPath, failures, seen);
+    const next = [...trail, key];
+    const isFindingCounter = /^(?:secretFindings|secretFindingCount)$/i.test(key) && Number.isInteger(child);
+    if (!isFindingCounter && /password|secret|token|authorization|api[-_]?key/i.test(key) && child !== "[REDACTED]") return next.join(".");
+    const found = containsSecretShape(child, next);
+    if (found) return found;
   }
-  return failures;
+  return null;
 }
 
-function formatSchemaFailures(error) {
-  return error.issues.map((issue) => `SCHEMA_INVALID:${issue.path.join(".") || "$"}:${issue.message}`);
+function evaluateModuleEvidence(evidence) {
+  const failures = [];
+  if (!evidence || typeof evidence !== "object") return { accepted: false, status: "blocked", failures: ["evidence missing"] };
+  for (const field of ["candidateVersion", "rollbackVersion", "capabilitySchemaVersion"]) {
+    if (!EXACT_VERSION.test(String(evidence[field] || ""))) failures.push(`${field} must be an exact version`);
+  }
+  if (!String(evidence.packageIntegrity || "").startsWith("sha512-")) failures.push("package integrity missing");
+  const gates = evidence.riskGates || {};
+  const unknown = Object.keys(gates).filter((key) => !RISK_GATES.includes(key));
+  if (unknown.length) failures.push(`unknown risk gates: ${unknown.join(", ")}`);
+  for (const gate of RISK_GATES) {
+    if (gates[gate] !== "passed") failures.push(`${gate} is not passed`);
+  }
+  if (Number(evidence.failures) !== 0) failures.push("failure count is not zero");
+  if (Number(evidence.secretFindings) !== 0) failures.push("secret findings are not zero");
+  const startedAt = Date.parse(evidence.startedAt);
+  const finishedAt = Date.parse(evidence.finishedAt);
+  if (!Number.isFinite(startedAt) || !Number.isFinite(finishedAt) || finishedAt < startedAt) failures.push("evidence timestamps are invalid");
+  for (const engine of ["oracle", "dm"]) {
+    const database = evidence.databaseEvidence?.[engine];
+    if (database && database.real !== true) failures.push(`${engine} database evidence is not real`);
+  }
+  const secretPath = containsSecretShape(evidence);
+  if (secretPath) failures.push(`secret-shaped evidence field: ${secretPath}`);
+  return deepFreeze({ accepted: failures.length === 0, status: failures.length ? "failed" : "accepted", failures });
 }
 
-function evaluateModuleEvidence(input) {
-  const failures = scanSecrets(input);
-  const parsed = moduleEvidenceSchema.safeParse(input);
-  if (!parsed.success) {
-    failures.push(...formatSchemaFailures(parsed.error));
-    return { accepted: false, status: "failed", failures };
-  }
-
-  const evidence = parsed.data;
-  if (evidence.package.version !== evidence.moduleVersion) failures.push("PACKAGE_VERSION_MISMATCH");
-  if (evidence.package.name !== `@johnason/data-platform-module-${evidence.moduleName}`) failures.push("PACKAGE_NAME_MISMATCH");
-  if (Date.parse(evidence.finishedAt) < Date.parse(evidence.startedAt)) failures.push("TIMESTAMP_ORDER_INVALID:evidence");
-
-  for (const gateName of RISK_GATES) {
-    const gate = evidence.gates[gateName];
-    if (gate.status !== "passed") failures.push(`GATE_NOT_PASSED:${gateName}`);
-    if (Date.parse(gate.finishedAt) < Date.parse(gate.startedAt)) failures.push(`TIMESTAMP_ORDER_INVALID:${gateName}`);
-    if (gate.counts.failed !== 0) failures.push(`GATE_FAILURE_COUNT:${gateName}`);
-    if (gate.status === "passed" && gate.counts.skipped !== 0) failures.push(`GATE_SKIP_COUNT:${gateName}`);
-    if (gate.counts.secrets !== 0) failures.push(`GATE_SECRET_COUNT:${gateName}`);
-    if (gate.commands.some((command) => command.exitCode !== 0)) failures.push(`COMMAND_FAILED:${gateName}`);
-    if (gate.commands.some((command) => command.argv.some((argument) => SECRET_OPTION.test(argument)))) {
-      failures.push(`SECRET_ARGUMENT:${gateName}`);
-    }
-    for (const target of gate.executionTargets) {
-      if (target.kind === "database" && ["oracle", "dm"].includes(target.engine) && target.evidenceMode !== "live") {
-        failures.push(`NON_LIVE_DATABASE_EVIDENCE:${target.engine}`);
-      }
-    }
-  }
-
-  const baseAccepted = failures.length === 0 && evidence.status === "accepted";
-  if (evidence.accepted !== undefined && evidence.accepted !== baseAccepted) failures.push("ACCEPTED_SPOOF");
-  const accepted = baseAccepted && failures.length === 0;
-  const status = accepted ? "accepted" : evidence.status === "accepted" ? "failed" : evidence.status;
-  return { accepted, status, failures };
-}
-
-module.exports = { evaluateModuleEvidence };
+module.exports = { RISK_GATES, evaluateModuleEvidence, containsSecretShape };

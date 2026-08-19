@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "acceptanceId": "build-aviation-ontology-v1",
+  "status": "cli-project-and-ontology-accepted",
+  "fullSevenStageStatus": "blocked-real-evidence-required",
+  "verifiedAt": "2026-08-13T11:06:31.606Z",
+  "skill": {
+    "archive": "build-aviation-ontology.zip",
+    "archiveSha256": "a0fe7e777e22b8a700a529554cddeafdce5750abfd846d099d7048985346b3a6",
+    "installedPath": "/Users/sushi/.dintalclaw-demo/masters/rndmaster/data/cliagent/codex-homes/945fae6b-0218-45ef-b076-2eae497a36d6/skills/build-aviation-ontology",
+    "skillSha256": "be6646cfa4e499e21c97152ee5b2311afbd0a2f995e4966af7656e47ea03f64c",
+    "referenceSha256": "474ea88c6bcdb0662515f4117a8f14eaa9ba2182eec2a0bc26bd4bfd80b2199f",
+    "validation": "quick_validate.py passed"
+  },
+  "cli": {
+    "binary": ".local/data-platform-cli/install/node_modules/.bin/data-platform",
+    "profile": "aviation",
+    "health": "ok",
+    "capabilities": 596,
+    "commandDefinitions": 570,
+    "dispatches": 1166,
+    "keychain": "available; secrets not included in this report"
+  },
+  "project": {
+    "id": 2,
+    "projectCode": "aviation_ontology_cli_20260813",
+    "projectName": "航空本体 CLI 验收 20260813",
+    "access": {
+      "resolve": "passed",
+      "use": "passed",
+      "write": "passed",
+      "detail": "passed"
+    }
+  },
+  "ontology": {
+    "contractId": "aviation_ontology_cli_v1",
+    "contractValidation": "passed",
+    "lineageValidation": "passed",
+    "entities": 5,
+    "relations": 3,
+    "rules": 2,
+    "lineageLinks": 47,
+    "contractImport": "passed",
+    "contractShow": "passed",
+    "contractDiffEqual": true,
+    "lineageImport": "passed",
+    "lineageShow": "passed",
+    "graphExport": "passed",
+    "graphVerify": "passed",
+    "simulationExport": "passed",
+    "simulationVerify": "passed",
+    "artifacts": [
+      ".local/aviation-cli-acceptance/aviation-ontology-graph.html",
+      ".local/aviation-cli-acceptance/aviation-ontology-simulation.html"
+    ]
+  },
+  "tests": {
+    "cliServiceAcceptance": "passed",
+    "aviationOntology专项Tests": "8 passed, 0 failed",
+    "forbiddenBypassRejection": "passed"
+  },
+  "limitations": [
+    "No real seven-stage aviation evidence file was available, so acceptance run/verify/report was not claimed as GREEN.",
+    "External aviation API, PostgreSQL ODS, Oracle, Dameng, DataX reader/writer, knowledge-base vector readiness, and reporting runtime evidence remain required for full acceptance.",
+    "Ontology contract and lineage facades persist the validated project-scoped artifacts through the CLI local context; full platform asset stages require the corresponding real service evidence."
+  ],
+  "forbiddenInterfacesUsed": []
+}

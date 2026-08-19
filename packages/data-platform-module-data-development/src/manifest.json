@@ -1,0 +1,3030 @@
+{
+  "moduleName": "data-development",
+  "moduleVersion": "0.2.0",
+  "capabilitySchemaVersion": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "data-development.001.testdatasourceconfig",
+      "command": "development test-datasource-config",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/datasources/test"
+      ],
+      "sourceFrontendKeys": [
+        "/dashboard/data-development/workbench2",
+        "/dashboard/data-development/operator-platform",
+        "/dashboard/data-development/datasources",
+        "/dashboard/data-development/sql-tasks",
+        "/dashboard/data-development/processing",
+        "/dashboard/data-development/scheduling",
+        "/dashboard/data-development/models",
+        "/dashboard/processing",
+        "/dashboard/processing-rules",
+        "/dashboard/processing-schedule",
+        "/dashboard/data-development",
+        "/dashboard/data-development/workbench",
+        "/dashboard/data-development/orchestration"
+      ],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.testDatasourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/datasources/test"
+      ]
+    },
+    {
+      "capabilityId": "data-development.002.listdatasources",
+      "command": "development list-datasources",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources"
+      ]
+    },
+    {
+      "capabilityId": "data-development.003.getdatasource",
+      "command": "development get-datasource",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.004.createdatasource",
+      "command": "development create-datasource",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/datasources"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createDatasourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/datasources"
+      ]
+    },
+    {
+      "capabilityId": "data-development.005.updatedatasource",
+      "command": "development update-datasource",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/datasources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateDatasourceSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/datasources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.006.deletedatasource",
+      "command": "development delete-datasource",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/datasources/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/datasources/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.007.testdatasource",
+      "command": "development test-datasource",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/datasources/:id/test"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/datasources/:id/test"
+      ]
+    },
+    {
+      "capabilityId": "data-development.008.listdatasourcedatabases",
+      "command": "development list-datasource-databases",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/databases"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/databases"
+      ]
+    },
+    {
+      "capabilityId": "data-development.009.listdatasourcetables",
+      "command": "development list-datasource-tables",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/tables"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/tables"
+      ]
+    },
+    {
+      "capabilityId": "data-development.010.listdatasourcecolumns",
+      "command": "development list-datasource-columns",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/columns"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/columns"
+      ]
+    },
+    {
+      "capabilityId": "data-development.011.listdatasourcefunctions",
+      "command": "development list-datasource-functions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/functions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/datasources/:id/functions"
+      ]
+    },
+    {
+      "capabilityId": "data-development.012.listscriptfolders",
+      "command": "development list-script-folders",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/script-folders"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/script-folders"
+      ]
+    },
+    {
+      "capabilityId": "data-development.013.createscriptfolder",
+      "command": "development create-script-folder",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/script-folders"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createScriptFolderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/script-folders"
+      ]
+    },
+    {
+      "capabilityId": "data-development.014.updatescriptfolder",
+      "command": "development update-script-folder",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/script-folders/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateScriptFolderSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/script-folders/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.015.deletescriptfolder",
+      "command": "development delete-script-folder",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/script-folders/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/script-folders/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.016.listscripts",
+      "command": "development list-scripts",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scripts"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/scripts"
+      ]
+    },
+    {
+      "capabilityId": "data-development.017.getscript",
+      "command": "development get-script",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scripts/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/scripts/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.018.createscript",
+      "command": "development create-script",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scripts"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createScriptSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/scripts"
+      ]
+    },
+    {
+      "capabilityId": "data-development.019.updatescript",
+      "command": "development update-script",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/scripts/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateScriptSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/scripts/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.020.deletescript",
+      "command": "development delete-script",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/scripts/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/scripts/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.021.savescriptversion",
+      "command": "development save-script-version",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scripts/:id/save-version"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/scripts/:id/save-version"
+      ]
+    },
+    {
+      "capabilityId": "data-development.022.listscriptversions",
+      "command": "development list-script-versions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scripts/:id/versions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/scripts/:id/versions"
+      ]
+    },
+    {
+      "capabilityId": "data-development.023.savescriptas",
+      "command": "development save-script-as",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scripts/:id/save-as"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createScriptSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/scripts/:id/save-as"
+      ]
+    },
+    {
+      "capabilityId": "data-development.024.executequery",
+      "command": "development execute-query",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/queries/execute"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.executeQuerySchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/queries/execute"
+      ]
+    },
+    {
+      "capabilityId": "data-development.025.listqueryhistory",
+      "command": "development list-query-history",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/queries/history"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/queries/history"
+      ]
+    },
+    {
+      "capabilityId": "data-development.026.listcopilotsessions",
+      "command": "development list-copilot-sessions",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/copilot/sessions"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/copilot/sessions"
+      ]
+    },
+    {
+      "capabilityId": "data-development.027.listcopilotsessionmessages",
+      "command": "development list-copilot-session-messages",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/copilot/sessions/:id/messages"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/copilot/sessions/:id/messages"
+      ]
+    },
+    {
+      "capabilityId": "data-development.028.runcopilottaskstream",
+      "command": "development run-copilot-task-stream",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/copilot/stream"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "stream",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human stream or NDJSON",
+      "executionMode": "foreground-stream",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.copilotTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/copilot/stream"
+      ]
+    },
+    {
+      "capabilityId": "data-development.029.runcopilottask",
+      "command": "development run-copilot-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/copilot"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "api",
+          "provider": "external-api"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.copilotTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/copilot"
+      ]
+    },
+    {
+      "capabilityId": "data-development.030.listorchestrationtasks",
+      "command": "development list-orchestration-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/orchestrations"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations",
+        "GET /api/v1/data-development/operator-tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-development.031.getorchestrationtask",
+      "command": "development get-orchestration-task",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id",
+        "GET /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.032.createorchestrationtask",
+      "command": "development create-orchestration-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/orchestrations"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createOrchestrationTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/orchestrations",
+        "POST /api/v1/data-development/operator-tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-development.033.updateorchestrationtask",
+      "command": "development update-orchestration-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateOrchestrationTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id",
+        "PUT /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.034.deleteorchestrationtask",
+      "command": "development delete-orchestration-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/orchestrations/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/orchestrations/:id",
+        "DELETE /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.035.saveorchestrationgraph",
+      "command": "development save-orchestration-graph",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id/graph"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.orchestrationGraphSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id/graph",
+        "PUT /api/v1/data-development/operator-tasks/:id/graph"
+      ]
+    },
+    {
+      "capabilityId": "data-development.036.compileorchestrationsql",
+      "command": "development compile-orchestration-sql",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/sql-preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/sql-preview",
+        "GET /api/v1/data-development/operator-tasks/:id/sql-preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.037.previeworchestrationnode",
+      "command": "development preview-orchestration-node",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/nodes/:nodeKey/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/nodes/:nodeKey/preview",
+        "GET /api/v1/data-development/operator-tasks/:id/nodes/:nodeKey/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.038.runorchestration",
+      "command": "development run-orchestration",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/orchestrations/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/orchestrations/:id/run",
+        "POST /api/v1/data-development/operator-tasks/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "data-development.039.listorchestrationtasks",
+      "command": "development list-orchestration-tasks",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/operator-tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations",
+        "GET /api/v1/data-development/operator-tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-development.040.getorchestrationtask",
+      "command": "development get-orchestration-task",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/operator-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id",
+        "GET /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.041.createorchestrationtask",
+      "command": "development create-orchestration-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/operator-tasks"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createOrchestrationTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/orchestrations",
+        "POST /api/v1/data-development/operator-tasks"
+      ]
+    },
+    {
+      "capabilityId": "data-development.042.updateorchestrationtask",
+      "command": "development update-orchestration-task",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/operator-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateOrchestrationTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id",
+        "PUT /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.043.deleteorchestrationtask",
+      "command": "development delete-orchestration-task",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/operator-tasks/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/orchestrations/:id",
+        "DELETE /api/v1/data-development/operator-tasks/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.044.saveorchestrationgraph",
+      "command": "development save-orchestration-graph",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/operator-tasks/:id/graph"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.orchestrationGraphSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/orchestrations/:id/graph",
+        "PUT /api/v1/data-development/operator-tasks/:id/graph"
+      ]
+    },
+    {
+      "capabilityId": "data-development.045.compileorchestrationsql",
+      "command": "development compile-orchestration-sql",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/operator-tasks/:id/sql-preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/sql-preview",
+        "GET /api/v1/data-development/operator-tasks/:id/sql-preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.046.previeworchestrationnode",
+      "command": "development preview-orchestration-node",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/operator-tasks/:id/nodes/:nodeKey/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/orchestrations/:id/nodes/:nodeKey/preview",
+        "GET /api/v1/data-development/operator-tasks/:id/nodes/:nodeKey/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.047.runorchestration",
+      "command": "development run-orchestration",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/operator-tasks/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/orchestrations/:id/run",
+        "POST /api/v1/data-development/operator-tasks/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "data-development.048.listprocessingjobs",
+      "command": "development list-processing-jobs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/processing/jobs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/processing/jobs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.049.getprocessingjob",
+      "command": "development get-processing-job",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/processing/jobs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/processing/jobs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.050.previewprocessingjobdraft",
+      "command": "development preview-processing-job-draft",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.previewProcessingJobSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.051.createprocessingjob",
+      "command": "development create-processing-job",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/processing/jobs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createProcessingJobSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/processing/jobs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.052.updateprocessingjob",
+      "command": "development update-processing-job",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/processing/jobs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateProcessingJobSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/processing/jobs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.053.deleteprocessingjob",
+      "command": "development delete-processing-job",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/processing/jobs/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/processing/jobs/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.054.previewprocessingjob",
+      "command": "development preview-processing-job",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/:id/preview"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/:id/preview"
+      ]
+    },
+    {
+      "capabilityId": "data-development.055.runprocessingjob",
+      "command": "development run-processing-job",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.runProcessingJobSchema"
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/processing/jobs/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "data-development.056.listprocessingjobruns",
+      "command": "development list-processing-job-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/processing/jobs/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": false,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/processing/jobs/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.057.listworkflows",
+      "command": "development list-workflows",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/workflows"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows",
+        "GET /api/v1/data-development/scheduling/workflows"
+      ]
+    },
+    {
+      "capabilityId": "data-development.058.getworkflow",
+      "command": "development get-workflow",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows/:id",
+        "GET /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.059.createworkflow",
+      "command": "development create-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/workflows"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createWorkflowSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows",
+        "POST /api/v1/data-development/scheduling/workflows"
+      ]
+    },
+    {
+      "capabilityId": "data-development.060.createworkflowfromtask",
+      "command": "development create-workflow-from-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/workflows/from-task"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createWorkflowFromTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/from-task",
+        "POST /api/v1/data-development/scheduling/workflows/from-task"
+      ]
+    },
+    {
+      "capabilityId": "data-development.061.updateworkflow",
+      "command": "development update-workflow",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateWorkflowSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id",
+        "PUT /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.062.deleteworkflow",
+      "command": "development delete-workflow",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/workflows/:id",
+        "DELETE /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.063.saveworkflowgraph",
+      "command": "development save-workflow-graph",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id/graph"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.workflowGraphSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id/graph",
+        "PUT /api/v1/data-development/scheduling/workflows/:id/graph"
+      ]
+    },
+    {
+      "capabilityId": "data-development.064.validateworkflow",
+      "command": "development validate-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/validate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/validate",
+        "POST /api/v1/data-development/scheduling/workflows/:id/validate"
+      ]
+    },
+    {
+      "capabilityId": "data-development.065.runworkflow",
+      "command": "development run-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.runWorkflowSchema"
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/run",
+        "POST /api/v1/data-development/scheduling/workflows/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "data-development.066.listworkflowruns",
+      "command": "development list-workflow-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/workflows/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows/:id/runs",
+        "GET /api/v1/data-development/scheduling/workflows/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.067.listinstances",
+      "command": "development list-instances",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/instances"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances",
+        "GET /api/v1/data-development/scheduling/instances"
+      ]
+    },
+    {
+      "capabilityId": "data-development.068.getinstance",
+      "command": "development get-instance",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/instances/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances/:id",
+        "GET /api/v1/data-development/scheduling/instances/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.069.listinstancelogs",
+      "command": "development list-instance-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/instances/:id/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances/:id/logs",
+        "GET /api/v1/data-development/scheduling/instances/:id/logs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.070.listworkflows",
+      "command": "development list-workflows",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/workflows"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows",
+        "GET /api/v1/data-development/scheduling/workflows"
+      ]
+    },
+    {
+      "capabilityId": "data-development.071.getworkflow",
+      "command": "development get-workflow",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows/:id",
+        "GET /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.072.createworkflow",
+      "command": "development create-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scheduling/workflows"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createWorkflowSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows",
+        "POST /api/v1/data-development/scheduling/workflows"
+      ]
+    },
+    {
+      "capabilityId": "data-development.073.createworkflowfromtask",
+      "command": "development create-workflow-from-task",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scheduling/workflows/from-task"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.createWorkflowFromTaskSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/from-task",
+        "POST /api/v1/data-development/scheduling/workflows/from-task"
+      ]
+    },
+    {
+      "capabilityId": "data-development.074.updateworkflow",
+      "command": "development update-workflow",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/scheduling/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.updateWorkflowSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id",
+        "PUT /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.075.deleteworkflow",
+      "command": "development delete-workflow",
+      "sourceApiKeys": [
+        "DELETE /api/v1/data-development/scheduling/workflows/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "delete",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "DELETE /api/v1/data-development/workflows/:id",
+        "DELETE /api/v1/data-development/scheduling/workflows/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.076.saveworkflowgraph",
+      "command": "development save-workflow-graph",
+      "sourceApiKeys": [
+        "PUT /api/v1/data-development/scheduling/workflows/:id/graph"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.workflowGraphSchema"
+      ],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "PUT /api/v1/data-development/workflows/:id/graph",
+        "PUT /api/v1/data-development/scheduling/workflows/:id/graph"
+      ]
+    },
+    {
+      "capabilityId": "data-development.077.validateworkflow",
+      "command": "development validate-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scheduling/workflows/:id/validate"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "write",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/validate",
+        "POST /api/v1/data-development/scheduling/workflows/:id/validate"
+      ]
+    },
+    {
+      "capabilityId": "data-development.078.runworkflow",
+      "command": "development run-workflow",
+      "sourceApiKeys": [
+        "POST /api/v1/data-development/scheduling/workflows/:id/run"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "execute",
+      "interaction": "json-write",
+      "inputMode": "validated flags or --file JSON/YAML",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "async-job-capable",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [
+        "schema.runWorkflowSchema"
+      ],
+      "confirmationRequired": true,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "POST /api/v1/data-development/workflows/:id/run",
+        "POST /api/v1/data-development/scheduling/workflows/:id/run"
+      ]
+    },
+    {
+      "capabilityId": "data-development.079.listworkflowruns",
+      "command": "development list-workflow-runs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/workflows/:id/runs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        },
+        {
+          "kind": "database",
+          "engine": "postgresql",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "oracle",
+          "role": "business-datasource"
+        },
+        {
+          "kind": "database",
+          "engine": "dm",
+          "role": "business-datasource"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/workflows/:id/runs",
+        "GET /api/v1/data-development/scheduling/workflows/:id/runs"
+      ]
+    },
+    {
+      "capabilityId": "data-development.080.listinstances",
+      "command": "development list-instances",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/instances"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances",
+        "GET /api/v1/data-development/scheduling/instances"
+      ]
+    },
+    {
+      "capabilityId": "data-development.081.getinstance",
+      "command": "development get-instance",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/instances/:id"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances/:id",
+        "GET /api/v1/data-development/scheduling/instances/:id"
+      ]
+    },
+    {
+      "capabilityId": "data-development.082.listinstancelogs",
+      "command": "development list-instance-logs",
+      "sourceApiKeys": [
+        "GET /api/v1/data-development/scheduling/instances/:id/logs"
+      ],
+      "sourceFrontendKeys": [],
+      "module": "data-development",
+      "action": "read",
+      "interaction": "json-read",
+      "inputMode": "validated flags/query options",
+      "outputMode": "human table/detail or JSON envelope",
+      "executionMode": "sync-command",
+      "executionTargets": [
+        {
+          "kind": "database",
+          "engine": "mysql",
+          "role": "platform-authority"
+        }
+      ],
+      "authRequired": "route-or-module",
+      "projectScoped": true,
+      "featureGuard": "\"development\"",
+      "validationSchemas": [],
+      "confirmationRequired": false,
+      "sharedCommandAlias": true,
+      "aliasApiKeys": [
+        "GET /api/v1/data-development/instances/:id/logs",
+        "GET /api/v1/data-development/scheduling/instances/:id/logs"
+      ]
+    }
+  ]
+}

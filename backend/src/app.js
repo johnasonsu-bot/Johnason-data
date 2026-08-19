@@ -52,12 +52,12 @@ app.use(cors({ origin: [...new Set(corsOrigins)], credentials: false }));
 app.use(requestContext);
 app.use(morgan(":method :url :status :response-time ms :res[content-length] - :req[x-request-id]"));
 app.use(express.json({ limit: "2mb" }));
-app.get("/api/health", (req, res) => {
+app.get("/api/health", asyncHandler((req, res) => {
   res.json({ status: "ok", service: "medata-platform", env: env.nodeEnv });
-});
-app.get("/api/v1/platform/database-capabilities", (req, res) => {
+}));
+app.get("/api/v1/platform/database-capabilities", asyncHandler((req, res) => {
   res.json({ data: getRuntimeDatabaseCapabilityStatus() });
-});
+}));
 app.get("/api/v1/jobs/:id", activationMiddleware, requireFeature("services"), asyncHandler(async (req, res) => {
   const result = await dataServiceService.inspectServiceJob(Number(req.params.id), {
     headers: req.headers,

@@ -1,41 +1,38 @@
 {
   "name": "@johnason/data-platform-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
-  "description": "Aggregate capability catalog and runtime for Johnason Data Platform",
-  "main": "src/runtime.js",
-  "files": ["src"],
+  "description": "Aggregate application capability catalog for Johnason Data Platform",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=22.20.0"
   },
-  "scripts": {
-    "test": "node --test tests/*.test.js",
-    "pack:check": "npm pack --dry-run"
-  },
   "dependencies": {
-    "@johnason/data-platform-core-kernel": "0.1.0",
-    "@johnason/data-platform-module-auth": "0.2.0",
+    "@johnason/data-platform-core-kernel": "0.2.0",
     "@johnason/data-platform-module-asset-search": "0.2.0",
-    "@johnason/data-platform-module-data-sources": "0.2.0",
-    "@johnason/data-platform-module-data-source-research": "0.2.0",
+    "@johnason/data-platform-module-auth": "0.2.0",
+    "@johnason/data-platform-module-data-development": "0.2.0",
+    "@johnason/data-platform-module-data-lab": "0.2.0",
     "@johnason/data-platform-module-data-lab-sources": "0.2.0",
+    "@johnason/data-platform-module-data-map": "0.2.0",
+    "@johnason/data-platform-module-data-services": "0.2.0",
+    "@johnason/data-platform-module-data-source-research": "0.2.0",
+    "@johnason/data-platform-module-data-sources": "0.2.0",
+    "@johnason/data-platform-module-data-standards": "0.2.0",
+    "@johnason/data-platform-module-dev-ai-configs": "0.2.0",
+    "@johnason/data-platform-module-file-imports": "0.2.0",
     "@johnason/data-platform-module-ingestion-ai-configs": "0.2.0",
     "@johnason/data-platform-module-ingestion-tasks": "0.2.0",
-    "@johnason/data-platform-module-file-imports": "0.2.0",
     "@johnason/data-platform-module-model-providers": "0.2.0",
-    "@johnason/data-platform-module-dev-ai-configs": "0.2.0",
-    "@johnason/data-platform-module-reporting-ai-configs": "0.2.0",
-    "@johnason/data-platform-module-data-map": "0.2.0",
-    "@johnason/data-platform-module-data-standards": "0.2.0",
-    "@johnason/data-platform-module-system-knowledge-bases": "0.2.0",
-    "@johnason/data-platform-module-system-management": "0.2.0",
-    "@johnason/data-platform-module-data-development": "0.2.0",
-    "@johnason/data-platform-module-quality-control": "0.2.0",
-    "@johnason/data-platform-module-data-services": "0.2.0",
-    "@johnason/data-platform-module-reporting": "0.2.0",
-    "@johnason/data-platform-module-data-modeling": "0.2.0",
-    "@johnason/data-platform-module-service-runtime": "0.2.0",
     "@johnason/data-platform-module-platform": "0.2.0",
-    "@johnason/data-platform-module-project-spaces": "0.2.0"
-  }
+    "@johnason/data-platform-module-project-spaces": "0.2.0",
+    "@johnason/data-platform-module-quality-control": "0.2.0",
+    "@johnason/data-platform-module-reporting": "0.2.0",
+    "@johnason/data-platform-module-system-knowledge-base": "0.2.0",
+    "@johnason/data-platform-module-system-management": "0.2.0"
+  },
+  "license": "UNLICENSED"
 }

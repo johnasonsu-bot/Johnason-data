@@ -1,40 +1,49 @@
-const readline = require("node:readline");
-
-function defaultSetEcho(input) {
-  if (!input?.isTTY || typeof input.setRawMode !== "function") return () => {};
-  const previous = input.isRaw === true;
-  return (enabled) => input.setRawMode(enabled ? previous : true);
-}
-
-function readLine(input) {
+function readAll(input) {
   return new Promise((resolve, reject) => {
-    const interface_ = readline.createInterface({ input, terminal: false });
-    interface_.once("line", (line) => {
-      interface_.close();
-      resolve(line);
-    });
-    interface_.once("error", reject);
+    let value = "";
+    input.setEncoding?.("utf8");
+    input.on("data", (chunk) => { value += chunk; });
+    input.once("end", () => resolve(value.replace(/[\r\n]+$/, "")));
+    input.once("error", reject);
   });
 }
 
-async function readHiddenInput({
-  prompt = "Password: ",
-  input = process.stdin,
-  output = process.stderr,
-  setEcho,
-  read,
-} = {}) {
-  if (!output || typeof output.write !== "function") throw new TypeError("Hidden input output must expose write()");
-  const echo = setEcho || defaultSetEcho(input);
-  const reader = read || (() => readLine(input));
-  output.write(prompt);
-  echo(false);
-  try {
-    return await reader();
-  } finally {
-    echo(true);
-    if (input?.isTTY) output.write("\n");
-  }
+function readHiddenInput({ input = process.stdin, output = process.stderr, prompt = "Secret: " } = {}) {
+  if (!input.isTTY || typeof input.setRawMode !== "function") return readAll(input);
+  return new Promise((resolve, reject) => {
+    let value = "";
+    const previousRaw = Boolean(input.isRaw);
+    const cleanup = () => {
+      input.off("data", onData);
+      input.setRawMode(previousRaw);
+      input.pause();
+    };
+    const onData = (chunk) => {
+      const text = String(chunk);
+      for (const character of text) {
+        if (character === "\u0003") {
+          cleanup();
+          output.write("\n");
+          const error = new Error("Secret input cancelled");
+          error.code = "INPUT_CANCELLED";
+          reject(error);
+          return;
+        }
+        if (character === "\r" || character === "\n") {
+          cleanup();
+          output.write("\n");
+          resolve(value);
+          return;
+        }
+        if (character === "\u007f" || character === "\b") value = value.slice(0, -1);
+        else value += character;
+      }
+    };
+    output.write(prompt);
+    input.setRawMode(true);
+    input.resume();
+    input.on("data", onData);
+  });
 }
 
 module.exports = { readHiddenInput };

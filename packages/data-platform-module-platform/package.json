@@ -2,20 +2,27 @@
   "name": "@johnason/data-platform-module-platform",
   "version": "0.2.0",
   "private": false,
-  "description": "Transport-neutral platform overview and runtime capabilities for Johnason Data Platform",
   "main": "src/index.js",
-  "exports": {
-    ".": "./src/index.js",
-    "./contracts": "./contracts/index.js"
-  },
-  "files": ["src", "contracts"],
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=22.20.0"
   },
-  "scripts": {
-    "test": "node --test tests/*.test.js"
-  },
   "dependencies": {
-    "@johnason/data-platform-core-kernel": "0.1.0"
-  }
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "basic-ftp": "5.3.1",
+    "bcryptjs": "2.4.3",
+    "dmdb": "1.0.52452",
+    "docx": "9.7.1",
+    "hive-driver": "1.0.1",
+    "jsonwebtoken": "9.0.3",
+    "kafkajs": "2.2.4",
+    "mysql2": "3.23.3",
+    "node-opengauss": "1.1.0",
+    "node-sql-parser": "5.4.0",
+    "oracledb": "7.0.1",
+    "pg": "8.23.0"
+  },
+  "license": "UNLICENSED"
 }

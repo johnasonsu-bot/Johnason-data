@@ -1,9 +1,10 @@
-class DatabaseRuntimeMissingError extends Error {
-  constructor() {
-    super("A database runtime is required for this operation");
-    this.name = "DatabaseRuntimeMissingError";
-    this.code = "DATABASE_RUNTIME_MISSING";
+class PlatformError extends Error {
+  constructor(code, message, details, options) {
+    super(message, options);
+    this.name = "PlatformError";
+    this.code = code;
+    if (details !== undefined) this.details = details;
   }
 }
 
-module.exports = { DatabaseRuntimeMissingError };
+module.exports = { PlatformError };

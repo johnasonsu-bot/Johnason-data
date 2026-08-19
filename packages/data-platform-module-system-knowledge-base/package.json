@@ -1,0 +1,21 @@
+{
+  "name": "@johnason/data-platform-module-system-knowledge-base",
+  "version": "0.2.0",
+  "private": false,
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "dependencies": {
+    "@johnason/data-platform-core-kernel": "0.2.0",
+    "iconv-lite": "0.4.24",
+    "mammoth": "1.12.1",
+    "pdf-parse": "1.1.4",
+    "word-extractor": "1.0.4",
+    "xlsx": "0.18.5"
+  },
+  "license": "UNLICENSED"
+}
