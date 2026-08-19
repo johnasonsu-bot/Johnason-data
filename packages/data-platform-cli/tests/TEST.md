@@ -31,9 +31,9 @@ Install the packed CLI into a temporary prefix, create a profile with a fake key
 - Aviation: the installed CLI must execute all seven real stages twice with the same business keys and prove no duplicates.
 - Aggregate: requires accepted evidence for every module plus API, four databases, package install, aviation twice, zero bypasses, and zero secret findings.
 
-## Task 17 API-gate characterization (2026-08-19)
+## Task 17 concise non-release characterization (2026-08-19)
 
-Redacted environment fingerprint: Node `v22.20.0`; Darwin `27.0.0 arm64`; CLI package `@johnason/data-platform-cli@0.2.0`; candidate commit `623915470b2f44e79cff9891c6f85321e5ea31e2`. No credential values, endpoint URLs, or provider identifiers were recorded.
+This is a concise non-release test summary, not aggregate release evidence. Redacted environment fingerprint: Node `v22.20.0`; Darwin `27.0.0 arm64`; CLI package `@johnason/data-platform-cli@0.2.0`; portable base `623915470b2f44e79cff9891c6f85321e5ea31e2`; first Task 17 candidate `b7ceb34ca176f503463c010b9dad18c9c3f06e6d`. No credential values, endpoint URLs, or provider identifiers were recorded.
 
 Candidate baseline:
 
@@ -43,14 +43,14 @@ $ CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js
 # result: FAIL — api gate evidence is missing (blocked != accepted)
 ```
 
-The controlled loopback fixtures now cover successful JSON, pagination, `429` with `Retry-After`, retry progression, timeout, malformed JSON, NDJSON streaming, request cancellation, model discovery, and SSE completion. They are explicitly rejected as release evidence. Release evidence must contain exactly one successful installed `data-platform` command record for each of the 37 classified capabilities, a non-loopback approved-provider fingerprint represented only by a SHA-256 digest, JSON/NDJSON format, and redacted audit/event/idempotency references. The validator rejects mock evidence, bypasses, secret findings, loopback endpoints, unknown or missing capability IDs, and sensitive field names.
+The controlled loopback fixtures cover only mechanics: successful JSON, pagination, `429` with `Retry-After`, retry progression, timeout, malformed JSON, NDJSON streaming, request cancellation, model discovery, and SSE completion. They are not command-level or release coverage. A release run requires a host committed to the versioned service-runtime allowlist and derives every result by launching the installed `data-platform` binary once for each of the 37 classified capabilities. The harness reads only command-case arguments, derives the command, idempotency hash, exit status, JSON envelope, provider-host metadata, audit ID, and event ID from subprocess results, and rejects loopback hostnames/IPs plus DNS-resolved loopback addresses.
 
 Focused and package regression output:
 
 ```text
 $ cd packages/data-platform-cli && npm test
-# tests 67
-# pass 67
+# tests 70
+# pass 70
 # fail 0
 # skipped 0
 
@@ -58,10 +58,10 @@ $ npm run pack:check
 # exit 0; @johnason/data-platform-cli@0.2.0 dry-run package contains 23 files
 
 $ CLI_API_GATE=1 node --test tests/api-gate.test.js
-# tests 6
-# pass 5
+# tests 9
+# pass 8
 # fail 1
-# failure: api gate evidence is missing (blocked != accepted)
+# failure: approved endpoint, case file, installed binary, and profile are required (blocked != accepted)
 ```
 
-The strict gate remains intentionally blocked: approved real external-provider credentials/endpoints and real execution evidence were not supplied. No Data Platform HTTP request was made.
+The strict gate remains intentionally blocked: no provider endpoint is approved in the committed allowlist, and approved real external-provider infrastructure plus real command execution has not been supplied. No Data Platform HTTP request was made.
