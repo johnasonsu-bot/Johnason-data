@@ -43,6 +43,54 @@ $ CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js
 # result: FAIL — api gate evidence is missing (blocked != accepted)
 ```
 
+## Task 18 database-gate characterization (2026-08-19)
+
+This is strict, non-release evidence. The former `CLI_DATABASE_GATE_EVIDENCE*` self-declared JSON path was removed. Database acceptance is now derived at test time from the repository-owned packed install, a matching current `npm pack --dry-run --json` manifest, fixed profile names, and per-capability installed-CLI command output mappings. The JSON files below are command contracts only; they are not evidence and begin empty.
+
+Redacted environment fingerprint: Node `v22.20.0`; Darwin `27.0.0 arm64`; package `@johnason/data-platform-cli@0.2.0`; base `b246fc9b5c0b04db582e395b204a5119817d4726`. No credential values, database hostnames, database names, driver configuration, command inputs, or endpoint values were recorded.
+
+```text
+$ CLI_DATABASE_GATE=1 CLI_DATABASE_ENGINE=mysql node --test packages/data-platform-cli/tests/database-gate.test.js
+# packed `test-mysql` OS-Keychain runtime connectivity: PASS
+# command evidence: BLOCKED — 595/595 MySQL classified capabilities have no committed command cases
+# required uncovered evidence: CRUD, query, transaction, project isolation, durable runtime
+
+$ CLI_DATABASE_GATE=1 CLI_DATABASE_ENGINE=postgresql node --test packages/data-platform-cli/tests/database-gate.test.js
+# BLOCKED — profile `test-postgresql` unavailable; 130/130 command cases missing
+# required uncovered evidence: ODS, DataX, JDBC, schema, dialect, rollback, aviation exceptional values
+
+$ CLI_DATABASE_GATE=1 CLI_DATABASE_ENGINE=oracle node --test packages/data-platform-cli/tests/database-gate.test.js
+# BLOCKED — profile `test-oracle` unavailable; 130/130 command cases missing
+# required uncovered evidence: service/SID, schema, binds, pagination, rollback
+
+$ CLI_DATABASE_GATE=1 CLI_DATABASE_ENGINE=dm node --test packages/data-platform-cli/tests/database-gate.test.js
+# BLOCKED — profile `test-dm` unavailable; 130/130 command cases missing
+# required uncovered evidence: JDBC, schema, binds, pagination, rollback
+```
+
+All four explicit commands intentionally exit nonzero because `CLI_DATABASE_GATE=1` requires `accepted`; their failures are the expected honest release block, not passing integration evidence. The MySQL connectivity preflight uses only the packed CLI's profile/keychain/runtime modules and does not count as any command-capability evidence. No direct database client, Data Platform HTTP call, bootstrap script, mock adapter, placeholder host, or fabricated result was used.
+
+Focused regressions run after the replacement:
+
+```text
+$ node --test packages/data-platform-core-kernel/tests/database-contract.test.js packages/data-platform-core-kernel/tests/database-runtime.test.js
+# 6 passed, 0 failed
+
+$ cd packages/data-platform-cli && npm test && npm run pack:check
+# 80 passed, 0 failed, 1 expected conditional MySQL-gate skip; package dry-run: 23 files
+
+$ cd backend && npm test
+# 35 passed, 0 failed, 4 optional real-database contracts skipped because their environments are absent
+
+$ CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js
+# BLOCKED — rerun required after this code change; 37 capabilities still lack approved provider hosts/cases/profiles
+
+$ secret-literal scan of Task 18 files && git diff --check
+# 0 findings; exit 0
+```
+
+The mandatory installed aviation acceptance twice was not run: its prerequisite four-engine command gate is blocked. No duplicate-business-key or bypass claim is made.
+
 The controlled loopback fixtures cover only mechanics: successful JSON, pagination, `429` with `Retry-After`, retry progression, timeout, malformed JSON, NDJSON streaming, request cancellation, model discovery, and SSE completion. They are not command-level or release coverage. The gate resolves only the repository-owned packed install under `.local/data-platform-cli/install`, verifies its package name/version/bin relationship, and ignores `CLI_API_GATE_BINARY`. Its committed, secret-free policy separates approved hosts by `external-api`, `model-provider`, and `service-runtime`; all three lists are intentionally empty. The committed case artifact is also empty. Each capability therefore remains blocked with its own policy/case/provenance reason; no CLI metadata requirements are invented where the current capability/runtime contract declares none.
 
 Focused and package regression output:

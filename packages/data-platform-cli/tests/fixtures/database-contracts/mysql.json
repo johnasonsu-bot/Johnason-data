@@ -1,0 +1,6 @@
+{
+  "engine": "mysql",
+  "profile": "test-mysql",
+  "requiredOperations": ["crud", "query", "transaction", "projectIsolation", "durableRuntime"],
+  "cases": []
+}

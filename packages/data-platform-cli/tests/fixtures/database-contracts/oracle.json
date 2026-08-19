@@ -1,0 +1,6 @@
+{
+  "engine": "oracle",
+  "profile": "test-oracle",
+  "requiredOperations": ["serviceOrSid", "schema", "binds", "pagination", "rollback"],
+  "cases": []
+}
