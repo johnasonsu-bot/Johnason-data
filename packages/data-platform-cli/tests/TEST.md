@@ -49,8 +49,8 @@ Focused and package regression output:
 
 ```text
 $ cd packages/data-platform-cli && npm test
-# tests 74
-# pass 74
+# tests 77
+# pass 77
 # fail 0
 # skipped 0
 
@@ -58,8 +58,8 @@ $ npm run pack:check
 # exit 0; @johnason/data-platform-cli@0.2.0 dry-run package contains 23 files
 
 $ CLI_API_GATE=1 node --test tests/api-gate.test.js
-# tests 13
-# pass 12
+# tests 16
+# pass 15
 # fail 1
 # failure: each classified capability is listed as blocked by absent committed provider policy/case/provenance evidence
 ```
@@ -839,4 +839,777 @@ not ok 13 - API gate requires command-derived real evidence
 # skipped 0
 # todo 0
 # duration_ms 483.963084
+```
++
+## Task 17 round-3 full redacted output (2026-08-19)
+
+The following is raw command output. It contains no supplied credential values, provider hosts, or command case payloads.
+
+```text
+$ cd packages/data-platform-cli && npm test
+Your user’s .npmrc file (${HOME}/.npmrc)
+has a `globalconfig` and/or a `prefix` setting, which are incompatible with nvm.
+Run `nvm use --delete-prefix v22.20.0 --silent` to unset it.
+
+> @johnason/data-platform-cli@0.2.0 test
+> node --test tests/*.test.js
+
+TAP version 13
+# Subtest: every generated command parses and invokes its default shared-core capability
+ok 1 - every generated command parses and invokes its default shared-core capability
+  ---
+  duration_ms: 3214.196083
+  type: 'test'
+  ...
+# Subtest: controlled external API fixture preserves success, pagination, rate-limit, retry, and malformed contracts
+ok 2 - controlled external API fixture preserves success, pagination, rate-limit, retry, and malformed contracts
+  ---
+  duration_ms: 47.2035
+  type: 'test'
+  ...
+# Subtest: controlled external API fixture supports NDJSON streaming, timeout, and cancellation
+ok 3 - controlled external API fixture supports NDJSON streaming, timeout, and cancellation
+  ---
+  duration_ms: 30.117833
+  type: 'test'
+  ...
+# Subtest: controlled model-provider fixture supports model discovery and streaming completion
+ok 4 - controlled model-provider fixture supports model discovery and streaming completion
+  ---
+  duration_ms: 5.774667
+  type: 'test'
+  ...
+# Subtest: API gate enumerates every classified capability
+ok 5 - API gate enumerates every classified capability
+  ---
+  duration_ms: 1.42175
+  type: 'test'
+  ...
+# Subtest: gate locates and verifies only the repository-owned packed CLI install
+ok 6 - gate locates and verifies only the repository-owned packed CLI install
+  ---
+  duration_ms: 0.662375
+  type: 'test'
+  ...
+# Subtest: gate binds the installed package files to the current npm-pack manifest
+ok 7 - gate binds the installed package files to the current npm-pack manifest
+  ---
+  duration_ms: 233.094625
+  type: 'test'
+  ...
+# Subtest: provider policy is committed by provider and begins with no approved hosts
+ok 8 - provider policy is committed by provider and begins with no approved hosts
+  ---
+  duration_ms: 0.223125
+  type: 'test'
+  ...
+# Subtest: API classifications map to the committed provider policy buckets
+ok 9 - API classifications map to the committed provider policy buckets
+  ---
+  duration_ms: 0.867583
+  type: 'test'
+  ...
+# Subtest: stream output is parsed as NDJSON rather than as one JSON envelope
+ok 10 - stream output is parsed as NDJSON rather than as one JSON envelope
+  ---
+  duration_ms: 0.084709
+  type: 'test'
+  ...
+# Subtest: approved write case must explicitly require audit, event, and idempotency evidence
+ok 11 - approved write case must explicitly require audit, event, and idempotency evidence
+  ---
+  duration_ms: 0.199625
+  type: 'test'
+  ...
+# Subtest: policy and case preflight blocks before installed-package verification
+ok 12 - policy and case preflight blocks before installed-package verification
+  ---
+  duration_ms: 1.247125
+  type: 'test'
+  ...
+# Subtest: approved command harness lists classified capabilities blocked by absent committed policy and cases
+ok 13 - approved command harness lists classified capabilities blocked by absent committed policy and cases
+  ---
+  duration_ms: 1.851542
+  type: 'test'
+  ...
+# Subtest: profile or arbitrary binary input does not override the committed provider policy
+ok 14 - profile or arbitrary binary input does not override the committed provider policy
+  ---
+  duration_ms: 1.901167
+  type: 'test'
+  ...
+# Subtest: approved endpoint validation rejects normalized and DNS-resolved loopback hosts
+ok 15 - approved endpoint validation rejects normalized and DNS-resolved loopback hosts
+  ---
+  duration_ms: 0.24525
+  type: 'test'
+  ...
+# Subtest: service-runtime contract stays limited to controlled-fixture mechanics
+ok 16 - service-runtime contract stays limited to controlled-fixture mechanics
+  ---
+  duration_ms: 0.039709
+  type: 'test'
+  ...
+# Subtest: API gate requires command-derived real evidence
+ok 17 - API gate requires command-derived real evidence
+  ---
+  duration_ms: 1.726792
+  type: 'test'
+  ...
+# Subtest: ontology CLI writes and verifies graph and simulation files
+ok 18 - ontology CLI writes and verifies graph and simulation files
+  ---
+  duration_ms: 2.997458
+  type: 'test'
+  ...
+# Subtest: aviation CLI executes only injected registered stages
+ok 19 - aviation CLI executes only injected registered stages
+  ---
+  duration_ms: 0.419041
+  type: 'test'
+  ...
+# Subtest: aviation facade rejects stage files that merely claim successful checkpoints
+ok 20 - aviation facade rejects stage files that merely claim successful checkpoints
+  ---
+  duration_ms: 3.233792
+  type: 'test'
+  ...
+# Subtest: injects the selected profile runtime and closes it after success
+ok 21 - injects the selected profile runtime and closes it after success
+  ---
+  duration_ms: 0.726375
+  type: 'test'
+  ...
+# Subtest: closes the database runtime exactly once after failure
+ok 22 - closes the database runtime exactly once after failure
+  ---
+  duration_ms: 0.405958
+  type: 'test'
+  ...
+# Subtest: stores login token in keychain but removes it from command output
+ok 23 - stores login token in keychain but removes it from command output
+  ---
+  duration_ms: 0.296458
+  type: 'test'
+  ...
+# Subtest: local capabilities execute without loading profile, keychain, or database
+ok 24 - local capabilities execute without loading profile, keychain, or database
+  ---
+  duration_ms: 0.092042
+  type: 'test'
+  ...
+# Subtest: loadActor verifies token, active session, current user, and touches the session
+ok 25 - loadActor verifies token, active session, current user, and touches the session
+  ---
+  duration_ms: 0.243875
+  type: 'test'
+  ...
+# Subtest: loadActor rejects revoked sessions before capability execution
+ok 26 - loadActor rejects revoked sessions before capability execution
+  ---
+  duration_ms: 0.111333
+  type: 'test'
+  ...
+# Subtest: capability policy rejects missing module permission and viewer writes
+ok 27 - capability policy rejects missing module permission and viewer writes
+  ---
+  duration_ms: 0.183833
+  type: 'test'
+  ...
+# Subtest: project policy rejects a user without active membership
+ok 28 - project policy rejects a user without active membership
+  ---
+  duration_ms: 0.137875
+  type: 'test'
+  ...
+# Subtest: profile daemon lock is exclusive and recoverable
+ok 29 - profile daemon lock is exclusive and recoverable
+  ---
+  duration_ms: 2.610333
+  type: 'test'
+  ...
+# Subtest: daemon start and status are profile-scoped and detached
+ok 30 - daemon start and status are profile-scoped and detached
+  ---
+  duration_ms: 4.17725
+  type: 'test'
+  ...
+# Subtest: database gate enumerates every engine-classified capability
+ok 31 - database gate enumerates every engine-classified capability
+  ---
+  duration_ms: 3.69325
+  type: 'test'
+  ...
+# Subtest: database gate requires complete real non-mock evidence
+ok 32 - database gate requires complete real non-mock evidence
+  ---
+  duration_ms: 5.097792
+  type: 'test'
+  ...
+# Subtest: database password is read only from keychain
+ok 33 - database password is read only from keychain
+  ---
+  duration_ms: 0.550458
+  type: 'test'
+  ...
+# Subtest: missing keychain password fails closed
+ok 34 - missing keychain password fails closed
+  ---
+  duration_ms: 0.210583
+  type: 'test'
+  ...
+# Subtest: accepts and deduplicates approved execution targets
+ok 35 - accepts and deduplicates approved execution targets
+  ---
+  duration_ms: 0.765459
+  type: 'test'
+  ...
+# Subtest: rejects empty, unknown, and malformed targets
+ok 36 - rejects empty, unknown, and malformed targets
+  ---
+  duration_ms: 0.308291
+  type: 'test'
+  ...
+# Subtest: resolves dynamic datasource engine to the real target
+ok 37 - resolves dynamic datasource engine to the real target
+  ---
+  duration_ms: 0.134833
+  type: 'test'
+  ...
+# Subtest: config profile add reads secrets from stdin and persists only non-secret fields
+ok 38 - config profile add reads secrets from stdin and persists only non-secret fields
+  ---
+  duration_ms: 48.029584
+  type: 'test'
+  ...
+# Subtest: JSON mode emits exactly one document and stable code for invalid commands
+ok 39 - JSON mode emits exactly one document and stable code for invalid commands
+  ---
+  duration_ms: 0.736125
+  type: 'test'
+  ...
+# Subtest: generated command executes through Commander with positional IDs and one JSON document
+ok 40 - generated command executes through Commander with positional IDs and one JSON document
+  ---
+  duration_ms: 0.717833
+  type: 'test'
+  ...
+# Subtest: project facade resolves through the shared catalog and selects profile project
+ok 41 - project facade resolves through the shared catalog and selects profile project
+  ---
+  duration_ms: 0.873791
+  type: 'test'
+  ...
+# Subtest: catalog and command tree cover all inventory entries
+ok 42 - catalog and command tree cover all inventory entries
+  ---
+  duration_ms: 13.331041
+  type: 'test'
+  ...
+# Subtest: every definition enforces its I/O and safety contract
+ok 43 - every definition enforces its I/O and safety contract
+  ---
+  duration_ms: 6.377667
+  type: 'test'
+  ...
+# Subtest: all generated command help renders
+ok 44 - all generated command help renders
+  ---
+  duration_ms: 21.506791
+  type: 'test'
+  ...
+# Subtest: shared command aliases execute one canonical capability by default
+ok 45 - shared command aliases execute one canonical capability by default
+  ---
+  duration_ms: 2.9115
+  type: 'test'
+  ...
+# Subtest: namespaces database and session secrets per profile
+ok 46 - namespaces database and session secrets per profile
+  ---
+  duration_ms: 0.637958
+  type: 'test'
+  ...
+# Subtest: reads database and session values without exposing account internals
+ok 47 - reads database and session values without exposing account internals
+  ---
+  duration_ms: 0.156166
+  type: 'test'
+  ...
+# Subtest: deletes each secret independently
+ok 48 - deletes each secret independently
+  ---
+  duration_ms: 0.107875
+  type: 'test'
+  ...
+# Subtest: returns null for a missing secret
+ok 49 - returns null for a missing secret
+  ---
+  duration_ms: 0.59525
+  type: 'test'
+  ...
+# Subtest: rejects empty profile names and secret values
+ok 50 - rejects empty profile names and secret values
+  ---
+  duration_ms: 0.518833
+  type: 'test'
+  ...
+# Subtest: fails closed when native keyring is unavailable
+ok 51 - fails closed when native keyring is unavailable
+  ---
+  duration_ms: 0.200209
+  type: 'test'
+  ...
+# Subtest: redacts native failures and offers no filesystem fallback
+ok 52 - redacts native failures and offers no filesystem fallback
+  ---
+  duration_ms: 0.127166
+  type: 'test'
+  ...
+# Subtest: ontology package inspection distinguishes valid rows from missing source baselines
+ok 53 - ontology package inspection distinguishes valid rows from missing source baselines
+  ---
+  duration_ms: 14.4065
+  type: 'test'
+  ...
+# Subtest: ontology package validation rejects duplicate natural keys and dangling dependencies
+ok 54 - ontology package validation rejects duplicate natural keys and dangling dependencies
+  ---
+  duration_ms: 5.35875
+  type: 'test'
+  ...
+# Subtest: ontology package reports required environment names without exposing values
+ok 55 - ontology package reports required environment names without exposing values
+  ---
+  duration_ms: 8.029458
+  type: 'test'
+  ...
+# Subtest: package exposes data-platform for Node 22.20+
+ok 56 - package exposes data-platform for Node 22.20+
+  ---
+  duration_ms: 0.751042
+  type: 'test'
+  ...
+# Subtest: workspace local installer is pinned below .local and verifies the installed catalog
+ok 57 - workspace local installer is pinned below .local and verifies the installed catalog
+  ---
+  duration_ms: 0.192625
+  type: 'test'
+  ...
+# Subtest: resolves the macOS application support config path
+ok 58 - resolves the macOS application support config path
+  ---
+  duration_ms: 1.4815
+  type: 'test'
+  ...
+# Subtest: resolves the Linux XDG config path
+ok 59 - resolves the Linux XDG config path
+  ---
+  duration_ms: 0.296792
+  type: 'test'
+  ...
+# Subtest: persists profile state atomically with mode 0600
+ok 60 - persists profile state atomically with mode 0600
+  ---
+  duration_ms: 8.691417
+  type: 'test'
+  ...
+# Subtest: rejects recursively nested secret fields
+ok 61 - rejects recursively nested secret fields
+  ---
+  duration_ms: 0.498833
+  type: 'test'
+  ...
+# Subtest: rejects duplicate profile names
+ok 62 - rejects duplicate profile names
+  ---
+  duration_ms: 1.255041
+  type: 'test'
+  ...
+# Subtest: rejects invalid database ports
+ok 63 - rejects invalid database ports
+  ---
+  duration_ms: 0.87775
+  type: 'test'
+  ...
+# Subtest: selects an existing profile and lists deterministic names
+ok 64 - selects an existing profile and lists deterministic names
+  ---
+  duration_ms: 18.303667
+  type: 'test'
+  ...
+# Subtest: refuses to select a missing profile
+ok 65 - refuses to select a missing profile
+  ---
+  duration_ms: 0.463042
+  type: 'test'
+  ...
+# Subtest: removing the current profile clears selection and supports project selection
+ok 66 - removing the current profile clears selection and supports project selection
+  ---
+  duration_ms: 3.759417
+  type: 'test'
+  ...
+# Subtest: recursively redacts credentials and URI passwords
+ok 67 - recursively redacts credentials and URI passwords
+  ---
+  duration_ms: 1.053916
+  type: 'test'
+  ...
+# Subtest: error envelopes are redacted
+ok 68 - error envelopes are redacted
+  ---
+  duration_ms: 0.209166
+  type: 'test'
+  ...
+# Subtest: maps stable exit codes
+ok 69 - maps stable exit codes
+  ---
+  duration_ms: 0.240875
+  type: 'test'
+  ...
+# Subtest: renders collected NDJSON buffers line by line with redaction
+ok 70 - renders collected NDJSON buffers line by line with redaction
+  ---
+  duration_ms: 0.207209
+  type: 'test'
+  ...
+# Subtest: REPL tokenizes quotes and escapes without shell evaluation
+ok 71 - REPL tokenizes quotes and escapes without shell evaluation
+  ---
+  duration_ms: 0.925083
+  type: 'test'
+  ...
+# Subtest: REPL reuses argv execution and exposes profile/project context
+ok 72 - REPL reuses argv execution and exposes profile/project context
+  ---
+  duration_ms: 1.661416
+  type: 'test'
+  ...
+# Subtest: JSON mode without a command fails once and never enters REPL
+ok 73 - JSON mode without a command fails once and never enters REPL
+  ---
+  duration_ms: 1.919875
+  type: 'test'
+  ...
+# Subtest: three acceptance source assets match the architecture-approved fingerprints
+ok 74 - three acceptance source assets match the architecture-approved fingerprints
+  ---
+  duration_ms: 1.30625
+  type: 'test'
+  ...
+# Subtest: inventory totals and every route handler binding are complete
+ok 75 - inventory totals and every route handler binding are complete
+  ---
+  duration_ms: 0.558459
+  type: 'test'
+  ...
+# Subtest: generated CLI response is a real Writable and collects piped content
+ok 76 - generated CLI response is a real Writable and collects piped content
+  ---
+  duration_ms: 1.561375
+  type: 'test'
+  ...
+# Subtest: generated CLI response keeps download paths for --output handling
+ok 77 - generated CLI response keeps download paths for --output handling
+  ---
+  duration_ms: 0.352667
+  type: 'test'
+  ...
+1..77
+# tests 77
+# suites 0
+# pass 77
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3860.810917
+
+$ npm run pack:check
+Your user’s .npmrc file (${HOME}/.npmrc)
+has a `globalconfig` and/or a `prefix` setting, which are incompatible with nvm.
+Run `nvm use --delete-prefix v22.20.0 --silent` to unset it.
+
+> @johnason/data-platform-cli@0.2.0 pack:check
+> npm pack --dry-run
+
+npm notice
+npm notice 📦  @johnason/data-platform-cli@0.2.0
+npm notice Tarball Contents
+npm notice 3.0kB README.md
+npm notice 259B bin/data-platform.js
+npm notice 756B package.json
+npm notice 405B src/commands/aviation-acceptance.js
+npm notice 5.1kB src/commands/config.js
+npm notice 5.4kB src/commands/daemon.js
+npm notice 1.3kB src/commands/file-io.js
+npm notice 12.0kB src/commands/foundation.js
+npm notice 9.5kB src/commands/ontology-package.js
+npm notice 1.5kB src/commands/ontology.js
+npm notice 1.6kB src/daemon/process-manager.js
+npm notice 12.8kB src/main.js
+npm notice 2.8kB src/output.js
+npm notice 2.6kB src/registry/domain-commands.js
+npm notice 2.3kB src/registry/execution-targets.js
+npm notice 2.3kB src/repl/repl.js
+npm notice 7.2kB src/runtime/cli-execution.js
+npm notice 795B src/runtime/database.js
+npm notice 1.5kB src/runtime/hidden-input.js
+npm notice 3.2kB src/runtime/keychain.js
+npm notice 984B src/runtime/paths.js
+npm notice 5.3kB src/runtime/policies.js
+npm notice 3.7kB src/runtime/profile-store.js
+npm notice Tarball Details
+npm notice name: @johnason/data-platform-cli
+npm notice version: 0.2.0
+npm notice filename: johnason-data-platform-cli-0.2.0.tgz
+npm notice package size: 22.9 kB
+npm notice unpacked size: 86.2 kB
+npm notice shasum: 44a59989eaf687274f90c1425fd0dcdc010f7a0e
+npm notice integrity: sha512-PdLch21MiAlBa[...]hpfEYRByvuQAA==
+npm notice total files: 23
+npm notice
+johnason-data-platform-cli-0.2.0.tgz
+
+$ CLI_API_GATE=1 node --test tests/api-gate.test.js
+Your user’s .npmrc file (${HOME}/.npmrc)
+has a `globalconfig` and/or a `prefix` setting, which are incompatible with nvm.
+Run `nvm use --delete-prefix v22.20.0 --silent` to unset it.
+TAP version 13
+# Subtest: controlled external API fixture preserves success, pagination, rate-limit, retry, and malformed contracts
+ok 1 - controlled external API fixture preserves success, pagination, rate-limit, retry, and malformed contracts
+  ---
+  duration_ms: 28.202166
+  type: 'test'
+  ...
+# Subtest: controlled external API fixture supports NDJSON streaming, timeout, and cancellation
+ok 2 - controlled external API fixture supports NDJSON streaming, timeout, and cancellation
+  ---
+  duration_ms: 29.220834
+  type: 'test'
+  ...
+# Subtest: controlled model-provider fixture supports model discovery and streaming completion
+ok 3 - controlled model-provider fixture supports model discovery and streaming completion
+  ---
+  duration_ms: 4.960708
+  type: 'test'
+  ...
+# Subtest: API gate enumerates every classified capability
+ok 4 - API gate enumerates every classified capability
+  ---
+  duration_ms: 1.254333
+  type: 'test'
+  ...
+# Subtest: gate locates and verifies only the repository-owned packed CLI install
+ok 5 - gate locates and verifies only the repository-owned packed CLI install
+  ---
+  duration_ms: 0.591042
+  type: 'test'
+  ...
+# Subtest: gate binds the installed package files to the current npm-pack manifest
+ok 6 - gate binds the installed package files to the current npm-pack manifest
+  ---
+  duration_ms: 205.062291
+  type: 'test'
+  ...
+# Subtest: provider policy is committed by provider and begins with no approved hosts
+ok 7 - provider policy is committed by provider and begins with no approved hosts
+  ---
+  duration_ms: 0.188458
+  type: 'test'
+  ...
+# Subtest: API classifications map to the committed provider policy buckets
+ok 8 - API classifications map to the committed provider policy buckets
+  ---
+  duration_ms: 0.781417
+  type: 'test'
+  ...
+# Subtest: stream output is parsed as NDJSON rather than as one JSON envelope
+ok 9 - stream output is parsed as NDJSON rather than as one JSON envelope
+  ---
+  duration_ms: 0.090833
+  type: 'test'
+  ...
+# Subtest: approved write case must explicitly require audit, event, and idempotency evidence
+ok 10 - approved write case must explicitly require audit, event, and idempotency evidence
+  ---
+  duration_ms: 0.20075
+  type: 'test'
+  ...
+# Subtest: policy and case preflight blocks before installed-package verification
+ok 11 - policy and case preflight blocks before installed-package verification
+  ---
+  duration_ms: 1.130042
+  type: 'test'
+  ...
+# Subtest: approved command harness lists classified capabilities blocked by absent committed policy and cases
+ok 12 - approved command harness lists classified capabilities blocked by absent committed policy and cases
+  ---
+  duration_ms: 1.804875
+  type: 'test'
+  ...
+# Subtest: profile or arbitrary binary input does not override the committed provider policy
+ok 13 - profile or arbitrary binary input does not override the committed provider policy
+  ---
+  duration_ms: 1.780625
+  type: 'test'
+  ...
+# Subtest: approved endpoint validation rejects normalized and DNS-resolved loopback hosts
+ok 14 - approved endpoint validation rejects normalized and DNS-resolved loopback hosts
+  ---
+  duration_ms: 0.244667
+  type: 'test'
+  ...
+# Subtest: service-runtime contract stays limited to controlled-fixture mechanics
+ok 15 - service-runtime contract stays limited to controlled-fixture mechanics
+  ---
+  duration_ms: 0.036083
+  type: 'test'
+  ...
+# Subtest: API gate requires command-derived real evidence
+not ok 16 - API gate requires command-derived real evidence
+  ---
+  duration_ms: 2.062709
+  type: 'test'
+  location: '/Users/sushi/Documents/ChatGPT/Johnason-data/.worktrees/data-platform-cli/packages/data-platform-cli/tests/api-gate.test.js:389:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    data-development.028.runcopilottaskstream: no committed approved host for external-api
+    data-development.028.runcopilottaskstream: no committed command case
+    data-development.028.runcopilottaskstream: CLI_API_GATE_PROFILE is required
+    data-development.029.runcopilottask: no committed approved host for external-api
+    data-development.029.runcopilottask: no committed command case
+    data-development.029.runcopilottask: CLI_API_GATE_PROFILE is required
+    data-lab.014.analyzescene: no committed approved host for external-api
+    data-lab.014.analyzescene: no committed command case
+    data-lab.014.analyzescene: CLI_API_GATE_PROFILE is required
+    data-lab.086.generateaibusinessdataplan: no committed approved host for external-api
+    data-lab.086.generateaibusinessdataplan: no committed command case
+    data-lab.086.generateaibusinessdataplan: CLI_API_GATE_PROFILE is required
+    data-lab.088.generateaibusinessdatabatch: no committed approved host for external-api
+    data-lab.088.generateaibusinessdatabatch: no committed command case
+    data-lab.088.generateaibusinessdatabatch: CLI_API_GATE_PROFILE is required
+    data-lab.089.loadaibusinessdatabatch: no committed approved host for external-api
+    data-lab.089.loadaibusinessdatabatch: no committed command case
+    data-lab.089.loadaibusinessdatabatch: CLI_API_GATE_PROFILE is required
+    data-lab.091.saveaibusinessdatatask: no committed approved host for external-api
+    data-lab.091.saveaibusinessdatatask: no committed command case
+    data-lab.091.saveaibusinessdatatask: CLI_API_GATE_PROFILE is required
+    data-lab.092.updateaibusinessdatataskschedule: no committed approved host for external-api
+    data-lab.092.updateaibusinessdatataskschedule: no committed command case
+    data-lab.092.updateaibusinessdatataskschedule: CLI_API_GATE_PROFILE is required
+    data-lab.093.runaibusinessdatatask: no committed approved host for external-api
+    data-lab.093.runaibusinessdatatask: no committed command case
+    data-lab.093.runaibusinessdatatask: CLI_API_GATE_PROFILE is required
+    data-lab.094.deleteaibusinessdatatask: no committed approved host for external-api
+    data-lab.094.deleteaibusinessdatatask: no committed command case
+    data-lab.094.deleteaibusinessdatatask: CLI_API_GATE_PROFILE is required
+    data-map.037.analyzeresourcecontentprofile: no committed approved host for external-api
+    data-map.037.analyzeresourcecontentprofile: no committed command case
+    data-map.037.analyzeresourcecontentprofile: CLI_API_GATE_PROFILE is required
+    data-map.038.analyzeresourcefieldprofile: no committed approved host for external-api
+    data-map.038.analyzeresourcefieldprofile: no committed command case
+    data-map.038.analyzeresourcefieldprofile: CLI_API_GATE_PROFILE is required
+    data-map.039.analyzeresourceprofile: no committed approved host for external-api
+    data-map.039.analyzeresourceprofile: no committed command case
+    data-map.039.analyzeresourceprofile: CLI_API_GATE_PROFILE is required
+    data-services.013.recommendserviceconfig: no committed approved host for external-api
+    data-services.013.recommendserviceconfig: no committed command case
+    data-services.013.recommendserviceconfig: CLI_API_GATE_PROFILE is required
+    data-services.031.handleinvoke: no committed approved host for service-runtime
+    data-services.031.handleinvoke: no committed command case
+    data-services.031.handleinvoke: CLI_API_GATE_PROFILE is required
+    data-services.032.handleinvoke: no committed approved host for service-runtime
+    data-services.032.handleinvoke: no committed command case
+    data-services.032.handleinvoke: CLI_API_GATE_PROFILE is required
+    data-sources.005.samplerows: no committed approved host for external-api
+    data-sources.005.samplerows: no committed command case
+    data-sources.005.samplerows: CLI_API_GATE_PROFILE is required
+    data-sources.009.testconnection: no committed approved host for external-api
+    data-sources.009.testconnection: no committed command case
+    data-sources.009.testconnection: CLI_API_GATE_PROFILE is required
+    data-standards.031.suggestdataelements: no committed approved host for external-api
+    data-standards.031.suggestdataelements: no committed command case
+    data-standards.031.suggestdataelements: CLI_API_GATE_PROFILE is required
+    ingestion-tasks.007.recommendtaskconfig: no committed approved host for external-api
+    ingestion-tasks.007.recommendtaskconfig: no committed command case
+    ingestion-tasks.007.recommendtaskconfig: CLI_API_GATE_PROFILE is required
+    ingestion-tasks.009.previewsourcedata: no committed approved host for external-api
+    ingestion-tasks.009.previewsourcedata: no committed command case
+    ingestion-tasks.009.previewsourcedata: CLI_API_GATE_PROFILE is required
+    ingestion-tasks.014.analyzejobrunfailure: no committed approved host for external-api
+    ingestion-tasks.014.analyzejobrunfailure: no committed command case
+    ingestion-tasks.014.analyzejobrunfailure: CLI_API_GATE_PROFILE is required
+    model-providers.002.testmodelprovider: no committed approved host for model-provider
+    model-providers.002.testmodelprovider: no committed command case
+    model-providers.002.testmodelprovider: CLI_API_GATE_PROFILE is required
+    quality-control.014.analyzeregexrule: no committed approved host for external-api
+    quality-control.014.analyzeregexrule: no committed command case
+    quality-control.014.analyzeregexrule: CLI_API_GATE_PROFILE is required
+    quality-control.021.analyzedictionarytable: no committed approved host for external-api
+    quality-control.021.analyzedictionarytable: no committed command case
+    quality-control.021.analyzedictionarytable: CLI_API_GATE_PROFILE is required
+    quality-control.042.recommendstrategy: no committed approved host for external-api
+    quality-control.042.recommendstrategy: no committed command case
+    quality-control.042.recommendstrategy: CLI_API_GATE_PROFILE is required
+    quality-control.043.startrecommendation: no committed approved host for external-api
+    quality-control.043.startrecommendation: no committed command case
+    quality-control.043.startrecommendation: CLI_API_GATE_PROFILE is required
+    quality-control.045.applyrecommendationrun: no committed approved host for external-api
+    quality-control.045.applyrecommendationrun: no committed command case
+    quality-control.045.applyrecommendationrun: CLI_API_GATE_PROFILE is required
+    quality-control.046.rejectrecommendationrun: no committed approved host for external-api
+    quality-control.046.rejectrecommendationrun: no committed command case
+    quality-control.046.rejectrecommendationrun: CLI_API_GATE_PROFILE is required
+    quality-control.084.runqualityaianalysis: no committed approved host for external-api
+    quality-control.084.runqualityaianalysis: no committed command case
+    quality-control.084.runqualityaianalysis: CLI_API_GATE_PROFILE is required
+    quality-control.087.queryqualityopsrobot: no committed approved host for external-api
+    quality-control.087.queryqualityopsrobot: no committed command case
+    quality-control.087.queryqualityopsrobot: CLI_API_GATE_PROFILE is required
+    reporting.006.suggestaichartanalysis: no committed approved host for external-api
+    reporting.006.suggestaichartanalysis: no committed command case
+    reporting.006.suggestaichartanalysis: CLI_API_GATE_PROFILE is required
+    reporting.007.planaichartsql: no committed approved host for external-api
+    reporting.007.planaichartsql: no committed command case
+    reporting.007.planaichartsql: CLI_API_GATE_PROFILE is required
+    reporting.008.reviseaichartsql: no committed approved host for external-api
+    reporting.008.reviseaichartsql: no committed command case
+    reporting.008.reviseaichartsql: CLI_API_GATE_PROFILE is required
+    reporting.009.runaichartquery: no committed approved host for external-api
+    reporting.009.runaichartquery: no committed command case
+    reporting.009.runaichartquery: CLI_API_GATE_PROFILE is required
+    reporting.010.recommendaichart: no committed approved host for external-api
+    reporting.010.recommendaichart: no committed command case
+    reporting.010.recommendaichart: CLI_API_GATE_PROFILE is required
+    reporting.011.allocateaichartfieldmap: no committed approved host for external-api
+    reporting.011.allocateaichartfieldmap: no committed command case
+    reporting.011.allocateaichartfieldmap: CLI_API_GATE_PROFILE is required
+    + actual - expected
+
+    + 'blocked'
+    - 'accepted'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'accepted'
+  actual: 'blocked'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (/Users/sushi/Documents/ChatGPT/Johnason-data/.worktrees/data-platform-cli/packages/data-platform-cli/tests/api-gate.test.js:392:25)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 15
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 686.297667
 ```

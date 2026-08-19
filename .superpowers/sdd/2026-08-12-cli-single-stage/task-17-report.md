@@ -31,9 +31,9 @@ The API gate harness is stricter and its controlled-provider mechanics are cover
 
 | Command | Result |
 | --- | --- |
-| `cd packages/data-platform-cli && npm test` | 74 passed, 0 failed |
+| `cd packages/data-platform-cli && npm test` | 77 passed, 0 failed |
 | `cd packages/data-platform-cli && npm run pack:check` | exit 0 |
-| `CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js` | expected failure: 8 passed, 1 failed because approved command-run inputs are absent |
+| `CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js` | expected failure: 15 passed, 1 failed because committed policies/cases remain empty |
 | `git diff --check` | clean |
 
 The redacted environment fingerprint and test outputs are appended to `packages/data-platform-cli/tests/TEST.md`.
@@ -66,3 +66,9 @@ Task 17 cannot be accepted until an approved real external API/model/service-run
 - Removed invented provider/audit/event/idempotency output requirements. The current capability/runtime contract declares none, so the gate does not claim them. If a future capability declares provenance, audit, event, idempotency, or stream-terminal contracts, the harness derives and validates those fields only from the installed CLI subprocess output.
 - Added format-aware output parsing: stream definitions are parsed line-by-line as NDJSON and can validate a declared terminal evidence field; JSON definitions require a successful JSON envelope.
 - Full redacted outputs are appended to `TEST.md`; its base/candidate labels remain explicit.
+
+## Review round 3 remediation
+
+- Added current-package provenance verification. When execution prerequisites are complete, the gate runs `npm pack --dry-run --json` for the current CLI source, hashes every packed file, and compares each byte-for-byte with the repository-owned local installed package. A same-version stale or modified install now fails.
+- Moved audit/event/idempotency requirements into the committed per-capability command-case schema. Every case must explicitly declare all three booleans; write capabilities must require all three and map their actual output paths. The gate reads only those mapped subprocess fields. Empty cases remain blocked.
+- Reordered the gate so provider policies, cases, profiles, and case contracts are checked before package provenance. Missing approved inputs return `blocked`; a missing or non-matching local package becomes `failed` only after the gate is otherwise ready to execute.

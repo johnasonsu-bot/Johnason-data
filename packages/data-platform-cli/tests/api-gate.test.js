@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const net = require("node:net");
 const dns = require("node:dns/promises");
+const crypto = require("node:crypto");
 const { spawnSync } = require("node:child_process");
 
 const { baseline, apiCapabilityIds } = require("./gate-harness");
@@ -18,6 +19,7 @@ const apiGateCases = require("./fixtures/api-gate-cases.json");
 
 const workspaceRoot = path.resolve(__dirname, "../../..");
 const installPrefix = path.join(workspaceRoot, ".local", "data-platform-cli", "install");
+const packageRoot = path.resolve(__dirname, "..");
 
 function isWithin(root, target) {
   const relative = path.relative(root, target);
@@ -43,6 +45,34 @@ function findVerifiedLocalInstall() {
     throw new Error("packed CLI bin does not resolve to the repository-owned package bin");
   }
   return { prefix, binary, package: installedPackage };
+}
+
+function hashFile(file) {
+  return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
+}
+
+function currentPackManifest() {
+  const result = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: packageRoot, encoding: "utf8" });
+  if (result.error || result.status !== 0) throw new Error("cannot produce current npm-pack manifest");
+  const manifest = JSON.parse(result.stdout);
+  if (!Array.isArray(manifest) || manifest.length !== 1 || !Array.isArray(manifest[0].files)) {
+    throw new Error("current npm-pack manifest is invalid");
+  }
+  return manifest[0].files.map((entry) => entry.path).sort();
+}
+
+function verifyCurrentPackedInstall() {
+  const installed = findVerifiedLocalInstall();
+  const manifest = currentPackManifest();
+  const packageDirectory = path.dirname(fs.realpathSync(path.join(installed.prefix, "node_modules", "@johnason", "data-platform-cli", "package.json")));
+  for (const relative of manifest) {
+    const source = path.join(packageRoot, relative);
+    const packed = path.join(packageDirectory, relative);
+    if (!fs.existsSync(source) || !fs.existsSync(packed) || hashFile(source) !== hashFile(packed)) {
+      throw new Error(`installed package content differs from current npm-pack file: ${relative}`);
+    }
+  }
+  return { ...installed, manifestFiles: manifest.length };
 }
 
 function normalizeHost(host) {
@@ -95,43 +125,63 @@ function apiProvider(capability) {
   return targets[0].provider;
 }
 
-function declaredEvidenceRequirements(capability) {
-  const requirements = [];
-  if (capability.audit?.required) requirements.push("auditId");
-  if (capability.event?.required) requirements.push("eventId");
-  if (capability.idempotency?.required) requirements.push("idempotencyKeyHash");
-  return requirements;
+function outputValue(output, fieldPath) {
+  const root = output.format === "json" ? output.envelope : output.records.at(-1);
+  return String(fieldPath || "").split(".").filter(Boolean).reduce((value, key) => value?.[key], root);
 }
 
-function outputValue(output, field) {
-  if (output.format === "json") return output.envelope.meta?.[field] ?? output.envelope.data?.[field];
-  return output.records.at(-1)?.meta?.[field] ?? output.records.at(-1)?.[field];
+function validateCaseContract(entry, capability) {
+  const failures = [];
+  if (!Array.isArray(entry?.args) || entry.args.some((argument) => !isSafeCaseArgument(argument))) failures.push("case has unsafe command arguments");
+  const evidence = entry?.evidence;
+  for (const field of ["audit", "event", "idempotency"]) {
+    if (typeof evidence?.[field] !== "boolean") failures.push(`case must explicitly declare ${field} evidence`);
+  }
+  if (capability.action === "write") {
+    if (!evidence?.audit) failures.push("case omits required audit evidence");
+    if (!evidence?.event) failures.push("case omits required event evidence");
+    if (!evidence?.idempotency) failures.push("case omits required idempotency evidence");
+  }
+  const output = entry?.output;
+  if (typeof output?.providerHost !== "string") failures.push("case does not map provider-host output evidence");
+  for (const [contractField, outputField] of [["audit", "auditId"], ["event", "eventId"], ["idempotency", "idempotencyKeyHash"]]) {
+    if (evidence?.[contractField] && typeof output?.[outputField] !== "string") {
+      failures.push(`case does not map required ${contractField} output evidence`);
+    }
+  }
+  if (capability.interaction === "stream" && typeof output?.terminal !== "string") {
+    failures.push("stream case does not map terminal output evidence");
+  }
+  return failures;
+}
+
+function collectPreflightBlocks({ profile, catalog, cases, policy }) {
+  const blocked = [];
+  for (const capabilityId of apiCapabilityIds()) {
+    const capability = catalog.get(capabilityId);
+    const provider = apiProvider(capability);
+    if (!policy.providers?.[provider]?.approvedHosts?.length) blocked.push(`${capabilityId}: no committed approved host for ${provider}`);
+    const entry = cases.get(capabilityId);
+    if (!entry) blocked.push(`${capabilityId}: no committed command case`);
+    else for (const failure of validateCaseContract(entry, capability)) blocked.push(`${capabilityId}: ${failure}`);
+    if (!profile) blocked.push(`${capabilityId}: CLI_API_GATE_PROFILE is required`);
+  }
+  return blocked;
 }
 
 async function runApprovedApiGate({ env = process.env, spawn = spawnSync, lookup = dns.lookup } = {}) {
   const profile = env.CLI_API_GATE_PROFILE;
-  try {
-    findVerifiedLocalInstall();
-  } catch (error) {
-    return { status: "failed", failures: [error.message] };
-  }
   const expected = apiCapabilityIds();
   const catalog = createCapabilityCatalog();
   const cases = new Map(apiGateCases.cases.map((entry) => [entry.capabilityId, entry]));
-  const blocked = [];
-  for (const capabilityId of expected) {
-    const capability = catalog.get(capabilityId);
-    const provider = apiProvider(capability);
-    if (!apiGatePolicy.providers?.[provider]?.approvedHosts?.length) blocked.push(`${capabilityId}: no committed approved host for ${provider}`);
-    if (!cases.has(capabilityId)) blocked.push(`${capabilityId}: no committed command case`);
-    if (!profile) blocked.push(`${capabilityId}: CLI_API_GATE_PROFILE is required`);
-    if (!capability.providerEvidenceContract?.outputField) blocked.push(`${capabilityId}: capability does not declare provider-output provenance`);
-    if (capability.interaction === "stream" && !capability.streamEvidenceContract?.terminalField) {
-      blocked.push(`${capabilityId}: stream capability does not declare a terminal evidence contract`);
-    }
-  }
+  const blocked = collectPreflightBlocks({ profile, catalog, cases, policy: apiGatePolicy });
   if (blocked.length) return { status: "blocked", failures: blocked, tested: 0, expected: expected.length };
-  const installed = findVerifiedLocalInstall();
+  let installed;
+  try {
+    installed = verifyCurrentPackedInstall();
+  } catch (error) {
+    return { status: "failed", failures: [error.message] };
+  }
   const providerHosts = new Map();
   try {
     for (const [provider, policy] of Object.entries(apiGatePolicy.providers)) {
@@ -143,10 +193,6 @@ async function runApprovedApiGate({ env = process.env, spawn = spawnSync, lookup
   const failures = [];
   for (const capabilityId of expected) {
     const entry = cases.get(capabilityId);
-    if (!Array.isArray(entry.args) || entry.args.some((argument) => !isSafeCaseArgument(argument))) {
-      failures.push(`unsafe command arguments: ${capabilityId}`);
-      continue;
-    }
     const definition = commandDefinition(capabilityId);
     if (!definition) {
       failures.push(`missing CLI definition: ${capabilityId}`);
@@ -165,13 +211,13 @@ async function runApprovedApiGate({ env = process.env, spawn = spawnSync, lookup
     try {
       const output = parseCommandOutput(definition, result.stdout);
       const provider = apiProvider(capability);
-      const actualHost = normalizeHost(outputValue(output, capability.providerEvidenceContract.outputField));
+      const actualHost = normalizeHost(outputValue(output, entry.output.providerHost));
       if (!providerHosts.get(provider).includes(actualHost)) throw new Error("provider endpoint metadata is not an approved host");
-      for (const field of declaredEvidenceRequirements(capability)) {
-        if (!outputValue(output, field)) throw new Error(`missing declared command metadata: ${field}`);
+      for (const [required, outputField] of [[entry.evidence.audit, entry.output.auditId], [entry.evidence.event, entry.output.eventId], [entry.evidence.idempotency, entry.output.idempotencyKeyHash]]) {
+        if (required && !outputValue(output, outputField)) throw new Error("missing required command evidence");
       }
-      if (definition.streamOutput === "ndjson" && !outputValue(output, capability.streamEvidenceContract.terminalField)) {
-        throw new Error("missing declared NDJSON terminal evidence");
+      if (definition.streamOutput === "ndjson" && !outputValue(output, entry.output.terminal)) {
+        throw new Error("missing required NDJSON terminal evidence");
       }
     } catch (error) {
       failures.push(`${capabilityId}: ${error.message}`);
@@ -265,6 +311,12 @@ test("gate locates and verifies only the repository-owned packed CLI install", (
   assert.equal(installed.package.version, require("../package.json").version);
 });
 
+test("gate binds the installed package files to the current npm-pack manifest", () => {
+  const installed = verifyCurrentPackedInstall();
+  assert.equal(installed.package.name, "@johnason/data-platform-cli");
+  assert.ok(installed.manifestFiles >= 20);
+});
+
 test("provider policy is committed by provider and begins with no approved hosts", () => {
   assert.deepEqual(apiGatePolicy.providers, {
     "external-api": { approvedHosts: [] },
@@ -287,6 +339,18 @@ test("stream output is parsed as NDJSON rather than as one JSON envelope", () =>
     format: "ndjson",
     records: [{ event: "progress" }, { event: "complete" }],
   });
+});
+
+test("approved write case must explicitly require audit, event, and idempotency evidence", () => {
+  assert.deepEqual(
+    validateCaseContract({ capabilityId: "write.capability", args: [], evidence: { audit: false, event: false, idempotency: false }, output: { providerHost: "meta.providerHost" } }, { action: "write", interaction: "json-write" }),
+    ["case omits required audit evidence", "case omits required event evidence", "case omits required idempotency evidence"],
+  );
+});
+
+test("policy and case preflight blocks before installed-package verification", () => {
+  const blocks = collectPreflightBlocks({ profile: null, catalog: createCapabilityCatalog(), cases: new Map(), policy: apiGatePolicy });
+  assert.match(blocks.join("\n"), /no committed approved host for external-api/);
 });
 
 test("approved command harness lists classified capabilities blocked by absent committed policy and cases", async () => {
