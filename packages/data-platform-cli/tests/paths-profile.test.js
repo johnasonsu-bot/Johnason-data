@@ -72,6 +72,14 @@ test("rejects invalid database ports", (t) => {
   assert.throws(() => store.add(profile("dev", { db: { ...profile().db, port: 70000 } })), /port/i);
 });
 
+test("accepts secret-free PostgreSQL, Oracle, and DM profile connection contracts", () => {
+  const { profileSchema } = require("../src/runtime/profile-store");
+  assert.equal(profileSchema.parse({ name: "test-postgresql", db: { engine: "postgresql", host: "db", port: 5432, database: "platform", user: "cli" } }).db.engine, "postgresql");
+  assert.equal(profileSchema.parse({ name: "test-oracle", db: { engine: "oracle", host: "db", port: 1521, user: "cli", serviceName: "service", schema: "APP" } }).db.serviceName, "service");
+  assert.equal(profileSchema.parse({ name: "test-dm", db: { engine: "dm", host: "db", port: 5236, user: "cli", jdbcUrl: "jdbc:dm://db:5236/APP" } }).db.engine, "dm");
+  assert.throws(() => profileSchema.parse({ name: "unsafe", db: { engine: "dm", host: "db", port: 5236, user: "cli", jdbcUrl: "jdbc:dm://cli:password@db:5236/APP" } }), /secret/i);
+});
+
 test("selects an existing profile and lists deterministic names", (t) => {
   const { root, store } = createStore();
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));

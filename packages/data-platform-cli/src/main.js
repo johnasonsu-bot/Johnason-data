@@ -14,6 +14,7 @@ const { readHiddenInput } = require("./runtime/hidden-input");
 const { registerConfigCommands } = require("./commands/config");
 const { registerFoundationCommands } = require("./commands/foundation");
 const { registerDaemonCommands } = require("./commands/daemon");
+const { registerDatabaseCommands } = require("./commands/database");
 const { runRepl } = require("./repl/repl");
 
 function addCommonOptions(command, definition) {
@@ -151,6 +152,7 @@ function createProgram(options = {}) {
       secretReader,
     });
   }
+  if (profileStore && keychain) registerDatabaseCommands(program, { profileStore, keychain, output: stdout, databaseRuntimeFactory: options.databaseRuntimeFactory });
 
   for (const definition of definitions) {
     const words = definition.command.split(/\s+/);

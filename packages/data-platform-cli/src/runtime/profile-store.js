@@ -1,15 +1,35 @@
 const path = require("node:path");
 const { z } = require("zod");
 
+const databaseProfileSchema = z.object({
+  engine: z.enum(["mysql", "postgresql", "oracle", "dm"]).default("mysql"),
+  host: z.string().min(1),
+  port: z.number().int().min(1).max(65535),
+  database: z.string().min(1).optional(),
+  user: z.string().min(1),
+  timezone: z.string().default("+08:00"),
+  schema: z.string().min(1).optional(),
+  serviceName: z.string().min(1).optional(),
+  sid: z.string().min(1).optional(),
+  jdbcUrl: z.string().min(1).optional(),
+}).strict().superRefine((value, context) => {
+  if (["mysql", "postgresql"].includes(value.engine) && !value.database) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: "database is required for MySQL and PostgreSQL" });
+  }
+  if (value.engine === "oracle" && Boolean(value.serviceName) === Boolean(value.sid)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: "Oracle requires exactly one of serviceName or sid" });
+  }
+  if (value.engine === "dm" && !value.jdbcUrl && !value.database) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: "DM requires jdbcUrl or database" });
+  }
+  if (value.jdbcUrl && (/\/\/[^\s/:]+:[^\s@]+@/.test(value.jdbcUrl) || /(?:password|pwd|secret|token)\s*=\s*[^\s;&]+/i.test(value.jdbcUrl))) {
+    context.addIssue({ code: z.ZodIssueCode.custom, message: "Secret values are forbidden in jdbcUrl" });
+  }
+});
+
 const profileSchema = z.object({
   name: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
-  db: z.object({
-    host: z.string().min(1),
-    port: z.number().int().min(1).max(65535),
-    database: z.string().min(1),
-    user: z.string().min(1),
-    timezone: z.string().default("+08:00"),
-  }).strict(),
+  db: databaseProfileSchema,
   dataxHome: z.string().min(1).optional(),
   kafkaBootstrapServers: z.array(z.string().min(1)).optional(),
   currentProjectId: z.number().int().positive().optional(),
@@ -23,6 +43,9 @@ const stateSchema = z.object({
 const secretKey = /password|secret|token|api[-_]?key/i;
 
 function assertSecretFree(value, trail = []) {
+  if (typeof value === "string" && (/\/\/[^\s/:]+:[^\s@]+@/.test(value) || /(?:password|pwd|secret|token)\s*=\s*[^\s;&]+/i.test(value))) {
+    throw new Error(`Secret values are forbidden in profile config: ${trail.join(".")}`);
+  }
   if (!value || typeof value !== "object") return;
   for (const [key, child] of Object.entries(value)) {
     if (secretKey.test(key)) {
@@ -101,4 +124,4 @@ function createProfileStore({ configFile, fsImpl }) {
   };
 }
 
-module.exports = { createProfileStore, profileSchema };
+module.exports = { createProfileStore, profileSchema, databaseProfileSchema };

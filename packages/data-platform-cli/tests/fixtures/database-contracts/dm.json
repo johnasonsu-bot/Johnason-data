@@ -1,6 +1,5 @@
 {
   "engine": "dm",
   "profile": "test-dm",
-  "requiredOperations": ["jdbc", "schema", "binds", "pagination", "rollback"],
   "cases": []
 }

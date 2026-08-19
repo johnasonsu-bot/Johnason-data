@@ -1,6 +1,5 @@
 {
   "engine": "postgresql",
   "profile": "test-postgresql",
-  "requiredOperations": ["ods", "datax", "jdbc", "schema", "dialect", "rollback", "aviationExceptionalValues"],
   "cases": []
 }

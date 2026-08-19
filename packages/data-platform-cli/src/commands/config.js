@@ -34,11 +34,16 @@ function registerConfigCommands(program, options) {
   });
 
   profile.command("add <name>")
-    .requiredOption("--host <host>", "MySQL host")
-    .requiredOption("--port <port>", "MySQL port", (value) => Number(value))
-    .requiredOption("--database <database>", "MySQL database")
-    .requiredOption("--user <user>", "MySQL user")
+    .option("--engine <engine>", "mysql, postgresql, oracle, or dm", "mysql")
+    .requiredOption("--host <host>", "database host")
+    .requiredOption("--port <port>", "database port", (value) => Number(value))
+    .option("--database <database>", "database name")
+    .requiredOption("--user <user>", "database user")
     .option("--timezone <timezone>", "database timezone", "+08:00")
+    .option("--schema <schema>", "database schema")
+    .option("--service-name <name>", "Oracle service name")
+    .option("--sid <sid>", "Oracle SID")
+    .option("--jdbc-url <url>", "DM JDBC URL without credentials")
     .option("--datax-home <path>", "DataX installation path")
     .option("--kafka <servers...>", "Kafka bootstrap servers")
     .option("--secrets-stdin", "read a JSON object containing databasePassword and runtimeSigningSecret from stdin")
@@ -61,11 +66,16 @@ function registerConfigCommands(program, options) {
       const value = profileStore.add({
         name,
         db: {
+          engine: localOptions.engine,
           host: localOptions.host,
           port: localOptions.port,
-          database: localOptions.database,
           user: localOptions.user,
           timezone: localOptions.timezone,
+          ...(localOptions.database ? { database: localOptions.database } : {}),
+          ...(localOptions.schema ? { schema: localOptions.schema } : {}),
+          ...(localOptions.serviceName ? { serviceName: localOptions.serviceName } : {}),
+          ...(localOptions.sid ? { sid: localOptions.sid } : {}),
+          ...(localOptions.jdbcUrl ? { jdbcUrl: localOptions.jdbcUrl } : {}),
         },
         ...(localOptions.dataxHome ? { dataxHome: localOptions.dataxHome } : {}),
         ...(localOptions.kafka ? { kafkaBootstrapServers: localOptions.kafka } : {}),
