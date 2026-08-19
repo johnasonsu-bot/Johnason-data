@@ -2,13 +2,6 @@
   "schemaVersion": "1.0.0",
   "provider": "service-runtime",
   "transport": "external-published-service",
-  "approvedEndpointAllowlist": [],
-  "requiredEnvelopeMeta": [
-    "providerEndpointHost",
-    "auditId",
-    "eventId",
-    "idempotencyKeyHash"
-  ],
   "responses": {
     "success": { "status": 200, "contentType": "application/json" },
     "stream": { "status": 200, "contentType": "application/x-ndjson" },

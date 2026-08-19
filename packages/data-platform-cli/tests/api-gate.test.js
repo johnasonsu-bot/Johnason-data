@@ -2,9 +2,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { once } = require("node:events");
 const fs = require("node:fs");
+const path = require("node:path");
 const net = require("node:net");
 const dns = require("node:dns/promises");
-const crypto = require("node:crypto");
 const { spawnSync } = require("node:child_process");
 
 const { baseline, apiCapabilityIds } = require("./gate-harness");
@@ -13,6 +13,37 @@ const { createDomainCommands } = require("../src/registry/domain-commands");
 const { startExternalApiServer } = require("./fixtures/external-api-server");
 const { startModelProviderServer } = require("./fixtures/model-provider-server");
 const serviceRuntimeContract = require("./fixtures/service-runtime-contract.json");
+const apiGatePolicy = require("./fixtures/api-gate-policy.json");
+const apiGateCases = require("./fixtures/api-gate-cases.json");
+
+const workspaceRoot = path.resolve(__dirname, "../../..");
+const installPrefix = path.join(workspaceRoot, ".local", "data-platform-cli", "install");
+
+function isWithin(root, target) {
+  const relative = path.relative(root, target);
+  return relative && !relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative);
+}
+
+function findVerifiedLocalInstall() {
+  const prefix = fs.realpathSync(installPrefix);
+  const packageJson = path.join(prefix, "node_modules", "@johnason", "data-platform-cli", "package.json");
+  const packagePath = fs.realpathSync(packageJson);
+  if (!isWithin(prefix, packagePath)) throw new Error("packed CLI package is outside the approved local install prefix");
+  const installedPackage = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+  const sourcePackage = require("../package.json");
+  if (installedPackage.name !== "@johnason/data-platform-cli" || installedPackage.version !== sourcePackage.version) {
+    throw new Error("packed CLI package name or version does not match this repository");
+  }
+  const binRelative = installedPackage.bin?.["data-platform"];
+  if (typeof binRelative !== "string") throw new Error("packed CLI package does not declare data-platform bin");
+  const packageDirectory = path.dirname(packagePath);
+  const binary = fs.realpathSync(path.join(packageDirectory, binRelative));
+  const shim = fs.realpathSync(path.join(prefix, "node_modules", ".bin", "data-platform"));
+  if (binary !== shim || !isWithin(packageDirectory, binary) || !isWithin(prefix, binary)) {
+    throw new Error("packed CLI bin does not resolve to the repository-owned package bin");
+  }
+  return { prefix, binary, package: installedPackage };
+}
 
 function normalizeHost(host) {
   const value = String(host || "").trim().toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
@@ -39,12 +70,6 @@ async function assertApprovedEndpoint(host, allowedHosts, lookup = dns.lookup) {
   return normalized;
 }
 
-function readApprovedCases(file) {
-  const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
-  if (!Array.isArray(parsed.cases)) throw new TypeError("approved command-case file must include cases");
-  return parsed;
-}
-
 function isSafeCaseArgument(value) {
   return typeof value === "string" && !/password|secret|token|authorization|credential/i.test(value);
 }
@@ -53,42 +78,71 @@ function commandDefinition(capabilityId) {
   return createDomainCommands(createCapabilityCatalog()).find((definition) => definition.capabilityIds.includes(capabilityId));
 }
 
-function parseJsonEnvelope(stdout) {
-  const parsed = JSON.parse(stdout);
-  if (!parsed?.success || !parsed.meta) throw new Error("command did not return a successful JSON envelope with metadata");
-  return parsed;
+function parseCommandOutput(definition, stdout) {
+  if (definition.streamOutput === "ndjson") {
+    const records = String(stdout).trim().split("\n").filter(Boolean).map((line) => JSON.parse(line));
+    if (!records.length) throw new Error("NDJSON command output is empty");
+    return { format: "ndjson", records };
+  }
+  const envelope = JSON.parse(stdout);
+  if (!envelope?.success) throw new Error("command did not return a successful JSON envelope");
+  return { format: "json", envelope };
+}
+
+function apiProvider(capability) {
+  const targets = capability.executionTargets.filter((target) => target.kind === "api");
+  if (targets.length !== 1) throw new Error(`${capability.capabilityId} must declare exactly one API provider`);
+  return targets[0].provider;
+}
+
+function declaredEvidenceRequirements(capability) {
+  const requirements = [];
+  if (capability.audit?.required) requirements.push("auditId");
+  if (capability.event?.required) requirements.push("eventId");
+  if (capability.idempotency?.required) requirements.push("idempotencyKeyHash");
+  return requirements;
+}
+
+function outputValue(output, field) {
+  if (output.format === "json") return output.envelope.meta?.[field] ?? output.envelope.data?.[field];
+  return output.records.at(-1)?.meta?.[field] ?? output.records.at(-1)?.[field];
 }
 
 async function runApprovedApiGate({ env = process.env, spawn = spawnSync, lookup = dns.lookup } = {}) {
-  const endpointHost = env.CLI_API_GATE_APPROVED_ENDPOINT;
-  const casesFile = env.CLI_API_GATE_CASES;
-  const binary = env.CLI_API_GATE_BINARY;
   const profile = env.CLI_API_GATE_PROFILE;
-  if (!endpointHost || !casesFile || !binary || !profile) {
-    return { status: "blocked", failures: ["approved endpoint, case file, installed binary, and profile are required"] };
-  }
-  if (!serviceRuntimeContract.approvedEndpointAllowlist.length) {
-    return { status: "blocked", failures: ["no provider endpoint is approved in the versioned allowlist"] };
-  }
-  const failures = [];
-  let approvedHost;
-  let configured;
   try {
-    approvedHost = await assertApprovedEndpoint(endpointHost, serviceRuntimeContract.approvedEndpointAllowlist, lookup);
-    if (!fs.existsSync(binary)) throw new Error("installed data-platform binary is missing");
-    configured = readApprovedCases(casesFile);
-    if (normalizeHost(configured.endpointHost) !== approvedHost) throw new Error("command-case endpoint does not match the approved endpoint");
+    findVerifiedLocalInstall();
   } catch (error) {
     return { status: "failed", failures: [error.message] };
   }
   const expected = apiCapabilityIds();
-  const cases = new Map(configured.cases.map((entry) => [entry.capabilityId, entry]));
+  const catalog = createCapabilityCatalog();
+  const cases = new Map(apiGateCases.cases.map((entry) => [entry.capabilityId, entry]));
+  const blocked = [];
+  for (const capabilityId of expected) {
+    const capability = catalog.get(capabilityId);
+    const provider = apiProvider(capability);
+    if (!apiGatePolicy.providers?.[provider]?.approvedHosts?.length) blocked.push(`${capabilityId}: no committed approved host for ${provider}`);
+    if (!cases.has(capabilityId)) blocked.push(`${capabilityId}: no committed command case`);
+    if (!profile) blocked.push(`${capabilityId}: CLI_API_GATE_PROFILE is required`);
+    if (!capability.providerEvidenceContract?.outputField) blocked.push(`${capabilityId}: capability does not declare provider-output provenance`);
+    if (capability.interaction === "stream" && !capability.streamEvidenceContract?.terminalField) {
+      blocked.push(`${capabilityId}: stream capability does not declare a terminal evidence contract`);
+    }
+  }
+  if (blocked.length) return { status: "blocked", failures: blocked, tested: 0, expected: expected.length };
+  const installed = findVerifiedLocalInstall();
+  const providerHosts = new Map();
+  try {
+    for (const [provider, policy] of Object.entries(apiGatePolicy.providers)) {
+      providerHosts.set(provider, await Promise.all(policy.approvedHosts.map((host) => assertApprovedEndpoint(host, policy.approvedHosts, lookup))));
+    }
+  } catch (error) {
+    return { status: "failed", failures: [error.message] };
+  }
+  const failures = [];
   for (const capabilityId of expected) {
     const entry = cases.get(capabilityId);
-    if (!entry) {
-      failures.push(`untested command case: ${capabilityId}`);
-      continue;
-    }
     if (!Array.isArray(entry.args) || entry.args.some((argument) => !isSafeCaseArgument(argument))) {
       failures.push(`unsafe command arguments: ${capabilityId}`);
       continue;
@@ -98,25 +152,27 @@ async function runApprovedApiGate({ env = process.env, spawn = spawnSync, lookup
       failures.push(`missing CLI definition: ${capabilityId}`);
       continue;
     }
+    const capability = catalog.get(capabilityId);
     const apiIndex = definition.capabilityIds.indexOf(capabilityId);
-    const idempotencyKey = `api-gate-${crypto.createHash("sha256").update(capabilityId).digest("hex").slice(0, 24)}`;
-    const argv = ["--json", "--profile", profile, ...definition.command.split(" ")];
+    const argv = [definition.streamOutput === "ndjson" ? "--ndjson" : "--json", "--profile", profile, ...definition.command.split(" ")];
     if (definition.capabilityIds.length > 1) argv.push("--api-key", definition.sourceApiKeys[apiIndex]);
-    argv.push(...entry.args, "--idempotency-key", idempotencyKey);
-    const result = spawn(binary, argv, { encoding: "utf8", timeout: Number(env.CLI_API_GATE_TIMEOUT_MS || 120000) });
+    argv.push(...entry.args);
+    const result = spawn(installed.binary, argv, { encoding: "utf8", timeout: Number(env.CLI_API_GATE_TIMEOUT_MS || 120000) });
     if (result.error || result.status !== 0) {
       failures.push(`installed command failed: ${capabilityId}`);
       continue;
     }
     try {
-      const envelope = parseJsonEnvelope(result.stdout);
-      const meta = envelope.meta;
-      if (normalizeHost(meta.providerEndpointHost) !== approvedHost) throw new Error("provider endpoint metadata mismatch");
-      for (const field of serviceRuntimeContract.requiredEnvelopeMeta) {
-        if (!meta[field]) throw new Error(`missing command metadata: ${field}`);
+      const output = parseCommandOutput(definition, result.stdout);
+      const provider = apiProvider(capability);
+      const actualHost = normalizeHost(outputValue(output, capability.providerEvidenceContract.outputField));
+      if (!providerHosts.get(provider).includes(actualHost)) throw new Error("provider endpoint metadata is not an approved host");
+      for (const field of declaredEvidenceRequirements(capability)) {
+        if (!outputValue(output, field)) throw new Error(`missing declared command metadata: ${field}`);
       }
-      const expectedHash = crypto.createHash("sha256").update(idempotencyKey).digest("hex");
-      if (meta.idempotencyKeyHash !== expectedHash) throw new Error("idempotency metadata mismatch");
+      if (definition.streamOutput === "ndjson" && !outputValue(output, capability.streamEvidenceContract.terminalField)) {
+        throw new Error("missing declared NDJSON terminal evidence");
+      }
     } catch (error) {
       failures.push(`${capabilityId}: ${error.message}`);
     }
@@ -202,24 +258,51 @@ test("API gate enumerates every classified capability", () => {
   assert.equal(apiCapabilityIds().length, baseline.gates.apiClassified);
 });
 
-test("approved command harness stays blocked without an approved endpoint and command-case file", async () => {
-  const result = await runApprovedApiGate({ env: {} });
-  assert.equal(result.status, "blocked");
-  assert.match(result.failures.join("\n"), /approved endpoint/);
+test("gate locates and verifies only the repository-owned packed CLI install", () => {
+  const installed = findVerifiedLocalInstall();
+  assert.match(installed.binary, /\.local\/data-platform-cli\/install\/node_modules\/@johnason\/data-platform-cli\/bin\/data-platform\.js$/);
+  assert.equal(installed.package.name, "@johnason/data-platform-cli");
+  assert.equal(installed.package.version, require("../package.json").version);
 });
 
-test("approved command harness remains blocked until a provider host is versioned into the allowlist", async () => {
+test("provider policy is committed by provider and begins with no approved hosts", () => {
+  assert.deepEqual(apiGatePolicy.providers, {
+    "external-api": { approvedHosts: [] },
+    "model-provider": { approvedHosts: [] },
+    "service-runtime": { approvedHosts: [] },
+  });
+  assert.deepEqual(apiGateCases.cases, []);
+});
+
+test("API classifications map to the committed provider policy buckets", () => {
+  const counts = { "external-api": 0, "model-provider": 0, "service-runtime": 0 };
+  for (const capability of createCapabilityCatalog().values()) {
+    if (capability.executionTargets.some((target) => target.kind === "api")) counts[apiProvider(capability)] += 1;
+  }
+  assert.deepEqual(counts, { "external-api": 34, "model-provider": 1, "service-runtime": 2 });
+});
+
+test("stream output is parsed as NDJSON rather than as one JSON envelope", () => {
+  assert.deepEqual(parseCommandOutput({ streamOutput: "ndjson" }, '{"event":"progress"}\n{"event":"complete"}\n'), {
+    format: "ndjson",
+    records: [{ event: "progress" }, { event: "complete" }],
+  });
+});
+
+test("approved command harness lists classified capabilities blocked by absent committed policy and cases", async () => {
+  const result = await runApprovedApiGate({ env: {} });
+  assert.equal(result.status, "blocked");
+  assert.match(result.failures.join("\n"), /data-development\.028\.runcopilottaskstream: no committed approved host for external-api/);
+  assert.match(result.failures.join("\n"), /model-providers\.002\.testmodelprovider: no committed approved host for model-provider/);
+  assert.match(result.failures.join("\n"), /data-services\.031\.handleinvoke: no committed approved host for service-runtime/);
+});
+
+test("profile or arbitrary binary input does not override the committed provider policy", async () => {
   const result = await runApprovedApiGate({
-    env: {
-      CLI_API_GATE_APPROVED_ENDPOINT: "provider.example.test",
-      CLI_API_GATE_CASES: "not-read-without-approval.json",
-      CLI_API_GATE_BINARY: process.execPath,
-      CLI_API_GATE_PROFILE: "approved-profile",
-    },
-    lookup: async () => [{ address: "203.0.113.1" }],
+    env: { CLI_API_GATE_PROFILE: "approved-profile", CLI_API_GATE_BINARY: process.execPath },
   });
   assert.equal(result.status, "blocked");
-  assert.match(result.failures.join("\n"), /no provider endpoint is approved/);
+  assert.match(result.failures.join("\n"), /no committed approved host for external-api/);
 });
 
 test("approved endpoint validation rejects normalized and DNS-resolved loopback hosts", async () => {
@@ -233,14 +316,10 @@ test("approved endpoint validation rejects normalized and DNS-resolved loopback 
   );
 });
 
-test("service-runtime contract supplies the metadata consumed by real command evidence", () => {
-  assert.deepEqual(serviceRuntimeContract.approvedEndpointAllowlist, []);
-  assert.deepEqual(serviceRuntimeContract.requiredEnvelopeMeta, [
-    "providerEndpointHost",
-    "auditId",
-    "eventId",
-    "idempotencyKeyHash",
-  ]);
+test("service-runtime contract stays limited to controlled-fixture mechanics", () => {
+  assert.equal(serviceRuntimeContract.provider, "service-runtime");
+  assert.equal(Object.hasOwn(serviceRuntimeContract, "requiredEnvelopeMeta"), false);
+  assert.equal(Object.hasOwn(serviceRuntimeContract, "approvedEndpointAllowlist"), false);
 });
 
 test("API gate requires command-derived real evidence", async () => {

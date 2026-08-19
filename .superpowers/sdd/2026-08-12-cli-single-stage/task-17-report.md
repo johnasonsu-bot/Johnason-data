@@ -16,14 +16,9 @@ The API gate harness is stricter and its controlled-provider mechanics are cover
 
 - Added a loopback external API fixture covering JSON success, pagination, rate limiting, retry progression, timeout, malformed JSON, NDJSON streaming, and request cancellation.
 - Added a model-provider fixture covering model discovery and SSE completion streaming.
-- Added the published service-runtime contract fixture, explicitly marking loopback as ineligible for release evidence.
-- Extended the API gate to reject release evidence unless it has:
-  - the existing complete, real, non-mock, zero-bypass, zero-secret-findings evidence fields;
-  - a non-loopback provider fingerprint with a SHA-256 digest only;
-  - exactly one successful installed `data-platform` execution record for every classified capability;
-  - JSON/NDJSON format plus redacted audit, event, and idempotency references on every record; and
-  - no sensitive field names in the provider fingerprint or execution records.
-- Preserved the candidate's honest missing-evidence status as `blocked`; `CLI_API_GATE=1` therefore still fails, as required for absent approved infrastructure.
+- Added the published service-runtime fixture contract, explicitly marking loopback as ineligible for release evidence.
+- The current gate validates only actual CLI/capability contracts: committed provider policy and command cases, the repository-owned packed binary, declared output provenance, and declared audit/event/idempotency/stream-terminal fields when those fields actually exist. It does not accept self-declared evidence records.
+- Preserved the candidate's honest missing-evidence status as `blocked`; `CLI_API_GATE=1` therefore still fails with classified capability IDs and precise missing-policy/provenance reasons, as required for absent approved infrastructure.
 
 ## TDD evidence
 
@@ -36,7 +31,7 @@ The API gate harness is stricter and its controlled-provider mechanics are cover
 
 | Command | Result |
 | --- | --- |
-| `cd packages/data-platform-cli && npm test` | 70 passed, 0 failed |
+| `cd packages/data-platform-cli && npm test` | 74 passed, 0 failed |
 | `cd packages/data-platform-cli && npm run pack:check` | exit 0 |
 | `CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js` | expected failure: 8 passed, 1 failed because approved command-run inputs are absent |
 | `git diff --check` | clean |
@@ -61,4 +56,13 @@ Task 17 cannot be accepted until an approved real external API/model/service-run
 1. Added missing approved-harness and endpoint-validation tests; the focused suite failed with missing function references.
 2. Implemented the minimal command-derived harness; added a contract metadata expectation which failed until the contract declared the consumed metadata.
 3. Added a versioned-empty-allowlist test; it failed as `failed` until the harness was corrected to preserve `blocked` when no provider is approved.
-4. Final focused gate: 9 passed without release mode; full CLI suite: 70 passed. Strict release mode remains expected-blocked without approved infrastructure.
+4. Final focused gate: 9 passed without release mode; full CLI suite: 74 passed. Strict release mode remains expected-blocked without approved infrastructure.
+
+## Review round 2 remediation
+
+- Removed the environment-selected binary path. The gate discovers only `.local/data-platform-cli/install`, verifies the real path remains inside that prefix, requires package name `@johnason/data-platform-cli`, exact source-package version, and requires the local `.bin/data-platform` shim to resolve to that package's declared bin.
+- Replaced the single service-runtime allowlist with committed, secret-free provider policy buckets: `external-api`, `model-provider`, and `service-runtime`. The catalog check confirms their current classified counts are 34, 1, and 2 respectively. All host lists remain empty; no placeholder host was approved.
+- Added a committed, versioned command-case artifact. It is intentionally empty without approved infrastructure. The gate reports every classified capability as blocked with a precise missing policy/case/provenance reason.
+- Removed invented provider/audit/event/idempotency output requirements. The current capability/runtime contract declares none, so the gate does not claim them. If a future capability declares provenance, audit, event, idempotency, or stream-terminal contracts, the harness derives and validates those fields only from the installed CLI subprocess output.
+- Added format-aware output parsing: stream definitions are parsed line-by-line as NDJSON and can validate a declared terminal evidence field; JSON definitions require a successful JSON envelope.
+- Full redacted outputs are appended to `TEST.md`; its base/candidate labels remain explicit.
