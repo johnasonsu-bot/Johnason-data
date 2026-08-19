@@ -72,3 +72,38 @@ Task 17 cannot be accepted until an approved real external API/model/service-run
 - Added current-package provenance verification. When execution prerequisites are complete, the gate runs `npm pack --dry-run --json` for the current CLI source, hashes every packed file, and compares each byte-for-byte with the repository-owned local installed package. A same-version stale or modified install now fails.
 - Moved audit/event/idempotency requirements into the committed per-capability command-case schema. Every case must explicitly declare all three booleans; write capabilities must require all three and map their actual output paths. The gate reads only those mapped subprocess fields. Empty cases remain blocked.
 - Reordered the gate so provider policies, cases, profiles, and case contracts are checked before package provenance. Missing approved inputs return `blocked`; a missing or non-matching local package becomes `failed` only after the gate is otherwise ready to execute.
+
+## Review round 4 remediation
+
+- The two standalone installed-package provenance unit tests now register with a skip reason when the repository-owned `.local/data-platform-cli/install` prerequisite is absent. A present-but-invalid install is not skipped and still fails verification.
+- The production `runApprovedApiGate` order is unchanged: committed policy, cases, profile, and case contracts are evaluated before installed-package provenance.
+- The current-package byte-integrity implementation is unchanged. When execution prerequisites are ready it still derives the current `npm pack --dry-run --json` manifest and hashes every packed source/install file pair.
+
+### Review-fix TDD evidence
+
+1. Clean-environment reproduction before the fix used an in-process filesystem shim that forced `.local/data-platform-cli/install` to be absent, then loaded `api-gate.test.js`. Exact TAP summary: `tests 16`, `pass 14`, `fail 2`, `skipped 0`, exit `1`. The only failures were the two provenance tests at then-lines 307 and 314, both with `ENOENT` from `findVerifiedLocalInstall`; the blocked-policy gate test passed.
+2. Added `installed-package provenance unit tests skip when the local install prerequisite is absent` before adding the helper. Exact RED command and result:
+
+   ```text
+   node --test --test-name-pattern='installed-package provenance unit tests skip' packages/data-platform-cli/tests/api-gate.test.js
+   # tests 1
+   # pass 0
+   # fail 1
+   error: installedPackageProvenanceTestOptions is not defined
+   exit 1
+   ```
+
+3. Added the minimal prerequisite test option and applied it only to the two standalone provenance tests. Exact GREEN result for the command above: `tests 1`, `pass 1`, `fail 0`, exit `0`.
+4. Repeated the clean-environment shim after the fix. Exact TAP summary: `tests 17`, `pass 15`, `fail 0`, `skipped 2`, exit `0`; both provenance tests reported `# SKIP requires the repository-owned local CLI install`, while both blocked-policy tests passed.
+5. Repeated that shim with `CLI_API_GATE=1`. Exact TAP summary: `tests 17`, `pass 14`, `fail 1`, `skipped 2`, exit `1`; the only failure was the expected strict `blocked != accepted` assertion listing empty policy/case/profile reasons, with no `.local`/`ENOENT` provenance failure.
+
+### Fresh verification evidence
+
+| Command | Exit | Exact result |
+| --- | ---: | --- |
+| `node --test packages/data-platform-cli/tests/api-gate.test.js` | 0 | `tests 17`, `pass 17`, `fail 0`, `skipped 0`; both real installed-package provenance tests executed |
+| `cd packages/data-platform-cli && npm test` | 0 | `tests 78`, `pass 78`, `fail 0`, `skipped 0` |
+| `cd packages/data-platform-cli && npm run pack:check` | 0 | `@johnason/data-platform-cli@0.2.0`, `total files: 23` |
+| `CLI_API_GATE=1 node --test packages/data-platform-cli/tests/api-gate.test.js` | 1 (expected blocked) | `tests 17`, `pass 16`, `fail 1`, `skipped 0`; strict assertion received `blocked` because committed policies/cases remain empty |
+
+The expected strict blocker begins with `data-development.028.runcopilottaskstream: no committed approved host for external-api` and `data-development.028.runcopilottaskstream: no committed command case`; it does not fail on `.local` provenance first.

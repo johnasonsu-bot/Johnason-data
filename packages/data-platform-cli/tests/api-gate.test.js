@@ -21,6 +21,10 @@ const workspaceRoot = path.resolve(__dirname, "../../..");
 const installPrefix = path.join(workspaceRoot, ".local", "data-platform-cli", "install");
 const packageRoot = path.resolve(__dirname, "..");
 
+function installedPackageProvenanceTestOptions(prefix = installPrefix) {
+  return fs.existsSync(prefix) ? {} : { skip: "requires the repository-owned local CLI install" };
+}
+
 function isWithin(root, target) {
   const relative = path.relative(root, target);
   return relative && !relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative);
@@ -304,14 +308,21 @@ test("API gate enumerates every classified capability", () => {
   assert.equal(apiCapabilityIds().length, baseline.gates.apiClassified);
 });
 
-test("gate locates and verifies only the repository-owned packed CLI install", () => {
+test("installed-package provenance unit tests skip when the local install prerequisite is absent", () => {
+  const missingInstall = path.join(__dirname, "fixtures", "missing-data-platform-cli-install");
+  assert.deepEqual(installedPackageProvenanceTestOptions(missingInstall), {
+    skip: "requires the repository-owned local CLI install",
+  });
+});
+
+test("gate locates and verifies only the repository-owned packed CLI install", installedPackageProvenanceTestOptions(), () => {
   const installed = findVerifiedLocalInstall();
   assert.match(installed.binary, /\.local\/data-platform-cli\/install\/node_modules\/@johnason\/data-platform-cli\/bin\/data-platform\.js$/);
   assert.equal(installed.package.name, "@johnason/data-platform-cli");
   assert.equal(installed.package.version, require("../package.json").version);
 });
 
-test("gate binds the installed package files to the current npm-pack manifest", () => {
+test("gate binds the installed package files to the current npm-pack manifest", installedPackageProvenanceTestOptions(), () => {
   const installed = verifyCurrentPackedInstall();
   assert.equal(installed.package.name, "@johnason/data-platform-cli");
   assert.ok(installed.manifestFiles >= 20);
