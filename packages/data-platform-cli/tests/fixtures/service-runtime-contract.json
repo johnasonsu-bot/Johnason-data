@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "provider": "service-runtime",
+  "transport": "external-published-service",
+  "responses": {
+    "success": { "status": 200, "contentType": "application/json" },
+    "stream": { "status": 200, "contentType": "application/x-ndjson" },
+    "rateLimit": { "status": 429, "retryAfterSeconds": 1 },
+    "malformed": { "status": 200, "contentType": "application/json", "body": "invalid-json" }
+  },
+  "evidence": {
+    "requiresApprovedRealProvider": true,
+    "forbidsLoopbackAsReleaseEvidence": true,
+    "forbidsSecrets": true
+  }
+}
